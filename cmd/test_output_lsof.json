@@ -41,6 +41,12 @@
 			"subtitle": "List open files in a directory:",
 			"arg": "lsof +D {{path/to/directory}}",
 			"autocomplete": "lsof +D {{path/to/directory}}"
+		},
+		{
+			"title": "lsof -iTCP:{{port}} -sTCP:LISTEN",
+			"subtitle": "Find the process that is listening on a local TCP port:",
+			"arg": "lsof -iTCP:{{port}} -sTCP:LISTEN",
+			"autocomplete": "lsof -iTCP:{{port}} -sTCP:LISTEN"
 		}
 	]
 }

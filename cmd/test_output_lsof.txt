@@ -24,3 +24,6 @@ Note: Root privileges (or sudo) is required to list files opened by others.
 - [32mList open files in a directory:[33;0m
 [31mlsof +D [34mpath/to/directory[31m[33;0m
 
+- [32mFind the process that is listening on a local TCP port:[33;0m
+[31mlsof -iTCP:[34mport[31m -sTCP:LISTEN[33;0m
+
