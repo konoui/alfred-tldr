@@ -113,7 +113,7 @@ func (t *Tldr) FindPage(cmd string) (*Page, error) {
 
 		f, err := os.Open(path)
 		if err != nil {
-			return nil, err
+			return &Page{}, err
 		}
 		defer f.Close()
 
