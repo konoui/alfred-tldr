@@ -19,7 +19,9 @@ var (
 	errStream io.Writer = os.Stderr
 )
 
-var op tldr.Options
+var (
+	op tldr.Options
+)
 
 func init() {
 	platform := runtime.GOOS
@@ -65,7 +67,7 @@ func Execute(rootCmd *cobra.Command) {
 	}
 }
 
-type renderFunc func(*tldr.Page, error)
+type renderFunc func(*tldr.Page, bool, error)
 
 func run(cmd string, op tldr.Options, f renderFunc) error {
 	const tldrDir = ".tldr"
@@ -78,15 +80,13 @@ func run(cmd string, op tldr.Options, f renderFunc) error {
 	t := tldr.NewTldr(path, op)
 
 	err = t.OnInitialize()
-	if tldr.IsCacheExpired(err) {
-		// if cache is expired, show error and pass
-		fmt.Fprintln(errStream, err.Error())
-	} else if err != nil {
+	isCacheExpired := tldr.IsCacheExpired(err)
+	if isCacheExpired && err != nil {
 		return err
 	}
 
 	p, err := t.FindPage(cmd)
-	f(p, err)
+	f(p, isCacheExpired, err)
 
 	return nil
 }
@@ -99,8 +99,13 @@ const (
 	reset = "\x1b[33;0m"
 )
 
-func renderToOut(p *tldr.Page, err error) {
-	if err != nil {
+func renderToOut(p *tldr.Page, isCacheExpired bool, pageErr error) {
+	if isCacheExpired {
+		fmt.Fprintln(errStream, tldr.CacheExpiredMsg)
+		fmt.Fprintln(errStream)
+	}
+
+	if pageErr != nil {
 		fmt.Fprintln(errStream, "This page doesn't exist yet!\nSubmit new pages here: https://github.com/tldr-pages/tldr")
 		return
 	}
@@ -120,7 +125,7 @@ func renderToOut(p *tldr.Page, err error) {
 	}
 }
 
-func renderToWorkflow(p *tldr.Page, err error) {
+func renderToWorkflow(p *tldr.Page, isCacheExpired bool, pageErr error) {
 	wf := alfred.New()
 	for _, cmd := range p.CmdExamples {
 		wf.Append(alfred.Item{

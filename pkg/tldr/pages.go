@@ -7,9 +7,13 @@ import (
 	"time"
 )
 
-const pageSource = "https://tldr.sh/assets/tldr.zip"
-const indexSource = "https://tldr.sh/assets/index.json"
-const cacheExpiredErr = "more than a week passed, should update tldr using --update"
+const (
+	pageSource      = "https://tldr.sh/assets/tldr.zip"
+	indexSource     = "https://tldr.sh/assets/index.json"
+	cacheExpiredErr = "more than a week passed, should update tldr using --update"
+	// CacheExpiredMsg a message to tell user should update
+	CacheExpiredMsg = cacheExpiredErr
+)
 
 // Options are tldr functions
 type Options struct {
