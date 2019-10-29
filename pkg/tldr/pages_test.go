@@ -147,7 +147,7 @@ func TestOnInitialize(t *testing.T) {
 			},
 		},
 		{
-			description: "failed test due to cache expired",
+			description: "failed test due to expired cache",
 			expectErr:   true,
 			tldr: Tldr{
 				path:           filepath.Join(os.TempDir(), ".tldr"),

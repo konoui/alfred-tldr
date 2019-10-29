@@ -11,12 +11,12 @@ const (
 	pageSource      = "https://tldr.sh/assets/tldr.zip"
 	indexSource     = "https://tldr.sh/assets/index.json"
 	cacheExpiredErr = "more than a week passed, should update tldr using --update"
-	// CacheExpiredMsg a message to tell user should update
+	// CacheExpiredMsg a message to tell users should update
 	CacheExpiredMsg = cacheExpiredErr
 )
 
 var (
-	// CacheMaxAge tildr page cache expired time. default is a week.
+	// CacheMaxAge tldr page cache age. default is a week.
 	// you should not override.
 	CacheMaxAge time.Duration = 24 * 7 * time.Hour
 )
@@ -110,12 +110,12 @@ func (t *Tldr) Update() error {
 	return nil
 }
 
-// FindPage find tldr page by `cmd`
+// FindPage find tldr page by `cmds`
 func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 	for _, pt := range t.platformDirs {
-		path := filepath.Join(t.path, t.langDir, pt, convertCmdToPage(cmds))
+		path := filepath.Join(t.path, t.langDir, pt, concatCmds(cmds)+".md")
 		if !pathExists(path) {
-			// try to find it in next platform if cmd does not exists
+			// if cmd does not exist, try to find it in next platform
 			continue
 		}
 
@@ -131,11 +131,12 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 	return &Page{}, fmt.Errorf("not found %s page", cmds)
 }
 
-func convertCmdToPage(cmds []string) string {
-	var pageCmd = cmds[0]
+func concatCmds(cmds []string) string {
+	pageCmd := cmds[0]
 	for _, cmd := range cmds[1:] {
+		// concat sub command with `-`
 		pageCmd = pageCmd + "-" + cmd
 	}
 
-	return pageCmd + ".md"
+	return pageCmd
 }

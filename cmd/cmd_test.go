@@ -54,7 +54,7 @@ func TestExecute(t *testing.T) {
 			errMsg:      "",
 		},
 		{
-			description: "text output tests with cache expired with lsof.",
+			description: "text output tests with expired cache with lsof.",
 			expectErr:   false,
 			command:     "lsof",
 			filepath:    "./test_output_lsof.txt",
@@ -62,7 +62,7 @@ func TestExecute(t *testing.T) {
 			errMsg:      fmt.Sprintf("%s\n", tldr.CacheExpiredMsg),
 		},
 		{
-			description: "alfred workflow tests with cache expired with lsof. alfred workflow show no error",
+			description: "alfred workflow tests with expired cache with lsof. alfred workflow show no error",
 			expectErr:   false,
 			command:     "lsof --workflow",
 			filepath:    "./test_output_lsof.json",

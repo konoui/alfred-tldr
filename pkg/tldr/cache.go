@@ -23,7 +23,7 @@ func NewCache(dir, file string, maxAge time.Duration) *Cache {
 }
 
 // Clear remove cache file if exists
-func (c Cache) Clear() error {
+func (c *Cache) Clear() error {
 	p := c.path()
 	if pathExists(p) {
 		return os.RemoveAll(p)
@@ -32,12 +32,12 @@ func (c Cache) Clear() error {
 }
 
 // NotExpired return true if cache is not expired
-func (c Cache) NotExpired() bool {
+func (c *Cache) NotExpired() bool {
 	return !c.Expired()
 }
 
 // Expired return true if cache is expired
-func (c Cache) Expired() bool {
+func (c *Cache) Expired() bool {
 	age, err := c.Age()
 	if err != nil {
 		return true
@@ -46,7 +46,7 @@ func (c Cache) Expired() bool {
 }
 
 // Age return the time since the data is cached at
-func (c Cache) Age() (time.Duration, error) {
+func (c *Cache) Age() (time.Duration, error) {
 	p := c.path()
 	fi, err := os.Stat(p)
 	if err != nil {
@@ -56,12 +56,12 @@ func (c Cache) Age() (time.Duration, error) {
 }
 
 // Exists return true if the cache file exists
-func (c Cache) Exists() bool {
+func (c *Cache) Exists() bool {
 	return pathExists(c.path())
 }
 
 // path return the path of cache file
-func (c Cache) path() string {
+func (c *Cache) path() string {
 	return filepath.Join(c.dir, c.file)
 }
 
