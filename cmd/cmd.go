@@ -51,7 +51,7 @@ func NewRootCmd() *cobra.Command {
 		SilenceUsage: true,
 	}
 	rootCmd.PersistentFlags().StringVarP(&op.Platform, "platform", "p", op.Platform, "platform")
-	rootCmd.PersistentFlags().StringVarP(&op.Language, "language", "l", op.Language, "language")
+	//rootCmd.PersistentFlags().StringVarP(&op.Language, "language", "l", op.Language, "language")
 	rootCmd.PersistentFlags().BoolVarP(&op.Update, "update", "u", op.Update, "update")
 	rootCmd.PersistentFlags().BoolVarP(&isWorkflow, "workflow", "w", false, "rendering for alfred workflow")
 
@@ -81,7 +81,7 @@ func run(cmd string, op tldr.Options, f renderFunc) error {
 
 	err = t.OnInitialize()
 	isCacheExpired := tldr.IsCacheExpired(err)
-	if isCacheExpired && err != nil {
+	if !isCacheExpired && err != nil {
 		return err
 	}
 
@@ -101,8 +101,7 @@ const (
 
 func renderToOut(p *tldr.Page, isCacheExpired bool, pageErr error) {
 	if isCacheExpired {
-		fmt.Fprintln(errStream, tldr.CacheExpiredMsg)
-		fmt.Fprintln(errStream)
+		fmt.Fprintf(errStream, "%s\n", tldr.CacheExpiredMsg)
 	}
 
 	if pageErr != nil {

@@ -15,6 +15,12 @@ const (
 	CacheExpiredMsg = cacheExpiredErr
 )
 
+var (
+	// CacheMaxAge tildr page cache expired time. default is a week.
+	// you should not override.
+	CacheMaxAge time.Duration = 24 * 7 * time.Hour
+)
+
 // Options are tldr functions
 type Options struct {
 	Platform string
@@ -32,6 +38,7 @@ type Tldr struct {
 	platformDirs   []string
 	langDir        string
 	update         bool
+	cacheMaxAge    time.Duration
 }
 
 // NewTldr create a instance of tldr repository
@@ -45,6 +52,7 @@ func NewTldr(tldrPath string, op Options) *Tldr {
 		platformDirs:   []string{op.Platform, "common"},
 		langDir:        convertToLangDir(op.Language),
 		update:         op.Update,
+		cacheMaxAge:    CacheMaxAge,
 	}
 }
 
@@ -67,7 +75,7 @@ func (t *Tldr) OnInitialize() error {
 		}
 	}
 
-	cache := NewCache(t.path, t.indexFile, 24*7*time.Hour)
+	cache := NewCache(t.path, t.indexFile, t.cacheMaxAge)
 	if cache.Expired() {
 		return fmt.Errorf(cacheExpiredErr)
 	}

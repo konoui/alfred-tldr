@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 )
 
 func TestFindPage(t *testing.T) {
@@ -122,6 +123,7 @@ func TestOnInitialize(t *testing.T) {
 				indexFile:      filepath.Base(indexSource),
 				zipFile:        filepath.Base(pageSource),
 				update:         true,
+				cacheMaxAge:    24 * 7 * time.Hour,
 			},
 		},
 		{
@@ -136,6 +138,19 @@ func TestOnInitialize(t *testing.T) {
 				platformDirs:   []string{"linux", "common"},
 				langDir:        "pages",
 				update:         false,
+			},
+		},
+		{
+			description: "failed test due to cache expired",
+			expectErr:   true,
+			tldr: Tldr{
+				path:           filepath.Join(os.TempDir(), ".tldr"),
+				pageSourceURL:  pageSource,
+				indexSourceURL: indexSource,
+				indexFile:      filepath.Base(indexSource),
+				zipFile:        filepath.Base(pageSource),
+				update:         false,
+				cacheMaxAge:    0 * time.Hour,
 			},
 		},
 	}
