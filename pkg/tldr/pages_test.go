@@ -12,19 +12,25 @@ func TestFindPage(t *testing.T) {
 		description string
 		want        string
 		expectErr   bool
-		cmd         string
+		cmds        []string
 	}{
 		{
 			description: "valid cmd",
 			expectErr:   false,
 			want:        "lsof",
-			cmd:         "lsof",
+			cmds:        []string{"lsof"},
+		},
+		{
+			description: "valid cmd and sub cmd",
+			expectErr:   false,
+			want:        "git checkout",
+			cmds:        []string{"git", "checkout"},
 		},
 		{
 			description: "invalid cmd, response will be empty Page struct",
 			expectErr:   true,
 			want:        "",
-			cmd:         "lsofaaaaaaaaaaaaaaa",
+			cmds:        []string{"lsofaaaaaaaaaaaaaaa"},
 		},
 	}
 	for _, tt := range tests {
@@ -38,7 +44,7 @@ func TestFindPage(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			page, err := tldr.FindPage(tt.cmd)
+			page, err := tldr.FindPage(tt.cmds)
 			if tt.expectErr && err == nil {
 				t.Errorf("expect error happens, but got response")
 			}

@@ -111,9 +111,9 @@ func (t *Tldr) Update() error {
 }
 
 // FindPage find tldr page by `cmd`
-func (t *Tldr) FindPage(cmd string) (*Page, error) {
+func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 	for _, pt := range t.platformDirs {
-		path := filepath.Join(t.path, t.langDir, pt, cmd+".md")
+		path := filepath.Join(t.path, t.langDir, pt, convertCmdToPage(cmds))
 		if !pathExists(path) {
 			// try to find it in next platform if cmd does not exists
 			continue
@@ -128,5 +128,14 @@ func (t *Tldr) FindPage(cmd string) (*Page, error) {
 		return parsePage(f)
 	}
 
-	return &Page{}, fmt.Errorf("not found %s page", cmd)
+	return &Page{}, fmt.Errorf("not found %s page", cmds)
+}
+
+func convertCmdToPage(cmds []string) string {
+	var pageCmd = cmds[0]
+	for _, cmd := range cmds[1:] {
+		pageCmd = pageCmd + "-" + cmd
+	}
+
+	return pageCmd + ".md"
 }

@@ -38,6 +38,22 @@ func TestExecute(t *testing.T) {
 			errMsg:      "",
 		},
 		{
+			description: "text output tests sub cmd tests with git checkout",
+			expectErr:   false,
+			command:     "git checkout --update",
+			filepath:    "./test_output_git-checkout.txt",
+			cacheMaxAge: tldr.CacheMaxAge,
+			errMsg:      "",
+		},
+		{
+			description: "alfred workflow sub cmd tests with git checkout",
+			expectErr:   false,
+			command:     "git checkout --update --workflow",
+			filepath:    "./test_output_git-checkout.json",
+			cacheMaxAge: tldr.CacheMaxAge,
+			errMsg:      "",
+		},
+		{
 			description: "text output tests with cache expired with lsof.",
 			expectErr:   false,
 			command:     "lsof",

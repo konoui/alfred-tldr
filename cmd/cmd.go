@@ -44,9 +44,9 @@ func NewRootCmd() *cobra.Command {
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if isWorkflow {
-				return run(args[0], op, renderToWorkflow)
+				return run(args, op, renderToWorkflow)
 			}
-			return run(args[0], op, renderToOut)
+			return run(args, op, renderToOut)
 		},
 		SilenceUsage: true,
 	}
@@ -69,7 +69,7 @@ func Execute(rootCmd *cobra.Command) {
 
 type renderFunc func(*tldr.Page, bool, error)
 
-func run(cmd string, op tldr.Options, f renderFunc) error {
+func run(cmds []string, op tldr.Options, f renderFunc) error {
 	const tldrDir = ".tldr"
 	home, err := homedir.Dir()
 	if err != nil {
@@ -85,7 +85,7 @@ func run(cmd string, op tldr.Options, f renderFunc) error {
 		return err
 	}
 
-	p, err := t.FindPage(cmd)
+	p, err := t.FindPage(cmds)
 	f(p, isCacheExpired, err)
 
 	return nil
