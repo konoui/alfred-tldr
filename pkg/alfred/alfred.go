@@ -2,6 +2,7 @@ package alfred
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 // see https://www.alfredapp.com/help/workflows/inputs/script-filter/json/
@@ -12,9 +13,22 @@ type Icon struct {
 	Path string `json:"path,omitempty"`
 }
 
+// ModKey is a mod key pressed by the user to run an alternate
+type ModKey string
+
+// Valid attribute to mark if the result is valid based on the modifier selection and set a different arg to be passed out if actioned with the modifier.
+const (
+	ModCmd   ModKey = "cmd"   // Alternate action for ⌘↩
+	ModAlt   ModKey = "alt"   // Alternate action for ⌥↩
+	ModOpt   ModKey = "alt"   // Synonym for ModAlt
+	ModCtrl  ModKey = "ctrl"  // Alternate action for ^↩
+	ModShift ModKey = "shift" // Alternate action for ⇧↩
+	ModFn    ModKey = "fn"    // Alternate action for fn↩
+)
+
 // Mod element gives you control over how the modifier keys react
 type Mod struct {
-	Variables map[string]string `json:"variables,omitempty"`
+	Variables map[ModKey]string `json:"variables,omitempty"`
 	Valid     *bool             `json:"valid,omitempty"`
 	Arg       string            `json:"arg,omitempty"`
 	Subtitle  string            `json:"subtitle,omitempty"`
@@ -53,21 +67,11 @@ type Variables map[string]string
 // Items array of `item`
 type Items []Item
 
-// Alfred Script Filter JSON Format
-type Alfred struct {
+// ScriptFilter JSON Format
+type ScriptFilter struct {
 	rerun     Rerun
 	variables Variables
 	items     Items
-}
-
-// New creates a new Workflow
-func New() *Alfred {
-	return &Alfred{}
-}
-
-// Append a new Item to alfred
-func (a *Alfred) Append(item Item) {
-	a.items = append(a.items, item)
 }
 
 type out struct {
@@ -76,27 +80,85 @@ type out struct {
 	Items     Items     `json:"items"`
 }
 
-const errJSON = `{
-    "items": [{
-	    "title": "no matching entry",
-	    "subtitle": "Try a different query?"
-    }]
-}`
+// NewScriptFilter creates a new ScriptFilter
+func NewScriptFilter() *ScriptFilter {
+	return &ScriptFilter{}
+}
 
-// Marshal as Workflow as Json
-func (a *Alfred) Marshal() string {
-	if len(a.items) == 0 {
-		return errJSON
-	}
-	obj, err := json.MarshalIndent(
+// Append a new Item to Items
+func (w *ScriptFilter) Append(item Item) {
+	w.items = append(w.items, item)
+}
+
+// Marshal ScriptFilter as Json
+func (w *ScriptFilter) Marshal() ([]byte, error) {
+	return json.MarshalIndent(
 		out{
-			Rerun:     a.rerun,
-			Variables: a.variables,
-			Items:     a.items,
+			Rerun:     w.rerun,
+			Variables: w.variables,
+			Items:     w.items,
 		}, "", "	")
-	if err != nil {
-		return errJSON
+}
+
+// Workflow is map of ScriptFilters
+type Workflow struct {
+	std  *ScriptFilter
+	warn *ScriptFilter
+	err  *ScriptFilter
+}
+
+// NewWorkflow has simple ScriptFilter api
+func NewWorkflow() Workflow {
+	return Workflow{
+		std:  NewScriptFilter(),
+		warn: NewScriptFilter(),
+		err:  NewScriptFilter(),
+	}
+}
+
+// Append a new Item to standard ScriptFilter
+func (awf Workflow) Append(item Item) {
+	awf.std.Append(item)
+}
+
+// EmptyWarning create a new Item to Marshal　when there are no standard items
+func (awf Workflow) EmptyWarning(title, subtitle string) {
+	awf.warn.Append(
+		Item{
+			Title:    title,
+			Subtitle: subtitle,
+		})
+}
+
+// Warning append a new Item to error ScriptFilter
+func (awf Workflow) error(title, subtitle string) {
+	awf.err.Append(
+		Item{
+			Title:    title,
+			Subtitle: subtitle,
+		})
+}
+
+// Marshal WorkFlow results
+func (awf Workflow) Marshal() []byte {
+	wf := awf.std
+	if len(wf.items) == 0 {
+		warnRes, err := awf.warn.Marshal()
+		if err != nil {
+			return []byte("")
+		}
+		return warnRes
 	}
 
-	return string(obj)
+	res, err := wf.Marshal()
+	if err != nil {
+		awf.error(fmt.Sprintf("An Error Occurs: %s", err.Error()), fmt.Sprintf("items length: %d, items: %v", len(wf.items), wf.items))
+		errRes, err := awf.err.Marshal()
+		if err != nil {
+			return []byte("")
+		}
+		return errRes
+	}
+
+	return res
 }

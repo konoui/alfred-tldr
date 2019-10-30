@@ -60,7 +60,7 @@ func NewRootCmd() *cobra.Command {
 
 // Execute Execute root cmd
 func Execute(rootCmd *cobra.Command) {
-	rootCmd.SetOutput(os.Stdout)
+	rootCmd.SetOutput(outStream)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(errStream, err)
 		os.Exit(1)
@@ -125,9 +125,9 @@ func renderToOut(p *tldr.Page, isCacheExpired bool, pageErr error) {
 }
 
 func renderToWorkflow(p *tldr.Page, isCacheExpired bool, pageErr error) {
-	wf := alfred.New()
+	awf := alfred.NewWorkflow()
 	for _, cmd := range p.CmdExamples {
-		wf.Append(alfred.Item{
+		awf.Append(alfred.Item{
 			Title:        cmd.Cmd,
 			Subtitle:     cmd.Description,
 			Autocomplete: cmd.Cmd,
@@ -135,5 +135,7 @@ func renderToWorkflow(p *tldr.Page, isCacheExpired bool, pageErr error) {
 		})
 	}
 
-	fmt.Fprintln(outStream, wf.Marshal())
+	awf.EmptyWarning("No matching query", "Try a different query")
+	res := awf.Marshal()
+	fmt.Fprintln(outStream, string(res))
 }
