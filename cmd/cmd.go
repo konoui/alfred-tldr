@@ -125,9 +125,9 @@ func renderToOut(p *tldr.Page, isCacheExpired bool, pageErr error) {
 }
 
 func renderToWorkflow(p *tldr.Page, isCacheExpired bool, pageErr error) {
-	wf := alfred.New()
+	awf := alfred.NewWorkflow()
 	for _, cmd := range p.CmdExamples {
-		wf.Append(alfred.Item{
+		awf.Append(alfred.Item{
 			Title:        cmd.Cmd,
 			Subtitle:     cmd.Description,
 			Autocomplete: cmd.Cmd,
@@ -135,5 +135,7 @@ func renderToWorkflow(p *tldr.Page, isCacheExpired bool, pageErr error) {
 		})
 	}
 
-	fmt.Fprintln(outStream, wf.Marshal())
+	awf.Warning("No matching bookmarks", "Try a different query")
+	res := awf.Marshal()
+	fmt.Fprintln(outStream, string(res))
 }

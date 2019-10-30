@@ -2,6 +2,7 @@ package alfred
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 // see https://www.alfredapp.com/help/workflows/inputs/script-filter/json/
@@ -53,21 +54,21 @@ type Variables map[string]string
 // Items array of `item`
 type Items []Item
 
-// Alfred Script Filter JSON Format
-type Alfred struct {
+// ScriptFilter JSON Format
+type ScriptFilter struct {
 	rerun     Rerun
 	variables Variables
 	items     Items
 }
 
-// New creates a new Workflow
-func New() *Alfred {
-	return &Alfred{}
+// NewScriptFilter creates a new ScriptFilter
+func NewScriptFilter() *ScriptFilter {
+	return &ScriptFilter{}
 }
 
-// Append a new Item to alfred
-func (a *Alfred) Append(item Item) {
-	a.items = append(a.items, item)
+// Append a new Item to Items
+func (w *ScriptFilter) append(item Item) {
+	w.items = append(w.items, item)
 }
 
 type out struct {
@@ -76,27 +77,71 @@ type out struct {
 	Items     Items     `json:"items"`
 }
 
-const errJSON = `{
-    "items": [{
-	    "title": "no matching entry",
-	    "subtitle": "Try a different query?"
-    }]
-}`
-
-// Marshal as Workflow as Json
-func (a *Alfred) Marshal() string {
-	if len(a.items) == 0 {
-		return errJSON
-	}
-	obj, err := json.MarshalIndent(
+// Marshal as ScriptFilter as Json
+func (w *ScriptFilter) Marshal() ([]byte, error) {
+	return json.MarshalIndent(
 		out{
-			Rerun:     a.rerun,
-			Variables: a.variables,
-			Items:     a.items,
+			Rerun:     w.rerun,
+			Variables: w.variables,
+			Items:     w.items,
 		}, "", "	")
-	if err != nil {
-		return errJSON
+}
+
+type wfKey string
+
+const (
+	std  wfKey = "std"
+	warn wfKey = "warn"
+	err  wfKey = "err"
+)
+
+// Workflow has standard and error Workflow
+type Workflow map[wfKey]*ScriptFilter
+
+// NewWorkflow creates a new AlfredWorkflow
+func NewWorkflow() Workflow {
+	return Workflow{
+		std:  NewScriptFilter(),
+		warn: NewScriptFilter(),
+		err:  NewScriptFilter(),
+	}
+}
+
+// Append a new Item to standard ScriptFilter
+func (awf Workflow) Append(item Item) {
+	awf[std].append(item)
+}
+
+// Warning append a new Item to error ScriptFilter
+func (awf Workflow) Warning(title, subtitle string) {
+	awf[warn].append(
+		Item{
+			Title:    title,
+			Subtitle: subtitle,
+		})
+}
+
+// Marshal WorkFlow results
+func (awf Workflow) Marshal() []byte {
+	wf := awf[std]
+	if len(wf.items) == 0 {
+		warnRes, err := awf[warn].Marshal()
+		if err != nil {
+			return []byte("")
+		}
+		return warnRes
 	}
 
-	return string(obj)
+	res, err := wf.Marshal()
+	if err != nil {
+		// FIXME should create a new workflow and use it to set Error
+		awf.Warning("An Error Occurs... ", fmt.Sprintf("items length: %d, items: %v", len(wf.items), wf.items))
+		warnRes, err := awf[warn].Marshal()
+		if err != nil {
+			return []byte("")
+		}
+		return warnRes
+	}
+
+	return res
 }
