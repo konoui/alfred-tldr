@@ -63,13 +63,16 @@ func convertToLangDir(lang string) string {
 
 // OnInitialize create tldr directory and check tldr pages whether cache expired or not
 func (t *Tldr) OnInitialize() error {
+	initUpdate := false
 	if !pathExists(t.path) {
 		if err := os.Mkdir(t.path, 0755); err != nil {
 			return err
 		}
+		// automatically updated if indexfile does not exist
+		initUpdate = true
 	}
 
-	if t.update {
+	if t.update || initUpdate {
 		if err := t.Update(); err != nil {
 			return err
 		}
