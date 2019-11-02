@@ -2,7 +2,6 @@ package alfred
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -38,7 +37,7 @@ func TestScriptFilterMarshal(t *testing.T) {
 		items       Items
 	}{
 		{
-			description: "create new workflow",
+			description: "create new scriptfilter",
 			filepath:    "./test_scriptfilter_marshal.json",
 			items: Items{
 				Item{
@@ -60,7 +59,7 @@ func TestScriptFilterMarshal(t *testing.T) {
 			}
 			defer f.Close()
 
-			v, err := ioutil.ReadAll(f)
+			want, err := ioutil.ReadAll(f)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -70,7 +69,7 @@ func TestScriptFilterMarshal(t *testing.T) {
 				wf.Append(item)
 			}
 
-			res, err := wf.Marshal()
+			got, err := wf.Marshal()
 			if tt.expectErr && err == nil {
 				t.Errorf("expect error happens, but got response")
 			}
@@ -79,14 +78,8 @@ func TestScriptFilterMarshal(t *testing.T) {
 				t.Errorf("unexpected error want: got: %+v", err.Error())
 			}
 
-			want := string(v)
-			got := string(res)
-			ret, err := AreEqualJSON(want, got)
-			if !tt.expectErr && err != nil {
-				t.Errorf("unexpected error want: got: %+v", err.Error())
-			}
-			if !ret {
-				t.Errorf("unexpected response: want: \n%+v, got: \n%+v", want, got)
+			if !EqualJSON(want, got) {
+				t.Errorf("unexpected response: want: \n%+v, got: \n%+v", string(want), string(got))
 			}
 		})
 	}
@@ -117,19 +110,78 @@ func TestNewWorkflow(t *testing.T) {
 	}
 }
 
-func AreEqualJSON(s1, s2 string) (bool, error) {
-	var o1 interface{}
-	var o2 interface{}
-
-	var err error
-	err = json.Unmarshal([]byte(s1), &o1)
-	if err != nil {
-		return false, fmt.Errorf("error mashalling string 1 :: %s", err.Error())
+func TestWorfkflowMarshal(t *testing.T) {
+	tests := []struct {
+		description string
+		filepath    string
+		items       Items
+		emptyItem   Item
+	}{
+		{
+			description: "output standard items",
+			filepath:    "./test_scriptfilter_marshal.json",
+			items: Items{
+				Item{
+					Title:    "title1",
+					Subtitle: "subtitle1",
+				},
+				Item{
+					Title:    "title2",
+					Subtitle: "subtitle2",
+				},
+			},
+			emptyItem: Item{
+				Title:    "emptyTitle1",
+				Subtitle: "emptySubtitle",
+			},
+		},
+		{
+			description: "output empty warning",
+			filepath:    "./test_scriptfilter_empty_warning_marshal.json",
+			items:       Items{},
+			emptyItem: Item{
+				Title:    "emptyTitle1",
+				Subtitle: "emptySubtitle1",
+			},
+		},
 	}
-	err = json.Unmarshal([]byte(s2), &o2)
-	if err != nil {
-		return false, fmt.Errorf("error mashalling string 2 :: %s", err.Error())
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			f, err := os.Open(tt.filepath)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer f.Close()
+
+			want, err := ioutil.ReadAll(f)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			awf := NewWorkflow()
+			awf.EmptyWarning(tt.emptyItem.Title, tt.emptyItem.Subtitle)
+			for _, item := range tt.items {
+				awf.Append(item)
+			}
+
+			got := awf.Marshal()
+			if !EqualJSON(want, got) {
+				t.Errorf("unexpected response: want: \n%+v, got: \n%+v", string(want), string(got))
+			}
+		})
+	}
+}
+
+func EqualJSON(a, b []byte) bool {
+	var ao interface{}
+	var bo interface{}
+
+	if err := json.Unmarshal(a, &ao); err != nil {
+		return false
+	}
+	if err := json.Unmarshal(b, &bo); err != nil {
+		return false
 	}
 
-	return reflect.DeepEqual(o1, o2), nil
+	return reflect.DeepEqual(ao, bo)
 }
