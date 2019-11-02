@@ -60,7 +60,7 @@ func NewRootCmd() *cobra.Command {
 
 // Execute Execute root cmd
 func Execute(rootCmd *cobra.Command) {
-	rootCmd.SetOutput(os.Stdout)
+	rootCmd.SetOutput(outStream)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(errStream, err)
 		os.Exit(1)
@@ -135,7 +135,7 @@ func renderToWorkflow(p *tldr.Page, isCacheExpired bool, pageErr error) {
 		})
 	}
 
-	awf.Warning("No matching bookmarks", "Try a different query")
+	awf.EmptyWarning("No matching query", "Try a different query")
 	res := awf.Marshal()
 	fmt.Fprintln(outStream, string(res))
 }

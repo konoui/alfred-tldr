@@ -13,9 +13,22 @@ type Icon struct {
 	Path string `json:"path,omitempty"`
 }
 
+// ModKey is a mod key pressed by the user to run an alternate
+type ModKey string
+
+// Valid attribute to mark if the result is valid based on the modifier selection and set a different arg to be passed out if actioned with the modifier.
+const (
+	ModCmd   ModKey = "cmd"   // Alternate action for ⌘↩
+	ModAlt   ModKey = "alt"   // Alternate action for ⌥↩
+	ModOpt   ModKey = "alt"   // Synonym for ModAlt
+	ModCtrl  ModKey = "ctrl"  // Alternate action for ^↩
+	ModShift ModKey = "shift" // Alternate action for ⇧↩
+	ModFn    ModKey = "fn"    // Alternate action for fn↩
+)
+
 // Mod element gives you control over how the modifier keys react
 type Mod struct {
-	Variables map[string]string `json:"variables,omitempty"`
+	Variables map[ModKey]string `json:"variables,omitempty"`
 	Valid     *bool             `json:"valid,omitempty"`
 	Arg       string            `json:"arg,omitempty"`
 	Subtitle  string            `json:"subtitle,omitempty"`
@@ -61,23 +74,23 @@ type ScriptFilter struct {
 	items     Items
 }
 
-// NewScriptFilter creates a new ScriptFilter
-func NewScriptFilter() *ScriptFilter {
-	return &ScriptFilter{}
-}
-
-// Append a new Item to Items
-func (w *ScriptFilter) append(item Item) {
-	w.items = append(w.items, item)
-}
-
 type out struct {
 	Rerun     Rerun     `json:"rerun,omitempty"`
 	Variables Variables `json:"variables,omitempty"`
 	Items     Items     `json:"items"`
 }
 
-// Marshal as ScriptFilter as Json
+// NewScriptFilter creates a new ScriptFilter
+func NewScriptFilter() *ScriptFilter {
+	return &ScriptFilter{}
+}
+
+// Append a new Item to Items
+func (w *ScriptFilter) Append(item Item) {
+	w.items = append(w.items, item)
+}
+
+// Marshal ScriptFilter as Json
 func (w *ScriptFilter) Marshal() ([]byte, error) {
 	return json.MarshalIndent(
 		out{
@@ -87,18 +100,14 @@ func (w *ScriptFilter) Marshal() ([]byte, error) {
 		}, "", "	")
 }
 
-type wfKey string
+// Workflow is map of ScriptFilters
+type Workflow struct {
+	std  *ScriptFilter
+	warn *ScriptFilter
+	err  *ScriptFilter
+}
 
-const (
-	std  wfKey = "std"
-	warn wfKey = "warn"
-	err  wfKey = "err"
-)
-
-// Workflow has standard and error Workflow
-type Workflow map[wfKey]*ScriptFilter
-
-// NewWorkflow creates a new AlfredWorkflow
+// NewWorkflow has simple ScriptFilter api
 func NewWorkflow() Workflow {
 	return Workflow{
 		std:  NewScriptFilter(),
@@ -109,12 +118,21 @@ func NewWorkflow() Workflow {
 
 // Append a new Item to standard ScriptFilter
 func (awf Workflow) Append(item Item) {
-	awf[std].append(item)
+	awf.std.Append(item)
+}
+
+// EmptyWarning create a new Item to Marshal　when there are no standard items
+func (awf Workflow) EmptyWarning(title, subtitle string) {
+	awf.warn.Append(
+		Item{
+			Title:    title,
+			Subtitle: subtitle,
+		})
 }
 
 // Warning append a new Item to error ScriptFilter
-func (awf Workflow) Warning(title, subtitle string) {
-	awf[warn].append(
+func (awf Workflow) error(title, subtitle string) {
+	awf.err.Append(
 		Item{
 			Title:    title,
 			Subtitle: subtitle,
@@ -123,9 +141,9 @@ func (awf Workflow) Warning(title, subtitle string) {
 
 // Marshal WorkFlow results
 func (awf Workflow) Marshal() []byte {
-	wf := awf[std]
+	wf := awf.std
 	if len(wf.items) == 0 {
-		warnRes, err := awf[warn].Marshal()
+		warnRes, err := awf.warn.Marshal()
 		if err != nil {
 			return []byte("")
 		}
@@ -134,13 +152,12 @@ func (awf Workflow) Marshal() []byte {
 
 	res, err := wf.Marshal()
 	if err != nil {
-		// FIXME should create a new workflow and use it to set Error
-		awf.Warning("An Error Occurs... ", fmt.Sprintf("items length: %d, items: %v", len(wf.items), wf.items))
-		warnRes, err := awf[warn].Marshal()
+		awf.error(fmt.Sprintf("An Error Occurs: %s", err.Error()), fmt.Sprintf("items length: %d, items: %v", len(wf.items), wf.items))
+		errRes, err := awf.err.Marshal()
 		if err != nil {
 			return []byte("")
 		}
-		return warnRes
+		return errRes
 	}
 
 	return res
