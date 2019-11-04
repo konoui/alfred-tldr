@@ -38,15 +38,16 @@ func init() {
 // NewRootCmd create a new cmd for root
 func NewRootCmd() *cobra.Command {
 	var isWorkflow bool
+	var enableFuzzy bool
 	rootCmd := &cobra.Command{
 		Use:   "tldr <cmd>",
 		Short: "show cmd examples",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if isWorkflow {
-				return run(args, op, renderToWorkflow)
+				return run(args, op, isWorkflow, enableFuzzy)
 			}
-			return run(args, op, renderToOut)
+			return run(args, op, isWorkflow, enableFuzzy)
 		},
 		SilenceUsage: true,
 	}
@@ -54,6 +55,7 @@ func NewRootCmd() *cobra.Command {
 	//rootCmd.PersistentFlags().StringVarP(&op.Language, "language", "l", op.Language, "language")
 	rootCmd.PersistentFlags().BoolVarP(&op.Update, "update", "u", op.Update, "update")
 	rootCmd.PersistentFlags().BoolVarP(&isWorkflow, "workflow", "w", false, "rendering for alfred workflow")
+	rootCmd.PersistentFlags().BoolVarP(&enableFuzzy, "fuzzy", "f", false, "enable fuzzy search for cmds")
 
 	return rootCmd
 }
@@ -67,9 +69,7 @@ func Execute(rootCmd *cobra.Command) {
 	}
 }
 
-type renderFunc func(*tldr.Page, bool, error)
-
-func run(cmds []string, op tldr.Options, f renderFunc) error {
+func run(cmds []string, op tldr.Options, isWorkflow, enableFuzzy bool) error {
 	const tldrDir = ".tldr"
 	home, err := homedir.Dir()
 	if err != nil {
@@ -85,9 +85,11 @@ func run(cmds []string, op tldr.Options, f renderFunc) error {
 		return err
 	}
 
-	p, err := t.FindPage(cmds)
-	f(p, isCacheExpired, err)
-
+	if isWorkflow {
+		renderToWorkflow(t, cmds, isCacheExpired, enableFuzzy)
+		return nil
+	}
+	renderToOut(t, cmds, isCacheExpired)
 	return nil
 }
 
@@ -99,12 +101,13 @@ const (
 	reset = "\x1b[33;0m"
 )
 
-func renderToOut(p *tldr.Page, isCacheExpired bool, pageErr error) {
+func renderToOut(t *tldr.Tldr, cmds []string, isCacheExpired bool) {
 	if isCacheExpired {
 		fmt.Fprintf(errStream, "%s\n", tldr.CacheExpiredMsg)
 	}
 
-	if pageErr != nil {
+	p, err := t.FindPage(cmds)
+	if err != nil {
 		fmt.Fprintln(errStream, "This page doesn't exist yet!\nSubmit new pages here: https://github.com/tldr-pages/tldr")
 		return
 	}
@@ -124,8 +127,11 @@ func renderToOut(p *tldr.Page, isCacheExpired bool, pageErr error) {
 	}
 }
 
-func renderToWorkflow(p *tldr.Page, isCacheExpired bool, pageErr error) {
+func renderToWorkflow(t *tldr.Tldr, cmds []string, isCacheExpired, enableFuzzy bool) {
 	awf := alfred.NewWorkflow()
+	awf.EmptyWarning("No matching query", "Try a different query")
+
+	p, _ := t.FindPage(cmds)
 	for _, cmd := range p.CmdExamples {
 		awf.Append(alfred.Item{
 			Title:        cmd.Cmd,
@@ -135,7 +141,29 @@ func renderToWorkflow(p *tldr.Page, isCacheExpired bool, pageErr error) {
 		})
 	}
 
-	awf.EmptyWarning("No matching query", "Try a different query")
+	if enableFuzzy && len(p.CmdExamples) == 0 {
+		index, err := t.LoadIndexFile()
+		if err != nil {
+			awf.Append(alfred.Item{
+				Title:    fmt.Sprintf("A Error Occurs: %s", err),
+				Subtitle: "",
+			})
+			res := awf.Marshal()
+			fmt.Fprintln(outStream, string(res))
+			return
+		}
+
+		query := strings.Join(cmds, "-")
+		suggestions := index.Commands.Filter(query)
+		for _, cmd := range suggestions {
+			awf.Append(alfred.Item{
+				Title:        cmd.Name,
+				Subtitle:     fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ",")),
+				Autocomplete: cmd.Name,
+			})
+		}
+	}
+
 	res := awf.Marshal()
 	fmt.Fprintln(outStream, string(res))
 }

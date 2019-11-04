@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -116,7 +117,7 @@ func (t *Tldr) Update() error {
 // FindPage find tldr page by `cmds`
 func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 	for _, pt := range t.platformDirs {
-		path := filepath.Join(t.path, t.langDir, pt, concatCmds(cmds)+".md")
+		path := filepath.Join(t.path, t.langDir, pt, strings.Join(cmds, "-")+".md")
 		if !pathExists(path) {
 			// if cmd does not exist, try to find it in next platform
 			continue
@@ -132,14 +133,4 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 	}
 
 	return &Page{}, fmt.Errorf("not found %s page", cmds)
-}
-
-func concatCmds(cmds []string) string {
-	pageCmd := cmds[0]
-	for _, cmd := range cmds[1:] {
-		// concat sub command with `-`
-		pageCmd = pageCmd + "-" + cmd
-	}
-
-	return pageCmd
 }
