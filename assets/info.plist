@@ -59,7 +59,7 @@
 				<string></string>
 				<key>script</key>
 				<string>q="$1"
-./tldr ${q} --workflow</string>
+./tldr ${q} --workflow --fuzzy</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -71,7 +71,7 @@
 				<key>type</key>
 				<integer>0</integer>
 				<key>withspace</key>
-				<false/>
+				<true/>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.input.scriptfilter</string>
