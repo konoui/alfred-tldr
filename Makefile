@@ -38,7 +38,7 @@ lint: setup
 
 ## Build linux binaries
 darwin: setup
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o ${BINARY} ./${SRC_DIR}
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags "${LDFLAGS} -s -w" -o ${BINARY} ./${SRC_DIR}
 
 ## Run tests for my project
 test: setup
@@ -66,6 +66,7 @@ release: darwin
 ## Clean Binary
 clean:
 	rm -f ${BIN_DIR}/*
+	rm -f ${ARTIFACT_DIR}/*
 
 ## Show help
 help:
