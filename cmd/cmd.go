@@ -156,10 +156,11 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, isCacheExpired, enableFuzzy b
 		query := strings.Join(cmds, "-")
 		suggestions := index.Commands.Filter(query)
 		for _, cmd := range suggestions {
+			nameWithSpace := strings.Replace(cmd.Name, "-", " ", -1)
 			awf.Append(alfred.Item{
-				Title:        cmd.Name,
+				Title:        nameWithSpace,
 				Subtitle:     fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ",")),
-				Autocomplete: cmd.Name,
+				Autocomplete: nameWithSpace,
 			})
 		}
 	}

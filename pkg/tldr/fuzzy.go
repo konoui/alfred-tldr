@@ -28,12 +28,12 @@ func (c Commands) String(i int) string {
 	return c[i].Name
 }
 
-// Len return length of Bookmarks for fuzzy interface
+// Len return length of Commands for fuzzy interface
 func (c Commands) Len() int {
 	return len(c)
 }
 
-// Filter fuzzy search bookmarks using query
+// Filter fuzzy search commands by query
 func (c Commands) Filter(query string) Commands {
 	cmds := Commands{}
 	results := fuzzy.FindFrom(query, c)
@@ -44,6 +44,7 @@ func (c Commands) Filter(query string) Commands {
 	return cmds
 }
 
+// LoadIndexFile load command index file
 func (t *Tldr) LoadIndexFile() (*CmdIndex, error) {
 	f, err := os.Open(filepath.Join(t.path, t.indexFile))
 	if err != nil {
