@@ -129,6 +129,8 @@ func renderToOut(t *tldr.Tldr, cmds []string, isCacheExpired bool) {
 
 func renderToWorkflow(t *tldr.Tldr, cmds []string, isCacheExpired, enableFuzzy bool) {
 	awf := alfred.NewWorkflow()
+	awf.SetStdStream(outStream)
+	awf.SetErrStream(outStream)
 	awf.EmptyWarning("No matching query", "Try a different query")
 
 	p, _ := t.FindPage(cmds)
@@ -144,12 +146,7 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, isCacheExpired, enableFuzzy b
 	if enableFuzzy && len(p.CmdExamples) == 0 {
 		index, err := t.LoadIndexFile()
 		if err != nil {
-			awf.Append(alfred.Item{
-				Title:    fmt.Sprintf("A Error Occurs: %s", err),
-				Subtitle: "",
-			})
-			res := awf.Marshal()
-			fmt.Fprintln(outStream, string(res))
+			awf.Fatal(fmt.Sprintf("A Error Occurs: %s", err), "")
 			return
 		}
 
@@ -165,6 +162,5 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, isCacheExpired, enableFuzzy b
 		}
 	}
 
-	res := awf.Marshal()
-	fmt.Fprintln(outStream, string(res))
+	awf.Output()
 }

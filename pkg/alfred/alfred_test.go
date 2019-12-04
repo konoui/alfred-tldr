@@ -11,11 +11,11 @@ import (
 func TestNewScriptFilter(t *testing.T) {
 	tests := []struct {
 		description string
-		want        *ScriptFilter
+		want        ScriptFilter
 	}{
 		{
 			description: "create new workflow",
-			want:        &ScriptFilter{},
+			want:        ScriptFilter{},
 		},
 	}
 	for _, tt := range tests {
@@ -88,14 +88,18 @@ func TestScriptFilterMarshal(t *testing.T) {
 func TestNewWorkflow(t *testing.T) {
 	tests := []struct {
 		description string
-		want        Workflow
+		want        *Workflow
 	}{
 		{
 			description: "create new workflow",
-			want: Workflow{
+			want: &Workflow{
 				std:  NewScriptFilter(),
 				warn: NewScriptFilter(),
 				err:  NewScriptFilter(),
+				streams: streams{
+					out: os.Stdout,
+					err: os.Stdout,
+				},
 			},
 		},
 	}

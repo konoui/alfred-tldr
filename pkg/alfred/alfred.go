@@ -3,6 +3,8 @@ package alfred
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 )
 
 // see https://www.alfredapp.com/help/workflows/inputs/script-filter/json/
@@ -81,8 +83,8 @@ type out struct {
 }
 
 // NewScriptFilter creates a new ScriptFilter
-func NewScriptFilter() *ScriptFilter {
-	return &ScriptFilter{}
+func NewScriptFilter() ScriptFilter {
+	return ScriptFilter{}
 }
 
 // Append a new Item to Items
@@ -102,27 +104,48 @@ func (w *ScriptFilter) Marshal() ([]byte, error) {
 
 // Workflow is map of ScriptFilters
 type Workflow struct {
-	std  *ScriptFilter
-	warn *ScriptFilter
-	err  *ScriptFilter
+	std     ScriptFilter
+	warn    ScriptFilter
+	err     ScriptFilter
+	streams streams
+}
+
+type streams struct {
+	out io.Writer
+	err io.Writer
+}
+
+// SetStdStream redirect stdout to s
+func (awf *Workflow) SetStdStream(s io.Writer) {
+	awf.streams.out = s
+}
+
+// SetErrStream redirect stderr to s
+func (awf *Workflow) SetErrStream(s io.Writer) {
+	awf.streams.out = s
 }
 
 // NewWorkflow has simple ScriptFilter api
-func NewWorkflow() Workflow {
-	return Workflow{
+func NewWorkflow() *Workflow {
+	return &Workflow{
 		std:  NewScriptFilter(),
 		warn: NewScriptFilter(),
 		err:  NewScriptFilter(),
+		streams: streams{
+			out: os.Stdout,
+			err: os.Stdout,
+		},
 	}
 }
 
 // Append a new Item to standard ScriptFilter
-func (awf Workflow) Append(item Item) {
+func (awf *Workflow) Append(item Item) {
 	awf.std.Append(item)
 }
 
 // EmptyWarning create a new Item to Marshal　when there are no standard items
-func (awf Workflow) EmptyWarning(title, subtitle string) {
+func (awf *Workflow) EmptyWarning(title, subtitle string) {
+	awf.warn = NewScriptFilter()
 	awf.warn.Append(
 		Item{
 			Title:    title,
@@ -131,7 +154,8 @@ func (awf Workflow) EmptyWarning(title, subtitle string) {
 }
 
 // Warning append a new Item to error ScriptFilter
-func (awf Workflow) error(title, subtitle string) {
+func (awf *Workflow) error(title, subtitle string) {
+	awf.err = NewScriptFilter()
 	awf.err.Append(
 		Item{
 			Title:    title,
@@ -140,7 +164,7 @@ func (awf Workflow) error(title, subtitle string) {
 }
 
 // Marshal WorkFlow results
-func (awf Workflow) Marshal() []byte {
+func (awf *Workflow) Marshal() []byte {
 	wf := awf.std
 	if len(wf.items) == 0 {
 		warnRes, err := awf.warn.Marshal()
@@ -161,4 +185,17 @@ func (awf Workflow) Marshal() []byte {
 	}
 
 	return res
+}
+
+// Fatal output error to io stream
+func (awf *Workflow) Fatal(title, subtitle string) {
+	awf.error(title, subtitle)
+	res, _ := awf.err.Marshal()
+	fmt.Fprintln(awf.streams.err, string(res))
+}
+
+// Output to io stream
+func (awf *Workflow) Output() {
+	res := awf.Marshal()
+	fmt.Fprintln(awf.streams.out, string(res))
 }
