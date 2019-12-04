@@ -31,7 +31,7 @@ func TestLoadIndexFile(t *testing.T) {
 				t.Errorf("unexpected error want: got: %+v", err.Error())
 			}
 
-			if len(index.Commands) == 0 {
+			if index != nil && len(index.Commands) == 0 {
 				t.Errorf("cannot load index file as commands length is 0")
 			}
 		})
