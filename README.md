@@ -1,4 +1,4 @@
-## alfred-tldr
+## alfred tldr
 tldr alfred workflow written in go.
 This tldr also works as cli.
 

@@ -42,7 +42,7 @@ func NewRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "tldr <cmd>",
 		Short: "show cmd examples",
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if isWorkflow {
 				return run(args, op, isWorkflow, enableFuzzy)
