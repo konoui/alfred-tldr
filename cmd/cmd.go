@@ -44,9 +44,6 @@ func NewRootCmd() *cobra.Command {
 		Short: "show cmd examples",
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if isWorkflow {
-				return run(args, op, isWorkflow, enableFuzzy)
-			}
 			return run(args, op, isWorkflow, enableFuzzy)
 		},
 		SilenceUsage: true,
@@ -146,18 +143,16 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, isCacheExpired, enableFuzzy b
 	if enableFuzzy && len(p.CmdExamples) == 0 {
 		index, err := t.LoadIndexFile()
 		if err != nil {
-			awf.Fatal(fmt.Sprintf("A Error Occurs: %s", err), "")
+			awf.Fatal(fmt.Sprintf("an error occurs: %s", err), "")
 			return
 		}
 
-		query := strings.Join(cmds, "-")
-		suggestions := index.Commands.Filter(query)
+		suggestions := index.Commands.Search(cmds)
 		for _, cmd := range suggestions {
-			nameWithSpace := strings.Replace(cmd.Name, "-", " ", -1)
 			awf.Append(alfred.Item{
-				Title:        nameWithSpace,
+				Title:        cmd.Name,
 				Subtitle:     fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ",")),
-				Autocomplete: nameWithSpace,
+				Autocomplete: cmd.Name,
 			})
 		}
 	}
