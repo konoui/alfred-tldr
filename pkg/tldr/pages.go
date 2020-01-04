@@ -9,17 +9,8 @@ import (
 )
 
 const (
-	pageSource      = "https://tldr.sh/assets/tldr.zip"
-	indexSource     = "https://tldr.sh/assets/index.json"
-	cacheExpiredErr = "more than a week passed, should update tldr using --update"
-	// CacheExpiredMsg a message to tell users should update
-	CacheExpiredMsg = cacheExpiredErr
-)
-
-var (
-	// CacheMaxAge tldr page cache age. default is a week.
-	// you should not override.
-	CacheMaxAge time.Duration = 24 * 7 * time.Hour
+	pageSource  = "https://tldr.sh/assets/tldr.zip"
+	indexSource = "https://tldr.sh/assets/index.json"
 )
 
 // Options are tldr functions
@@ -79,20 +70,15 @@ func (t *Tldr) OnInitialize() error {
 		}
 	}
 
-	cache := NewCache(t.path, t.indexFile, t.cacheMaxAge)
-	if cache.Expired() {
-		return fmt.Errorf(cacheExpiredErr)
+	indexPath := filepath.Join(t.path, t.indexFile)
+	age, err := age(indexPath)
+	if err != nil || age > t.cacheMaxAge {
+		return &errorCacheExpired{
+			error: fmt.Errorf(expiredMsg(age)),
+		}
 	}
 
 	return nil
-}
-
-// IsCacheExpired return true if `err` means expired cache
-func IsCacheExpired(err error) bool {
-	if err != nil && err.Error() == cacheExpiredErr {
-		return true
-	}
-	return false
 }
 
 // Update tldr pages from remote zip file

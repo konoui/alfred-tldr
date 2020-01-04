@@ -77,16 +77,22 @@ func run(cmds []string, op tldr.Options, isWorkflow, enableFuzzy bool) error {
 	t := tldr.NewTldr(path, op)
 
 	err = t.OnInitialize()
-	isCacheExpired := tldr.IsCacheExpired(err)
-	if !isCacheExpired && err != nil {
+	if !tldr.IsCacheExpired(err) && err != nil {
 		return err
 	}
 
+	// workflow will not show cache expired message
 	if isWorkflow {
-		renderToWorkflow(t, cmds, isCacheExpired, enableFuzzy)
+		renderToWorkflow(t, cmds, enableFuzzy)
 		return nil
 	}
-	renderToOut(t, cmds, isCacheExpired)
+
+	// cli will show cache expired message
+	if err != nil {
+		cacheExpiredMsg := err.Error()
+		fmt.Fprintf(errStream, "%s\n", cacheExpiredMsg)
+	}
+	renderToOut(t, cmds)
 	return nil
 }
 
@@ -98,11 +104,7 @@ const (
 	reset = "\x1b[33;0m"
 )
 
-func renderToOut(t *tldr.Tldr, cmds []string, isCacheExpired bool) {
-	if isCacheExpired {
-		fmt.Fprintf(errStream, "%s\n", tldr.CacheExpiredMsg)
-	}
-
+func renderToOut(t *tldr.Tldr, cmds []string) {
 	p, err := t.FindPage(cmds)
 	if err != nil {
 		fmt.Fprintln(errStream, "This page doesn't exist yet!\nSubmit new pages here: https://github.com/tldr-pages/tldr")
@@ -124,7 +126,7 @@ func renderToOut(t *tldr.Tldr, cmds []string, isCacheExpired bool) {
 	}
 }
 
-func renderToWorkflow(t *tldr.Tldr, cmds []string, isCacheExpired, enableFuzzy bool) {
+func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 	awf := alfred.NewWorkflow()
 	awf.SetStdStream(outStream)
 	awf.SetErrStream(outStream)

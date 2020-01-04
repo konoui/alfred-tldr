@@ -59,7 +59,7 @@ func TestExecute(t *testing.T) {
 			command:     "lsof",
 			filepath:    "./test_output_lsof.txt",
 			cacheMaxAge: 0 * time.Hour,
-			errMsg:      fmt.Sprintf("%s\n", tldr.CacheExpiredMsg),
+			errMsg:      fmt.Sprintln("should update tldr using --update"),
 		},
 		{
 			description: "alfred workflow tests with expired cache with lsof. alfred workflow show no error",

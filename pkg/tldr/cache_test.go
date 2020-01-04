@@ -6,61 +6,69 @@ import (
 	"time"
 )
 
-func TestNewCache(t *testing.T) {
+func TestCacheExpired(t *testing.T) {
 	tests := []struct {
 		description string
-		dir         string
-		want        string
-		expectErr   bool
+		filepath    string
+		expiredTime time.Duration
+		expired     bool
 	}{
-		{description: "exists cache dir", dir: os.TempDir(), want: "", expectErr: false},
-		{description: "no exists cache dir", dir: "/unk", want: "/unk directory does not exist", expectErr: true},
+		{
+			description: "test for not expired cache",
+			filepath:    "./test1",
+			expiredTime: 3 * time.Minute,
+			expired:     false,
+		},
+		{
+			description: "test for expired cache",
+			filepath:    "./test1",
+			expiredTime: 0 * time.Minute,
+			expired:     true,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			defer func() {
-				err := recover()
-				if tt.expectErr && err == nil {
-					t.Errorf("expect error happens, but got response")
-				}
-				if !tt.expectErr && err != nil {
-					t.Errorf("unexpected error want: %+v, got: %+v", tt.want, err)
-				}
-				if err != nil && err.(error).Error() != tt.want {
-					t.Errorf("unexpected response: want: %+v, got: %+v", tt.want, err)
-				}
-			}()
-			NewCache(tt.dir, "", 1*time.Minute)
+			if _, err := os.Create(tt.filepath); err != nil {
+				t.Fatal(err)
+			}
+			defer os.RemoveAll(tt.filepath)
+
+			age, err := age(tt.filepath)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if !tt.expired && age > tt.expiredTime {
+				t.Errorf("cache should not be expired but cache expired.")
+			}
 		})
 	}
 }
 
-func TestCacheExpired(t *testing.T) {
+func TestExpiredMSG(t *testing.T) {
 	tests := []struct {
 		description string
-		dir         string
-		file        string
 		expiredTime time.Duration
-		expired     bool
+		want        string
 	}{
-		{description: "test for not expired cache", dir: "./", file: "test1", expiredTime: 3 * time.Minute, expired: false},
-		{description: "test for expired cache", dir: "./", file: "test1", expiredTime: 0 * time.Minute, expired: true},
+		{
+			description: "has prefix message as passed more than a week",
+			expiredTime: 24 * time.Hour * 8,
+			want:        "more than a week passed, should update tldr using --update",
+		},
+		{
+			description: "has no prefix message as passed less than a week",
+			expiredTime: 7 * time.Hour,
+			want:        "should update tldr using --update",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			if _, err := os.Create(tt.file); err != nil {
-				t.Fatal(err)
-			}
-			defer os.RemoveAll(tt.file)
-
-			cache := NewCache(tt.dir, tt.file, tt.expiredTime)
-			if !tt.expired && cache.Expired() {
-				t.Errorf("cache should not be expired but cache expired.")
-			}
-			if tt.expired && cache.NotExpired() {
-				t.Errorf("cache should be expired but not expired.")
+			got := expiredMsg(tt.expiredTime)
+			if got != tt.want {
+				t.Errorf("unexpected response: want: %+v, got: %+v", tt.want, got)
 			}
 		})
 	}
