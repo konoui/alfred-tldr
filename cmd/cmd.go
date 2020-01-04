@@ -126,6 +126,12 @@ func renderToOut(t *tldr.Tldr, cmds []string) {
 	}
 }
 
+// decide next action for workflow filter
+const (
+	nextActionKey = "nextAction"
+	nextActionCmd = "cmd"
+)
+
 func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 	awf := alfred.NewWorkflow()
 	awf.SetStreams(outStream, outStream)
@@ -154,6 +160,10 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 				Title:        cmd.Name,
 				Subtitle:     fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ",")),
 				Autocomplete: cmd.Name,
+				Variables: map[string]string{
+					nextActionKey: nextActionCmd,
+				},
+				Arg: fmt.Sprintf("%s --platform %s", cmd.Name, cmd.Platform[0]),
 			})
 		}
 	}
