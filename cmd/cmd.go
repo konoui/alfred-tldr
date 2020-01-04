@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/konoui/tldr/pkg/alfred"
+	"github.com/konoui/go-alfred"
 	"github.com/konoui/tldr/pkg/tldr"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -128,8 +128,7 @@ func renderToOut(t *tldr.Tldr, cmds []string) {
 
 func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 	awf := alfred.NewWorkflow()
-	awf.SetStdStream(outStream)
-	awf.SetErrStream(outStream)
+	awf.SetStreams(outStream, outStream)
 	awf.EmptyWarning("No matching query", "Try a different query")
 
 	p, _ := t.FindPage(cmds)

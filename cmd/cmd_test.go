@@ -4,13 +4,41 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"os"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/konoui/go-alfred"
 	"github.com/konoui/tldr/pkg/tldr"
 	"github.com/mattn/go-shellwords"
 )
+
+func testWorkflowOutput(t *testing.T, outWantData, outGotData, errWantData, errGotData []byte) {
+	t.Helper()
+	if diff := alfred.DiffScriptFilter(outWantData, outGotData); diff != "" {
+		t.Errorf("Workflow unexpected response: (+want -got)\n%+v", diff)
+	}
+
+	if string(errWantData) != string(errGotData) {
+		t.Errorf("Workflow unexpected response: want: \n%+v, got: \n%+v", string(errWantData), string(errGotData))
+	}
+}
+
+func testCLI(t *testing.T, outWantData, outGotData, errWantData, errGotData []byte) {
+	t.Helper()
+
+	want := string(outWantData)
+	got := string(outGotData)
+	if want != got {
+		t.Errorf("CLI unexpected response: want: \n%+v, got: \n%+v", want, got)
+	}
+
+	want = string(errWantData)
+	got = string(errGotData)
+	if want != got {
+		t.Errorf("CLI unexpected response: want: \n%+v, got: \n%+v", want, got)
+	}
+}
 
 func TestExecute(t *testing.T) {
 	tests := []struct {
@@ -30,26 +58,10 @@ func TestExecute(t *testing.T) {
 			errMsg:      "",
 		},
 		{
-			description: "alfred workflow tests with lsof",
-			expectErr:   false,
-			command:     "lsof --update --workflow",
-			filepath:    "./test_output_lsof.json",
-			cacheMaxAge: tldr.CacheMaxAge,
-			errMsg:      "",
-		},
-		{
 			description: "text output tests sub cmd tests with git checkout",
 			expectErr:   false,
 			command:     "git checkout --update",
 			filepath:    "./test_output_git-checkout.txt",
-			cacheMaxAge: tldr.CacheMaxAge,
-			errMsg:      "",
-		},
-		{
-			description: "alfred workflow sub cmd tests with git checkout",
-			expectErr:   false,
-			command:     "git checkout --update --workflow",
-			filepath:    "./test_output_git-checkout.json",
 			cacheMaxAge: tldr.CacheMaxAge,
 			errMsg:      "",
 		},
@@ -62,12 +74,25 @@ func TestExecute(t *testing.T) {
 			errMsg:      fmt.Sprintln("should update tldr using --update"),
 		},
 		{
+			description: "alfred workflow tests with lsof",
+			expectErr:   false,
+			command:     "lsof --update --workflow",
+			filepath:    "./test_output_lsof.json",
+			cacheMaxAge: tldr.CacheMaxAge,
+		},
+		{
+			description: "alfred workflow sub cmd tests with git checkout",
+			expectErr:   false,
+			command:     "git checkout --update --workflow",
+			filepath:    "./test_output_git-checkout.json",
+			cacheMaxAge: tldr.CacheMaxAge,
+		},
+		{
 			description: "alfred workflow tests with expired cache with lsof. alfred workflow show no error",
 			expectErr:   false,
 			command:     "lsof --workflow",
 			filepath:    "./test_output_lsof.json",
 			cacheMaxAge: 0 * time.Hour,
-			errMsg:      "",
 		},
 	}
 
@@ -76,13 +101,7 @@ func TestExecute(t *testing.T) {
 			// set cache max age
 			tldr.CacheMaxAge = tt.cacheMaxAge
 
-			f, err := os.Open(tt.filepath)
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer f.Close()
-
-			v, err := ioutil.ReadAll(f)
+			wantData, err := ioutil.ReadFile(tt.filepath)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -106,16 +125,14 @@ func TestExecute(t *testing.T) {
 				t.Errorf("unexpected error want: got: %+v", err.Error())
 			}
 
-			got := outBuf.String()
-			if want := string(v); want != got {
-				t.Errorf("unexpected response: want: \n%+v, got: \n%+v", want, got)
+			outGotData := outBuf.Bytes()
+			errGotData := errBuf.Bytes()
+			// switch test
+			if strings.Contains(tt.command, "--workflow") || strings.Contains(tt.command, "-w") {
+				testWorkflowOutput(t, wantData, outGotData, []byte(tt.errMsg), errGotData)
+			} else {
+				testCLI(t, wantData, outGotData, []byte(tt.errMsg), errGotData)
 			}
-
-			got = errBuf.String()
-			if want := tt.errMsg; want != got {
-				t.Errorf("unexpected response: want: \n%+v, got: \n%+v", want, got)
-			}
-
 		})
 	}
 }
