@@ -1,0 +1,27 @@
+name: release
+
+on:
+  create:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+    - name: set up go
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13.x
+    - name: checkout
+      uses: actions/checkout@master
+    - name: release
+      env:
+        GO111MODULE: on
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        export GOBIN=$(pwd)/bin
+        export PATH=$GOBIN:$PATH
+        make lint
+        make test
+        make release

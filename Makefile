@@ -60,8 +60,7 @@ release: darwin
 	@(cp ${BINARY} ${ARTIFACT_DIR})
 	@(cp ${ASSETS_DIR}/* ${ARTIFACT_DIR})
 	@(zip -j ${ARTIFACT} ${ARTIFACT_DIR}/*)
-	@(export GITHUB_TOKEN=$(shell aws secretsmanager get-secret-value --secret-id github_token --query 'SecretString' --output text) ;\
-	ghr -replace ${VERSION} ${ARTIFACT})
+	@ghr -replace ${VERSION} ${ARTIFACT}
 
 ## Clean Binary
 clean:

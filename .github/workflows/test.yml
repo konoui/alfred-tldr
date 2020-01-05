@@ -1,0 +1,24 @@
+name: test
+
+on:
+  push:
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+    - name: set up go
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13.x
+    - name: checkout
+      uses: actions/checkout@v1
+    - name: test
+      env:
+        GO111MODULE: on
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        export GOBIN=$(pwd)/bin
+        export PATH=$GOBIN:$PATH
+        make lint
+        make test
