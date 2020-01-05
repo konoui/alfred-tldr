@@ -22,6 +22,9 @@ func TestLoadIndexFile(t *testing.T) {
 				filepath.Join(os.TempDir(), ".tldr"),
 				Options{Update: true},
 			)
+			if err := tldr.OnInitialize(); err != nil {
+				t.Fatal(err)
+			}
 			index, err := tldr.LoadIndexFile()
 			if tt.expectErr && err == nil {
 				t.Errorf("expect error happens, but got response")
@@ -55,6 +58,9 @@ func TestFilter(t *testing.T) {
 				filepath.Join(os.TempDir(), ".tldr"),
 				Options{Update: true},
 			)
+			if err := tldr.OnInitialize(); err != nil {
+				t.Fatal(err)
+			}
 			index, err := tldr.LoadIndexFile()
 			if err != nil {
 				t.Fatal(err)
