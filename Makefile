@@ -9,6 +9,7 @@ ASSETS_DIR := assets
 ARTIFACT_DIR := .artifact
 ARTIFACT := ${ARTIFACT_DIR}/tldr.alfredworkflow
 
+GOLANGCI_LINT_VERSION := v1.22.2
 export GO111MODULE=on
 
 ## Build binaries on your environment
@@ -17,10 +18,8 @@ build: setup
 
 ## Setup
 setup:
-	#installing golint
-	@(if ! type golint >/dev/null 2>&1; then go get -u golang.org/x/lint/golint ;fi)
 	#installing golangci-lint
-	@(if ! type golangci-lint >/dev/null 2>&1; then go get -u github.com/golangci/golangci-lint/cmd/golangci-lint ;fi)
+	@(if ! type golangci-lint >/dev/null 2>&1; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin ${GOLANGCI_LINT_VERSION} ;fi)
 	#installing goimports
 	@(if ! type goimports >/dev/null 2>&1; then go get -u golang.org/x/tools/cmd/goimports ;fi)
 	#installing ghr
@@ -36,7 +35,7 @@ fmt: setup
 lint: setup
 	golangci-lint run ./...
 
-## Build linux binaries
+## Build macos binaries
 darwin: setup
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags "${LDFLAGS} -s -w" -o ${BINARY} ./${SRC_DIR}
 
@@ -48,12 +47,6 @@ test: setup
 install: build
 	@(cp ${BINARY} ${WORKFLOW_DIR}/)
 	@(cp ${ASSETS_DIR}/*  ${WORKFLOW_DIR}/)
-
-## Initialize directory
-init:
-	@(if [ ! -e ${SRC_DIR} ]; then mkdir ${SRC_DIR}; fi)
-	@(if [ ! -e ${BIN_DIR} ]; then mkdir ${BIN_DIR}; fi)
-	@(if [ ! -e go.mod ]; then go mod init; fi)
 
 release: darwin
 	@(if [ ! -e ${ARTIFACT_DIR} ]; then mkdir ${ARTIFACT_DIR} ; fi)
@@ -71,4 +64,4 @@ clean:
 help:
 	@make2help $(MAKEFILE_LIST)
 
-.PHONY: build setup test lint fmt linux init clean help
+.PHONY: build setup test lint fmt darwin clean help

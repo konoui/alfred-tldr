@@ -20,8 +20,9 @@ jobs:
         GO111MODULE: on
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        export GOBIN=$(pwd)/bin
+        export GOBIN=$(go env GOPATH)/bin
         export PATH=$GOBIN:$PATH
+        make fmt
         make lint
         make test
         make release
