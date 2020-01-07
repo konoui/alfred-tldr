@@ -45,31 +45,3 @@ func TestCacheExpired(t *testing.T) {
 		})
 	}
 }
-
-func TestExpiredMSG(t *testing.T) {
-	tests := []struct {
-		description string
-		expiredTime time.Duration
-		want        string
-	}{
-		{
-			description: "has prefix message as passed more than a week",
-			expiredTime: 24 * time.Hour * 8,
-			want:        "more than a week passed, should update tldr using --update",
-		},
-		{
-			description: "has no prefix message as passed less than a week",
-			expiredTime: 7 * time.Hour,
-			want:        "should update tldr using --update",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.description, func(t *testing.T) {
-			got := expiredMsg(tt.expiredTime)
-			if got != tt.want {
-				t.Errorf("unexpected response: want: %+v, got: %+v", tt.want, got)
-			}
-		})
-	}
-}

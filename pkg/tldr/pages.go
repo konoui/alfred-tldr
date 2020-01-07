@@ -71,10 +71,9 @@ func (t *Tldr) OnInitialize() error {
 	}
 
 	indexPath := filepath.Join(t.path, t.indexFile)
-	age, err := age(indexPath)
-	if err != nil || age > t.cacheMaxAge {
-		return &errorCacheExpired{
-			error: fmt.Errorf(expiredMsg(age)),
+	if expired(indexPath, t.cacheMaxAge) {
+		return &cacheExpiredError{
+			msg: fmt.Sprintf("more than a week passed, should update tldr using --update"),
 		}
 	}
 

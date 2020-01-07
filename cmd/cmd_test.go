@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -20,23 +19,23 @@ func testWorkflowOutput(t *testing.T, outWantData, outGotData, errWantData, errG
 	}
 
 	if string(errWantData) != string(errGotData) {
-		t.Errorf("Workflow unexpected response: want: \n%+v, got: \n%+v", string(errWantData), string(errGotData))
+		t.Errorf("Workflow unexpected response: want: %+v\n, got: %+v\n", string(errWantData), string(errGotData))
 	}
 }
 
-func testCLI(t *testing.T, outWantData, outGotData, errWantData, errGotData []byte) {
+func testCLIOutput(t *testing.T, outWantData, outGotData, errWantData, errGotData []byte) {
 	t.Helper()
 
 	want := string(outWantData)
 	got := string(outGotData)
 	if want != got {
-		t.Errorf("CLI unexpected response: want: \n%+v, got: \n%+v", want, got)
+		t.Errorf("CLI unexpected response: want: %+v\n, got: %+v\n", want, got)
 	}
 
 	want = string(errWantData)
 	got = string(errGotData)
 	if want != got {
-		t.Errorf("CLI unexpected response: want: \n%+v, got: \n%+v", want, got)
+		t.Errorf("CLI unexpected response: want: %+v\n, got: %+v\n", want, got)
 	}
 }
 
@@ -55,7 +54,6 @@ func TestExecute(t *testing.T) {
 			command:     "lsof --update",
 			filepath:    "./test_output_lsof.txt",
 			cacheMaxAge: tldr.CacheMaxAge,
-			errMsg:      "",
 		},
 		{
 			description: "text output tests sub cmd tests with git checkout",
@@ -63,7 +61,6 @@ func TestExecute(t *testing.T) {
 			command:     "git checkout --update",
 			filepath:    "./test_output_git-checkout.txt",
 			cacheMaxAge: tldr.CacheMaxAge,
-			errMsg:      "",
 		},
 		{
 			description: "text output tests with expired cache with lsof.",
@@ -71,7 +68,7 @@ func TestExecute(t *testing.T) {
 			command:     "lsof",
 			filepath:    "./test_output_lsof.txt",
 			cacheMaxAge: 0 * time.Hour,
-			errMsg:      fmt.Sprintln("should update tldr using --update"),
+			errMsg:      "more than a week passed, should update tldr using --update\n",
 		},
 		{
 			description: "alfred workflow tests with lsof",
@@ -131,7 +128,7 @@ func TestExecute(t *testing.T) {
 			if strings.Contains(tt.command, "--workflow") || strings.Contains(tt.command, "-w") {
 				testWorkflowOutput(t, wantData, outGotData, []byte(tt.errMsg), errGotData)
 			} else {
-				testCLI(t, wantData, outGotData, []byte(tt.errMsg), errGotData)
+				testCLIOutput(t, wantData, outGotData, []byte(tt.errMsg), errGotData)
 			}
 		})
 	}
