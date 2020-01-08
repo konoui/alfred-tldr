@@ -70,23 +70,23 @@ func TestParsePage(t *testing.T) {
 
 			page, err := parsePage(f)
 			if !tt.expectErr && err != nil {
-				t.Errorf("unexpected error want: %+v, got: %+v", tt.want, err.Error())
+				t.Errorf("unexpected error got: %+v", err.Error())
 			}
 
 			want := tt.want.CmdName
 			got := page.CmdName
 			if want != got {
-				t.Errorf("unexpected response: want: %+v, got: %+v", want, got)
+				t.Errorf("want: %+v, got: %+v", want, got)
 			}
 
 			want = tt.want.CmdDescription
 			got = page.CmdDescription
 			if want != got {
-				t.Errorf("unexpected response: want: %+v, got: %+v", want, got)
+				t.Errorf("want: %+v, got: %+v", want, got)
 			}
 
 			if !reflect.DeepEqual(tt.want.CmdExamples, tt.want.CmdExamples) {
-				t.Errorf("unexpected response: want: %+v, got: %+v", tt.want.CmdExamples, tt.want.CmdExamples)
+				t.Errorf("want: %+v, got: %+v", tt.want.CmdExamples, tt.want.CmdExamples)
 			}
 		})
 	}

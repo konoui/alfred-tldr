@@ -31,7 +31,7 @@ func TestLoadIndexFile(t *testing.T) {
 			}
 
 			if !tt.expectErr && err != nil {
-				t.Errorf("unexpected error want: got: %+v", err.Error())
+				t.Errorf("unexpected error got: %+v", err.Error())
 			}
 
 			if index != nil && len(index.Commands) == 0 {

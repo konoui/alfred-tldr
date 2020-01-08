@@ -26,11 +26,11 @@ func TestDownload(t *testing.T) {
 			got, err := download(tt.url, "", tt.want)
 			defer os.RemoveAll(got)
 			if !tt.expectErr && err != nil {
-				t.Errorf("unexpected error want: %+v, got: %+v", tt.want, err.Error())
+				t.Errorf("unexpected error got: %+v", err.Error())
 			}
 
 			if tt.want != got {
-				t.Errorf("unexpected response: want: %+v, got: %+v", tt.want, got)
+				t.Errorf("want: %+v, got: %+v", tt.want, got)
 			}
 		})
 	}
@@ -58,7 +58,7 @@ func TestUnzip(t *testing.T) {
 			defer os.RemoveAll(path)
 
 			if err := unzip(path, tmpDir); !tt.expectErr && err != nil {
-				t.Errorf("unexpected error want: %+v", err.Error())
+				t.Errorf("unexpected error got: %+v", err.Error())
 			}
 		})
 	}

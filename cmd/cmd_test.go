@@ -15,11 +15,11 @@ import (
 func testWorkflowOutput(t *testing.T, outWantData, outGotData, errWantData, errGotData []byte) {
 	t.Helper()
 	if diff := alfred.DiffScriptFilter(outWantData, outGotData); diff != "" {
-		t.Errorf("Workflow unexpected response: (+want -got)\n%+v", diff)
+		t.Errorf("+want -got\n%+v", diff)
 	}
 
 	if string(errWantData) != string(errGotData) {
-		t.Errorf("Workflow unexpected response: want: %+v\n, got: %+v\n", string(errWantData), string(errGotData))
+		t.Errorf("Workflow want: %+v\n, got: %+v\n", string(errWantData), string(errGotData))
 	}
 }
 
@@ -29,13 +29,13 @@ func testCLIOutput(t *testing.T, outWantData, outGotData, errWantData, errGotDat
 	want := string(outWantData)
 	got := string(outGotData)
 	if want != got {
-		t.Errorf("CLI unexpected response: want: %+v\n, got: %+v\n", want, got)
+		t.Errorf("CLI want: %+v\n, got: %+v\n", want, got)
 	}
 
 	want = string(errWantData)
 	got = string(errGotData)
 	if want != got {
-		t.Errorf("CLI unexpected response: want: %+v\n, got: %+v\n", want, got)
+		t.Errorf("CLI want: %+v\n, got: %+v\n", want, got)
 	}
 }
 
@@ -119,7 +119,7 @@ func TestExecute(t *testing.T) {
 			}
 
 			if !tt.expectErr && err != nil {
-				t.Errorf("unexpected error want: got: %+v", err.Error())
+				t.Errorf("unexpected error got: %+v", err.Error())
 			}
 
 			outGotData := outBuf.Bytes()

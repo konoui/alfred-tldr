@@ -52,7 +52,7 @@ func TestFindPage(t *testing.T) {
 				t.Errorf("unexpected error got: %+v", err.Error())
 			}
 			if got := page.CmdName; got != tt.want {
-				t.Errorf("unexpected response: want: %+v, got: %+v", tt.want, got)
+				t.Errorf("want: %+v, got: %+v", tt.want, got)
 			}
 		})
 	}
