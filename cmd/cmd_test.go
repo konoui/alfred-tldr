@@ -58,7 +58,7 @@ func TestExecute(t *testing.T) {
 		{
 			description: "text output tests sub cmd tests with git checkout",
 			expectErr:   false,
-			command:     "git checkout --update",
+			command:     "git checkout",
 			filepath:    "./test_output_git-checkout.txt",
 			cacheMaxAge: tldr.CacheMaxAge,
 		},
@@ -71,6 +71,14 @@ func TestExecute(t *testing.T) {
 			errMsg:      "more than a week passed, should update tldr using --update\n",
 		},
 		{
+			description: "page not found",
+			expectErr:   false,
+			command:     "lsoff",
+			filepath:    "./test_output_no_page.txt",
+			errMsg:      "This page doesn't exist yet!\nSubmit new pages here: https://github.com/tldr-pages/tldr\n",
+			cacheMaxAge: tldr.CacheMaxAge,
+		},
+		{
 			description: "alfred workflow tests with lsof",
 			expectErr:   false,
 			command:     "lsof --update --workflow",
@@ -80,8 +88,15 @@ func TestExecute(t *testing.T) {
 		{
 			description: "alfred workflow sub cmd tests with git checkout",
 			expectErr:   false,
-			command:     "git checkout --update --workflow",
+			command:     "git checkout --workflow",
 			filepath:    "./test_output_git-checkout.json",
+			cacheMaxAge: tldr.CacheMaxAge,
+		},
+		{
+			description: "alfred workflow fuzzy search",
+			expectErr:   false,
+			command:     " gitchec --workflow --fuzzy",
+			filepath:    "./test_output_git-checkout_with_fuzzy.json",
 			cacheMaxAge: tldr.CacheMaxAge,
 		},
 		{

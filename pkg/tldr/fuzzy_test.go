@@ -41,22 +41,22 @@ func TestLoadIndexFile(t *testing.T) {
 	}
 }
 
-func TestFilter(t *testing.T) {
+func TestSearch(t *testing.T) {
 	tests := []struct {
 		description string
-		query       string
+		query       []string
 		want        string
 	}{
 		{
 			description: "similar ls cmd",
-			query:       "lsa",
+			query:       []string{"lsa"},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			tldr := New(
 				filepath.Join(os.TempDir(), ".tldr"),
-				Options{Update: true},
+				Options{},
 			)
 			if err := tldr.OnInitialize(); err != nil {
 				t.Fatal(err)
@@ -66,7 +66,7 @@ func TestFilter(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			got := index.Commands.Filter(tt.query)
+			got := index.Commands.Search(tt.query)
 			if len(got) == 0 {
 				t.Errorf("filter result is 0")
 			}
