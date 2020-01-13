@@ -9,9 +9,13 @@ import (
 )
 
 const (
-	pageSource  = "https://tldr.sh/assets/tldr.zip"
-	indexSource = "https://tldr.sh/assets/index.json"
+	pageSourceURL  = "https://tldr.sh/assets/tldr.zip"
+	indexSourceURL = "https://tldr.sh/assets/index.json"
 )
+
+// CacheMaxAge tldr page cache age. default is a week.
+// you should not override.
+var CacheMaxAge time.Duration = 24 * 7 * time.Hour
 
 // Options are tldr functions
 type Options struct {
@@ -33,14 +37,14 @@ type Tldr struct {
 	cacheMaxAge    time.Duration
 }
 
-// NewTldr create a instance of tldr repository
-func NewTldr(tldrPath string, op Options) *Tldr {
+// New create a instance of tldr repository
+func New(tldrPath string, op Options) *Tldr {
 	return &Tldr{
 		path:           tldrPath,
-		pageSourceURL:  pageSource,
-		indexSourceURL: indexSource,
-		indexFile:      filepath.Base(indexSource),
-		zipFile:        filepath.Base(pageSource),
+		pageSourceURL:  pageSourceURL,
+		indexSourceURL: indexSourceURL,
+		indexFile:      filepath.Base(indexSourceURL),
+		zipFile:        filepath.Base(pageSourceURL),
 		platformDirs:   []string{op.Platform, "common"},
 		langDir:        convertToLangDir(op.Language),
 		update:         op.Update,
@@ -67,13 +71,6 @@ func (t *Tldr) OnInitialize() error {
 	if t.update || initUpdate {
 		if err := t.Update(); err != nil {
 			return err
-		}
-	}
-
-	indexPath := filepath.Join(t.path, t.indexFile)
-	if expired(indexPath, t.cacheMaxAge) {
-		return &cacheExpiredError{
-			msg: fmt.Sprintf("more than a week passed, should update tldr using --update"),
 		}
 	}
 
@@ -119,4 +116,31 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 	}
 
 	return &Page{}, fmt.Errorf("not found %s page", cmds)
+}
+
+// Expired return true if cache is expired
+func (t *Tldr) Expired() bool {
+	indexPath := filepath.Join(t.path, t.indexFile)
+	age, err := age(indexPath)
+	if err != nil {
+		return true
+	}
+
+	return age > t.cacheMaxAge
+}
+
+// age return the time since the data is cached at
+func age(path string) (time.Duration, error) {
+	fi, err := os.Stat(path)
+	if err != nil {
+		return time.Duration(0), err
+	}
+
+	return time.Since(fi.ModTime()), nil
+}
+
+// pathExists return true if path exists
+func pathExists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
 }

@@ -74,24 +74,18 @@ func run(cmds []string, op tldr.Options, isWorkflow, enableFuzzy bool) error {
 	}
 	path := filepath.Join(home, tldrDir)
 
-	t := tldr.NewTldr(path, op)
+	t := tldr.New(path, op)
 
 	err = t.OnInitialize()
-	if !tldr.IsCacheExpired(err) && err != nil {
+	if err != nil {
 		return err
 	}
 
-	// workflow will not show cache expired message
 	if isWorkflow {
 		renderToWorkflow(t, cmds, enableFuzzy)
 		return nil
 	}
 
-	// cli will show cache expired message
-	if err != nil {
-		cacheExpiredMsg := err.Error()
-		fmt.Fprintf(errStream, "%s\n", cacheExpiredMsg)
-	}
 	renderToOut(t, cmds)
 	return nil
 }
@@ -105,6 +99,10 @@ const (
 )
 
 func renderToOut(t *tldr.Tldr, cmds []string) {
+	if t.Expired() {
+		fmt.Fprintln(errStream, "more than a week passed, should update tldr using --update")
+	}
+
 	p, err := t.FindPage(cmds)
 	if err != nil {
 		fmt.Fprintln(errStream, "This page doesn't exist yet!\nSubmit new pages here: https://github.com/tldr-pages/tldr")

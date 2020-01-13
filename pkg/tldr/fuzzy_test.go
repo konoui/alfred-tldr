@@ -18,7 +18,7 @@ func TestLoadIndexFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			tldr := NewTldr(
+			tldr := New(
 				filepath.Join(os.TempDir(), ".tldr"),
 				Options{Update: true},
 			)
@@ -54,7 +54,7 @@ func TestFilter(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			tldr := NewTldr(
+			tldr := New(
 				filepath.Join(os.TempDir(), ".tldr"),
 				Options{Update: true},
 			)

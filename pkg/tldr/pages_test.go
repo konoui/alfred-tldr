@@ -35,7 +35,7 @@ func TestFindPage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			tldr := NewTldr(
+			tldr := New(
 				filepath.Join(os.TempDir(), ".tldr"),
 				Options{Update: true},
 			)
@@ -69,10 +69,10 @@ func TestUpdate(t *testing.T) {
 			expectErr:   false,
 			tldr: Tldr{
 				path:           filepath.Join(os.TempDir(), ".tldr"),
-				pageSourceURL:  pageSource,
-				indexSourceURL: indexSource,
-				indexFile:      filepath.Base(indexSource),
-				zipFile:        filepath.Base(pageSource),
+				pageSourceURL:  pageSourceURL,
+				indexSourceURL: indexSourceURL,
+				indexFile:      filepath.Base(indexSourceURL),
+				zipFile:        filepath.Base(pageSourceURL),
 				update:         true,
 			},
 		},
@@ -81,10 +81,10 @@ func TestUpdate(t *testing.T) {
 			expectErr:   true,
 			tldr: Tldr{
 				path:           "/.tldr",
-				pageSourceURL:  pageSource,
-				indexSourceURL: indexSource,
-				indexFile:      filepath.Base(indexSource),
-				zipFile:        filepath.Base(pageSource),
+				pageSourceURL:  pageSourceURL,
+				indexSourceURL: indexSourceURL,
+				indexFile:      filepath.Base(indexSourceURL),
+				zipFile:        filepath.Base(pageSourceURL),
 			},
 		},
 		{
@@ -93,9 +93,9 @@ func TestUpdate(t *testing.T) {
 			tldr: Tldr{
 				path:           filepath.Join(os.TempDir(), ".tldr"),
 				pageSourceURL:  "https://google.com/index.html",
-				indexSourceURL: indexSource,
-				indexFile:      filepath.Base(indexSource),
-				zipFile:        filepath.Base(pageSource),
+				indexSourceURL: indexSourceURL,
+				indexFile:      filepath.Base(indexSourceURL),
+				zipFile:        filepath.Base(pageSourceURL),
 			},
 		},
 	}
@@ -124,10 +124,10 @@ func TestOnInitialize(t *testing.T) {
 			expectErr:   false,
 			tldr: Tldr{
 				path:           filepath.Join(os.TempDir(), ".tldr"),
-				pageSourceURL:  pageSource,
-				indexSourceURL: indexSource,
-				indexFile:      filepath.Base(indexSource),
-				zipFile:        filepath.Base(pageSource),
+				pageSourceURL:  pageSourceURL,
+				indexSourceURL: indexSourceURL,
+				indexFile:      filepath.Base(indexSourceURL),
+				zipFile:        filepath.Base(pageSourceURL),
 				update:         true,
 				cacheMaxAge:    24 * 7 * time.Hour,
 			},
@@ -137,26 +137,13 @@ func TestOnInitialize(t *testing.T) {
 			expectErr:   true,
 			tldr: Tldr{
 				path:           "/.tldr",
-				pageSourceURL:  pageSource,
-				indexSourceURL: indexSource,
-				indexFile:      filepath.Base(indexSource),
-				zipFile:        filepath.Base(pageSource),
+				pageSourceURL:  pageSourceURL,
+				indexSourceURL: indexSourceURL,
+				indexFile:      filepath.Base(indexSourceURL),
+				zipFile:        filepath.Base(pageSourceURL),
 				platformDirs:   []string{"linux", "common"},
 				langDir:        "pages",
 				update:         false,
-			},
-		},
-		{
-			description: "failed test due to expired cache",
-			expectErr:   true,
-			tldr: Tldr{
-				path:           filepath.Join(os.TempDir(), ".tldr"),
-				pageSourceURL:  pageSource,
-				indexSourceURL: indexSource,
-				indexFile:      filepath.Base(indexSource),
-				zipFile:        filepath.Base(pageSource),
-				update:         false,
-				cacheMaxAge:    0 * time.Hour,
 			},
 		},
 	}
@@ -170,6 +157,41 @@ func TestOnInitialize(t *testing.T) {
 
 			if !tt.expectErr && err != nil {
 				t.Errorf("unexpected error got: %+v", err.Error())
+			}
+		})
+	}
+}
+
+func TestExpired(t *testing.T) {
+	tests := []struct {
+		description string
+		tldr        Tldr
+		want        bool
+	}{
+		{
+			description: "failed test due to expired cache",
+			tldr: Tldr{
+				path:           filepath.Join(os.TempDir(), ".tldr"),
+				pageSourceURL:  pageSourceURL,
+				indexSourceURL: indexSourceURL,
+				indexFile:      filepath.Base(indexSourceURL),
+				zipFile:        filepath.Base(pageSourceURL),
+				update:         false,
+				cacheMaxAge:    0 * time.Hour,
+			},
+			want: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			err := tt.tldr.OnInitialize()
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if got := tt.tldr.Expired(); got != tt.want {
+				t.Errorf("want: %+v, got: %+v", tt.want, got)
 			}
 		})
 	}
