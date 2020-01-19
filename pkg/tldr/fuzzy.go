@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/sahilm/fuzzy"
 )
 
@@ -58,9 +59,10 @@ func (c Cmds) Search(args []string) Cmds {
 
 // LoadIndexFile load command index file
 func (t *Tldr) LoadIndexFile() (*CmdsIndex, error) {
-	f, err := os.Open(filepath.Join(t.path, t.indexFile))
+	path := filepath.Join(t.path, t.indexFile)
+	f, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to open index file")
 	}
 	defer f.Close()
 

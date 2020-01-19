@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 const (
@@ -57,7 +59,7 @@ func (t *Tldr) OnInitialize() error {
 	initUpdate := false
 	if !pathExists(t.path) {
 		if err := os.Mkdir(t.path, 0755); err != nil {
-			return err
+			return errors.Wrap(err, "failed to create tldr dir")
 		}
 		// automatically updated if indexfile does not exist
 		initUpdate = true
@@ -65,7 +67,7 @@ func (t *Tldr) OnInitialize() error {
 
 	if t.update || initUpdate {
 		if err := t.Update(); err != nil {
-			return err
+			return errors.Wrap(err, "failed to update tldr repository")
 		}
 	}
 
@@ -76,16 +78,16 @@ func (t *Tldr) OnInitialize() error {
 func (t *Tldr) Update() error {
 	_, err := download(t.indexSourceURL, t.path, t.indexFile)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to download index file")
 	}
 
 	zipPath, err := download(t.pageSourceURL, t.path, t.zipFile)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to download tldr repository")
 	}
 
 	if err := unzip(zipPath, t.path); err != nil {
-		return err
+		return errors.Wrap(err, "failed to unzip tldr repository")
 	}
 
 	return nil
@@ -103,7 +105,7 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 
 		f, err := os.Open(path)
 		if err != nil {
-			return &Page{}, err
+			return &Page{}, errors.Wrap(err, "failed to open page: "+f.Name())
 		}
 		defer f.Close()
 
