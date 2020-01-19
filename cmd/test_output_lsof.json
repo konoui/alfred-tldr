@@ -3,50 +3,42 @@
 		{
 			"title": "lsof {{path/to/file}}",
 			"subtitle": "Find the processes that have a given file open:",
-			"arg": "lsof {{path/to/file}}",
-			"autocomplete": "lsof {{path/to/file}}"
+			"arg": "lsof {{path/to/file}}"
 		},
 		{
 			"title": "lsof -i :{{port}}",
 			"subtitle": "Find the process that opened a local internet port:",
-			"arg": "lsof -i :{{port}}",
-			"autocomplete": "lsof -i :{{port}}"
+			"arg": "lsof -i :{{port}}"
 		},
 		{
 			"title": "lsof -t {{path/to/file}}",
 			"subtitle": "Only output the process ID (PID):",
-			"arg": "lsof -t {{path/to/file}}",
-			"autocomplete": "lsof -t {{path/to/file}}"
+			"arg": "lsof -t {{path/to/file}}"
 		},
 		{
 			"title": "lsof -u {{username}}",
 			"subtitle": "List files opened by the given user:",
-			"arg": "lsof -u {{username}}",
-			"autocomplete": "lsof -u {{username}}"
+			"arg": "lsof -u {{username}}"
 		},
 		{
 			"title": "lsof -c {{process_or_command_name}}",
 			"subtitle": "List files opened by the given command or process:",
-			"arg": "lsof -c {{process_or_command_name}}",
-			"autocomplete": "lsof -c {{process_or_command_name}}"
+			"arg": "lsof -c {{process_or_command_name}}"
 		},
 		{
 			"title": "lsof -p {{PID}}",
 			"subtitle": "List files opened by a specific process, given its PID:",
-			"arg": "lsof -p {{PID}}",
-			"autocomplete": "lsof -p {{PID}}"
+			"arg": "lsof -p {{PID}}"
 		},
 		{
 			"title": "lsof +D {{path/to/directory}}",
 			"subtitle": "List open files in a directory:",
-			"arg": "lsof +D {{path/to/directory}}",
-			"autocomplete": "lsof +D {{path/to/directory}}"
+			"arg": "lsof +D {{path/to/directory}}"
 		},
 		{
 			"title": "lsof -iTCP:{{port}} -sTCP:LISTEN",
 			"subtitle": "Find the process that is listening on a local TCP port:",
-			"arg": "lsof -iTCP:{{port}} -sTCP:LISTEN",
-			"autocomplete": "lsof -iTCP:{{port}} -sTCP:LISTEN"
+			"arg": "lsof -iTCP:{{port}} -sTCP:LISTEN"
 		}
 	]
 }

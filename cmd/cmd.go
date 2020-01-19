@@ -141,10 +141,9 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 	p, _ := t.FindPage(cmds)
 	for _, cmd := range p.CmdExamples {
 		awf.Append(alfred.Item{
-			Title:        cmd.Cmd,
-			Subtitle:     cmd.Description,
-			Autocomplete: cmd.Cmd,
-			Arg:          cmd.Cmd,
+			Title:    cmd.Cmd,
+			Subtitle: cmd.Description,
+			Arg:      cmd.Cmd,
 		})
 	}
 
