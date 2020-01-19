@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/konoui/go-alfred"
-	"github.com/konoui/tldr/pkg/tldr"
 	"github.com/mattn/go-shellwords"
 )
 
@@ -45,7 +44,7 @@ func TestExecute(t *testing.T) {
 		expectErr   bool
 		filepath    string
 		command     string
-		cacheMaxAge time.Duration
+		tldrMaxAge  time.Duration
 		errMsg      string
 	}{
 		{
@@ -53,22 +52,22 @@ func TestExecute(t *testing.T) {
 			expectErr:   false,
 			command:     "lsof --update",
 			filepath:    "./test_output_lsof.txt",
-			cacheMaxAge: tldr.CacheMaxAge,
+			tldrMaxAge:  tldrMaxAge,
 		},
 		{
 			description: "text output tests sub cmd tests with git checkout",
 			expectErr:   false,
 			command:     "git checkout",
 			filepath:    "./test_output_git-checkout.txt",
-			cacheMaxAge: tldr.CacheMaxAge,
+			tldrMaxAge:  tldrMaxAge,
 		},
 		{
 			description: "text output tests with expired cache with lsof.",
 			expectErr:   false,
 			command:     "lsof",
 			filepath:    "./test_output_lsof.txt",
-			cacheMaxAge: 0 * time.Hour,
 			errMsg:      "more than a week passed, should update tldr using --update\n",
+			tldrMaxAge:  0 * time.Hour,
 		},
 		{
 			description: "page not found",
@@ -76,42 +75,42 @@ func TestExecute(t *testing.T) {
 			command:     "lsoff",
 			filepath:    "./test_output_no_page.txt",
 			errMsg:      "This page doesn't exist yet!\nSubmit new pages here: https://github.com/tldr-pages/tldr\n",
-			cacheMaxAge: tldr.CacheMaxAge,
+			tldrMaxAge:  tldrMaxAge,
 		},
 		{
 			description: "alfred workflow tests with lsof",
 			expectErr:   false,
 			command:     "lsof --update --workflow",
 			filepath:    "./test_output_lsof.json",
-			cacheMaxAge: tldr.CacheMaxAge,
+			tldrMaxAge:  tldrMaxAge,
 		},
 		{
 			description: "alfred workflow sub cmd tests with git checkout",
 			expectErr:   false,
 			command:     "git checkout --workflow",
 			filepath:    "./test_output_git-checkout.json",
-			cacheMaxAge: tldr.CacheMaxAge,
+			tldrMaxAge:  tldrMaxAge,
 		},
 		{
 			description: "alfred workflow fuzzy search",
 			expectErr:   false,
 			command:     " gitchec --workflow --fuzzy",
 			filepath:    "./test_output_git-checkout_with_fuzzy.json",
-			cacheMaxAge: tldr.CacheMaxAge,
+			tldrMaxAge:  tldrMaxAge,
 		},
 		{
 			description: "alfred workflow tests with expired cache with lsof. alfred workflow show no error",
 			expectErr:   false,
 			command:     "lsof --workflow",
 			filepath:    "./test_output_lsof.json",
-			cacheMaxAge: 0 * time.Hour,
+			tldrMaxAge:  0 * time.Hour,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			// set cache max age
-			tldr.CacheMaxAge = tt.cacheMaxAge
+			tldrMaxAge = tt.tldrMaxAge
 
 			wantData, err := ioutil.ReadFile(tt.filepath)
 			if err != nil {

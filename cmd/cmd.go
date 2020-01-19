@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/konoui/go-alfred"
 	"github.com/konoui/tldr/pkg/tldr"
@@ -20,8 +21,11 @@ var (
 )
 
 var (
-	op tldr.Options
+	op         tldr.Options
+	tldrMaxAge time.Duration = 24 * 7 * time.Hour
 )
+
+const tldrDir = ".tldr"
 
 func init() {
 	platform := runtime.GOOS
@@ -67,7 +71,6 @@ func Execute(rootCmd *cobra.Command) {
 }
 
 func run(cmds []string, op tldr.Options, isWorkflow, enableFuzzy bool) error {
-	const tldrDir = ".tldr"
 	home, err := homedir.Dir()
 	if err != nil {
 		return err
@@ -99,7 +102,7 @@ const (
 )
 
 func renderToOut(t *tldr.Tldr, cmds []string) {
-	if t.Expired() {
+	if t.Expired(tldrMaxAge) {
 		fmt.Fprintln(errStream, "more than a week passed, should update tldr using --update")
 	}
 

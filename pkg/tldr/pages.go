@@ -13,10 +13,6 @@ const (
 	indexSourceURL = "https://tldr.sh/assets/index.json"
 )
 
-// CacheMaxAge tldr page cache age. default is a week.
-// you should not override.
-var CacheMaxAge time.Duration = 24 * 7 * time.Hour
-
 // Options are tldr functions
 type Options struct {
 	Platform string
@@ -48,7 +44,6 @@ func New(tldrPath string, op Options) *Tldr {
 		platformDirs:   []string{op.Platform, "common"},
 		langDir:        convertToLangDir(op.Language),
 		update:         op.Update,
-		cacheMaxAge:    CacheMaxAge,
 	}
 }
 
@@ -119,14 +114,14 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 }
 
 // Expired return true if cache is expired
-func (t *Tldr) Expired() bool {
+func (t *Tldr) Expired(maxAge time.Duration) bool {
 	indexPath := filepath.Join(t.path, t.indexFile)
 	age, err := age(indexPath)
 	if err != nil {
 		return true
 	}
 
-	return age > t.cacheMaxAge
+	return age > maxAge
 }
 
 // age return the time since the data is cached at

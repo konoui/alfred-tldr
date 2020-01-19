@@ -167,6 +167,7 @@ func TestExpired(t *testing.T) {
 		description string
 		tldr        Tldr
 		want        bool
+		tldrMaxAge  time.Duration
 	}{
 		{
 			description: "failed test due to expired cache",
@@ -179,7 +180,8 @@ func TestExpired(t *testing.T) {
 				update:         false,
 				cacheMaxAge:    0 * time.Hour,
 			},
-			want: true,
+			tldrMaxAge: 0 * time.Hour,
+			want:       true,
 		},
 	}
 
@@ -190,7 +192,7 @@ func TestExpired(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			if got := tt.tldr.Expired(); got != tt.want {
+			if got := tt.tldr.Expired(tt.tldrMaxAge); got != tt.want {
 				t.Errorf("want: %+v, got: %+v", tt.want, got)
 			}
 		})
