@@ -115,7 +115,7 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 	return &Page{}, fmt.Errorf("not found %s page", cmds)
 }
 
-// Expired return true if cache is expired
+// Expired return true if tldr repository have passed `maxAge`
 func (t *Tldr) Expired(maxAge time.Duration) bool {
 	indexPath := filepath.Join(t.path, t.indexFile)
 	age, err := age(indexPath)
@@ -126,7 +126,7 @@ func (t *Tldr) Expired(maxAge time.Duration) bool {
 	return age > maxAge
 }
 
-// age return the time since the data is cached at
+// age return the time since the data exist at
 func age(path string) (time.Duration, error) {
 	fi, err := os.Stat(path)
 	if err != nil {

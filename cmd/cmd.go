@@ -164,6 +164,9 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 					nextActionKey: nextActionCmd,
 				},
 				Arg: fmt.Sprintf("%s --platform %s", cmd.Name, cmd.Platform[0]),
+				Icon: &alfred.Icon{
+					Path: "candidate.png",
+				},
 			})
 		}
 	}
