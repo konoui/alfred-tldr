@@ -3,22 +3,23 @@ package tldr
 import (
 	"os"
 	"path/filepath"
-	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestParsePage(t *testing.T) {
 	tests := []struct {
 		description string
 		url         string
-		want        Page
+		want        *Page
 		expectErr   bool
 	}{
 		{
 			description: "lsof",
 			url:         "https://raw.githubusercontent.com/tldr-pages/tldr/master/pages/common/lsof.md",
 			expectErr:   false,
-			want: Page{
+			want: &Page{
 				CmdName:        "lsof",
 				CmdDescription: "Lists open files and the corresponding processes.\nNote: Root privileges (or sudo) is required to list files opened by others.\n",
 				CmdExamples: []*CmdExample{
@@ -50,6 +51,10 @@ func TestParsePage(t *testing.T) {
 						Description: "List open files in a directory:",
 						Cmd:         "lsof +D {{path/to/directory}}",
 					},
+					&CmdExample{
+						Description: "Find the process that is listening on a local TCP port:",
+						Cmd:         "lsof -iTCP:{{port}} -sTCP:LISTEN",
+					},
 				},
 			},
 		},
@@ -68,25 +73,13 @@ func TestParsePage(t *testing.T) {
 			}
 			defer f.Close()
 
-			page, err := parsePage(f)
+			got, err := parsePage(f)
 			if !tt.expectErr && err != nil {
-				t.Errorf("unexpected error got: %+v", err.Error())
+				t.Errorf("unexpected error got: %+v", err)
 			}
 
-			want := tt.want.CmdName
-			got := page.CmdName
-			if want != got {
-				t.Errorf("want: %+v, got: %+v", want, got)
-			}
-
-			want = tt.want.CmdDescription
-			got = page.CmdDescription
-			if want != got {
-				t.Errorf("want: %+v, got: %+v", want, got)
-			}
-
-			if !reflect.DeepEqual(tt.want.CmdExamples, tt.want.CmdExamples) {
-				t.Errorf("want: %+v, got: %+v", tt.want.CmdExamples, tt.want.CmdExamples)
+			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Errorf("+want -got\n%+v", diff)
 			}
 		})
 	}

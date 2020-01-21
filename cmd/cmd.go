@@ -150,7 +150,7 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 	if enableFuzzy && len(p.CmdExamples) == 0 {
 		index, err := t.LoadIndexFile()
 		if err != nil {
-			awf.Fatal(fmt.Sprintf("an error occurs: %s", err), "")
+			awf.Fatal("fatal error occurs", err.Error())
 			return
 		}
 

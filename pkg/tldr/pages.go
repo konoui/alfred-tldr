@@ -50,11 +50,11 @@ func New(tldrPath string, op Options) *Tldr {
 }
 
 func convertToLangDir(lang string) string {
-	// TODO return multi language dirs Depending on lang
+	// TODO return multi language dirs depending on lang
 	return "pages"
 }
 
-// OnInitialize create tldr directory and check tldr pages whether cache expired or not
+// OnInitialize create and update tldr directory
 func (t *Tldr) OnInitialize() error {
 	initUpdate := false
 	if !pathExists(t.path) {
@@ -105,7 +105,7 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 
 		f, err := os.Open(path)
 		if err != nil {
-			return &Page{}, errors.Wrap(err, "failed to open page: "+f.Name())
+			return &Page{}, errors.Wrapf(err, "failed to open page (%s)", f.Name())
 		}
 		defer f.Close()
 
