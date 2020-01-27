@@ -140,7 +140,7 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 
 	p, _ := t.FindPage(cmds)
 	for _, cmd := range p.CmdExamples {
-		awf.Append(alfred.Item{
+		awf.Append(&alfred.Item{
 			Title:    cmd.Cmd,
 			Subtitle: cmd.Description,
 			Arg:      cmd.Cmd,
@@ -156,7 +156,7 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 
 		suggestions := index.Commands.Search(cmds)
 		for _, cmd := range suggestions {
-			awf.Append(alfred.Item{
+			awf.Append(&alfred.Item{
 				Title:        cmd.Name,
 				Subtitle:     fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ",")),
 				Autocomplete: cmd.Name,
