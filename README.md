@@ -1,3 +1,5 @@
+![Generic badge](https://github.com/konoui/tldr/workflows/test/badge.svg)
+
 ## alfred tldr
 tldr alfred workflow written in go.
 This tldr also works as cli.
