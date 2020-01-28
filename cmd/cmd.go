@@ -140,7 +140,7 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 
 	p, _ := t.FindPage(cmds)
 	for _, cmd := range p.CmdExamples {
-		awf.Append(alfred.Item{
+		awf.Append(&alfred.Item{
 			Title:    cmd.Cmd,
 			Subtitle: cmd.Description,
 			Arg:      cmd.Cmd,
@@ -150,13 +150,13 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 	if enableFuzzy && len(p.CmdExamples) == 0 {
 		index, err := t.LoadIndexFile()
 		if err != nil {
-			awf.Fatal(fmt.Sprintf("an error occurs: %s", err), "")
+			awf.Fatal("fatal error occurs", err.Error())
 			return
 		}
 
 		suggestions := index.Commands.Search(cmds)
 		for _, cmd := range suggestions {
-			awf.Append(alfred.Item{
+			awf.Append(&alfred.Item{
 				Title:        cmd.Name,
 				Subtitle:     fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ",")),
 				Autocomplete: cmd.Name,
@@ -164,6 +164,9 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 					nextActionKey: nextActionCmd,
 				},
 				Arg: fmt.Sprintf("%s --platform %s", cmd.Name, cmd.Platform[0]),
+				Icon: &alfred.Icon{
+					Path: "candidate.png",
+				},
 			})
 		}
 	}

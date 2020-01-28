@@ -7,6 +7,9 @@
       "title": "git checkout",
       "subtitle": "Platforms: common",
       "arg": "git checkout --platform common",
+      "icon": {
+        "path": "candidate.png"
+      },
       "autocomplete": "git checkout"
     },
     {
@@ -16,6 +19,9 @@
       "title": "git check ignore",
       "subtitle": "Platforms: common",
       "arg": "git check ignore --platform common",
+      "icon": {
+        "path": "candidate.png"
+      },
       "autocomplete": "git check ignore"
     },
     {
@@ -25,6 +31,9 @@
       "title": "git cherry pick",
       "subtitle": "Platforms: common",
       "arg": "git cherry pick --platform common",
+      "icon": {
+        "path": "candidate.png"
+      },
       "autocomplete": "git cherry pick"
     }
   ]

@@ -21,7 +21,7 @@ func TestFindPage(t *testing.T) {
 			cmds:        []string{"lsof"},
 		},
 		{
-			description: "valid cmd and sub cmd",
+			description: "valid sub cmd",
 			expectErr:   false,
 			want:        "git checkout",
 			cmds:        []string{"git", "checkout"},
@@ -49,7 +49,7 @@ func TestFindPage(t *testing.T) {
 				t.Errorf("expect error happens, but got response")
 			}
 			if !tt.expectErr && err != nil {
-				t.Errorf("unexpected error got: %+v", err.Error())
+				t.Errorf("unexpected error got: %+v", err)
 			}
 			if got := page.CmdName; got != tt.want {
 				t.Errorf("want: %+v, got: %+v", tt.want, got)
@@ -107,7 +107,7 @@ func TestUpdate(t *testing.T) {
 			}
 
 			if !tt.expectErr && err != nil {
-				t.Errorf("unexpected error got: %+v", err.Error())
+				t.Errorf("unexpected error got: %+v", err)
 			}
 		})
 	}
@@ -156,7 +156,7 @@ func TestOnInitialize(t *testing.T) {
 			}
 
 			if !tt.expectErr && err != nil {
-				t.Errorf("unexpected error got: %+v", err.Error())
+				t.Errorf("unexpected error got: %+v", err)
 			}
 		})
 	}

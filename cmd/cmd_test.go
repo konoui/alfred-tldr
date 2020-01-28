@@ -48,21 +48,21 @@ func TestExecute(t *testing.T) {
 		errMsg      string
 	}{
 		{
-			description: "text output tests with lsof",
+			description: "text output. lsof",
 			expectErr:   false,
 			command:     "lsof --update",
 			filepath:    "./test_output_lsof.txt",
 			tldrMaxAge:  tldrMaxAge,
 		},
 		{
-			description: "text output tests sub cmd tests with git checkout",
+			description: "text output. sub command git checkout",
 			expectErr:   false,
 			command:     "git checkout",
 			filepath:    "./test_output_git-checkout.txt",
 			tldrMaxAge:  tldrMaxAge,
 		},
 		{
-			description: "text output tests with expired cache with lsof.",
+			description: "text output. expired cache",
 			expectErr:   false,
 			command:     "lsof",
 			filepath:    "./test_output_lsof.txt",
@@ -70,7 +70,7 @@ func TestExecute(t *testing.T) {
 			tldrMaxAge:  0 * time.Hour,
 		},
 		{
-			description: "page not found",
+			description: "text output. page not found",
 			expectErr:   false,
 			command:     "lsoff",
 			filepath:    "./test_output_no_page.txt",
@@ -78,28 +78,28 @@ func TestExecute(t *testing.T) {
 			tldrMaxAge:  tldrMaxAge,
 		},
 		{
-			description: "alfred workflow tests with lsof",
+			description: "alfred workflow. lsof",
 			expectErr:   false,
 			command:     "lsof --update --workflow",
 			filepath:    "./test_output_lsof.json",
 			tldrMaxAge:  tldrMaxAge,
 		},
 		{
-			description: "alfred workflow sub cmd tests with git checkout",
+			description: "alfred workflow. sub command git checkout",
 			expectErr:   false,
 			command:     "git checkout --workflow",
 			filepath:    "./test_output_git-checkout.json",
 			tldrMaxAge:  tldrMaxAge,
 		},
 		{
-			description: "alfred workflow fuzzy search",
+			description: "alfred workflow. fuzzy search",
 			expectErr:   false,
 			command:     " gitchec --workflow --fuzzy",
 			filepath:    "./test_output_git-checkout_with_fuzzy.json",
 			tldrMaxAge:  tldrMaxAge,
 		},
 		{
-			description: "alfred workflow tests with expired cache with lsof. alfred workflow show no error",
+			description: "alfred workflow. show no error when cache expired",
 			expectErr:   false,
 			command:     "lsof --workflow",
 			filepath:    "./test_output_lsof.json",
@@ -133,7 +133,7 @@ func TestExecute(t *testing.T) {
 			}
 
 			if !tt.expectErr && err != nil {
-				t.Errorf("unexpected error got: %+v", err.Error())
+				t.Errorf("unexpected error got: %+v", err)
 			}
 
 			outGotData := outBuf.Bytes()
