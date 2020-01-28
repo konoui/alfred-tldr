@@ -13,10 +13,6 @@ GOLANGCI_LINT_VERSION := v1.22.2
 export GO111MODULE=on
 
 ## Build binaries on your environment
-GOLANGCI_LINT_VERSION := v1.22.2
-export GO111MODULE=on
-
-## Build binaries on your environment
 build:
 	CGO_ENABLED=0 go build -ldflags "${LDFLAGS}" -o ${BINARY} ./${SRC_DIR}
 
