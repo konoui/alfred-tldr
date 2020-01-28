@@ -3,42 +3,114 @@
 		{
 			"title": "git checkout -b {{branch_name}}",
 			"subtitle": "Create and switch to a new branch:",
-			"arg": "git checkout -b {{branch_name}}"
+			"arg": "git checkout -b {{branch_name}}",
+			"mods": {
+				"ctrl": {
+					"variables": {
+						"nextAction": "shell"
+					},
+					"arg": "tldr --update",
+					"subtitle": "update tldr repository"
+				}
+			}
 		},
 		{
 			"title": "git checkout -b {{branch_name}} {{reference}}",
 			"subtitle": "Create and switch to a new branch based on a specific reference (branch, remote/branch, tag are examples of valid references):",
-			"arg": "git checkout -b {{branch_name}} {{reference}}"
+			"arg": "git checkout -b {{branch_name}} {{reference}}",
+			"mods": {
+				"ctrl": {
+					"variables": {
+						"nextAction": "shell"
+					},
+					"arg": "tldr --update",
+					"subtitle": "update tldr repository"
+				}
+			}
 		},
 		{
 			"title": "git checkout {{branch_name}}",
 			"subtitle": "Switch to an existing local branch:",
-			"arg": "git checkout {{branch_name}}"
+			"arg": "git checkout {{branch_name}}",
+			"mods": {
+				"ctrl": {
+					"variables": {
+						"nextAction": "shell"
+					},
+					"arg": "tldr --update",
+					"subtitle": "update tldr repository"
+				}
+			}
 		},
 		{
 			"title": "git checkout -",
 			"subtitle": "Switch to the previously checked out branch:",
-			"arg": "git checkout -"
+			"arg": "git checkout -",
+			"mods": {
+				"ctrl": {
+					"variables": {
+						"nextAction": "shell"
+					},
+					"arg": "tldr --update",
+					"subtitle": "update tldr repository"
+				}
+			}
 		},
 		{
 			"title": "git checkout --track {{remote_name}}/{{branch_name}}",
 			"subtitle": "Switch to an existing remote branch:",
-			"arg": "git checkout --track {{remote_name}}/{{branch_name}}"
+			"arg": "git checkout --track {{remote_name}}/{{branch_name}}",
+			"mods": {
+				"ctrl": {
+					"variables": {
+						"nextAction": "shell"
+					},
+					"arg": "tldr --update",
+					"subtitle": "update tldr repository"
+				}
+			}
 		},
 		{
 			"title": "git checkout .",
 			"subtitle": "Discard all unstaged changes in the current directory (see `git reset` for more undo-like commands):",
-			"arg": "git checkout ."
+			"arg": "git checkout .",
+			"mods": {
+				"ctrl": {
+					"variables": {
+						"nextAction": "shell"
+					},
+					"arg": "tldr --update",
+					"subtitle": "update tldr repository"
+				}
+			}
 		},
 		{
 			"title": "git checkout {{file_name}}",
 			"subtitle": "Discard unstaged changes to a given file:",
-			"arg": "git checkout {{file_name}}"
+			"arg": "git checkout {{file_name}}",
+			"mods": {
+				"ctrl": {
+					"variables": {
+						"nextAction": "shell"
+					},
+					"arg": "tldr --update",
+					"subtitle": "update tldr repository"
+				}
+			}
 		},
 		{
 			"title": "git checkout {{branch_name}} -- {{file_name}}",
 			"subtitle": "Replace a file in the current directory with the version of it committed in a given branch:",
-			"arg": "git checkout {{branch_name}} -- {{file_name}}"
+			"arg": "git checkout {{branch_name}} -- {{file_name}}",
+			"mods": {
+				"ctrl": {
+					"variables": {
+						"nextAction": "shell"
+					},
+					"arg": "tldr --update",
+					"subtitle": "update tldr repository"
+				}
+			}
 		}
 	]
 }
