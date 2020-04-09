@@ -23,6 +23,15 @@ var (
 var (
 	op         tldr.Options
 	tldrMaxAge time.Duration = 24 * 7 * time.Hour
+	updater                  = map[alfred.ModKey]alfred.Mod{
+		alfred.ModCtrl: alfred.Mod{
+			Subtitle: "update tldr repository",
+			Arg:      "tldr --update",
+			Variables: map[string]string{
+				nextActionKey: nextActionShell,
+			},
+		},
+	}
 )
 
 const tldrDir = ".tldr"
@@ -50,7 +59,8 @@ func NewRootCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return run(args, op, isWorkflow, enableFuzzy)
 		},
-		SilenceUsage: true,
+		SilenceErrors: true,
+		SilenceUsage:  false,
 	}
 	rootCmd.PersistentFlags().StringVarP(&op.Platform, "platform", "p", op.Platform, "platform")
 	//rootCmd.PersistentFlags().StringVarP(&op.Language, "language", "l", op.Language, "language")
@@ -63,9 +73,9 @@ func NewRootCmd() *cobra.Command {
 
 // Execute Execute root cmd
 func Execute(rootCmd *cobra.Command) {
-	rootCmd.SetOutput(outStream)
+	rootCmd.SetOut(outStream)
+	rootCmd.SetErr(errStream)
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(errStream, err)
 		os.Exit(1)
 	}
 }
@@ -89,8 +99,7 @@ func run(cmds []string, op tldr.Options, isWorkflow, enableFuzzy bool) error {
 		return nil
 	}
 
-	renderToOut(t, cmds)
-	return nil
+	return renderToOut(t, cmds)
 }
 
 const (
@@ -101,7 +110,10 @@ const (
 	reset = "\x1b[33;0m"
 )
 
-func renderToOut(t *tldr.Tldr, cmds []string) {
+func renderToOut(t *tldr.Tldr, cmds []string) error {
+	if len(cmds) == 0 {
+		return fmt.Errorf("no argument")
+	}
 	if t.Expired(tldrMaxAge) {
 		fmt.Fprintln(errStream, "more than a week passed, should update tldr using --update")
 	}
@@ -109,7 +121,7 @@ func renderToOut(t *tldr.Tldr, cmds []string) {
 	p, err := t.FindPage(cmds)
 	if err != nil {
 		fmt.Fprintln(errStream, "This page doesn't exist yet!\nSubmit new pages here: https://github.com/tldr-pages/tldr")
-		return
+		return nil
 	}
 
 	coloredCmdName := bold + p.CmdName + reset
@@ -125,12 +137,14 @@ func renderToOut(t *tldr.Tldr, cmds []string) {
 		fmt.Fprintln(outStream, coloredCmd)
 		fmt.Fprintln(outStream)
 	}
+	return nil
 }
 
 // decide next action for workflow filter
 const (
-	nextActionKey = "nextAction"
-	nextActionCmd = "cmd"
+	nextActionKey   = "nextAction"
+	nextActionCmd   = "cmd"
+	nextActionShell = "shell"
 )
 
 func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
@@ -144,6 +158,7 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 			Title:    cmd.Cmd,
 			Subtitle: cmd.Description,
 			Arg:      cmd.Cmd,
+			Mods:     updater,
 		})
 	}
 
@@ -167,6 +182,7 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 				Icon: &alfred.Icon{
 					Path: "candidate.png",
 				},
+				Mods: updater,
 			})
 		}
 	}
