@@ -14,3 +14,6 @@ This tldr also works as cli.
 
 -  tldr `<cmd>` with cli
 ![cli-tldr](./cli-tldr.png)
+
+## License
+MIT License.
