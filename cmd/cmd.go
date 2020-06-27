@@ -149,7 +149,8 @@ const (
 
 func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 	awf := alfred.NewWorkflow()
-	awf.SetStreams(outStream, outStream)
+	awf.SetOut(outStream)
+	awf.SetErr(errStream)
 	awf.EmptyWarning("No matching query", "Try a different query")
 
 	p, _ := t.FindPage(cmds)

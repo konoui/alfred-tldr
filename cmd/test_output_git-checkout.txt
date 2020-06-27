@@ -22,8 +22,8 @@ More information: <https://git-scm.com/docs/git-checkout>.
 [31mgit checkout .[33;0m
 
 - [32mDiscard unstaged changes to a given file:[33;0m
-[31mgit checkout [34mfile_name[31m[33;0m
+[31mgit checkout [34mfilename[31m[33;0m
 
 - [32mReplace a file in the current directory with the version of it committed in a given branch:[33;0m
-[31mgit checkout [34mbranch_name[31m -- [34mfile_name[31m[33;0m
+[31mgit checkout [34mbranch_name[31m -- [34mfilename[31m[33;0m
 

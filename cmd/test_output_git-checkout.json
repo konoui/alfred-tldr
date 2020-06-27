@@ -85,9 +85,9 @@
 			}
 		},
 		{
-			"title": "git checkout {{file_name}}",
+			"title": "git checkout {{filename}}",
 			"subtitle": "Discard unstaged changes to a given file:",
-			"arg": "git checkout {{file_name}}",
+			"arg": "git checkout {{filename}}",
 			"mods": {
 				"ctrl": {
 					"variables": {
@@ -99,9 +99,9 @@
 			}
 		},
 		{
-			"title": "git checkout {{branch_name}} -- {{file_name}}",
+			"title": "git checkout {{branch_name}} -- {{filename}}",
 			"subtitle": "Replace a file in the current directory with the version of it committed in a given branch:",
-			"arg": "git checkout {{branch_name}} -- {{file_name}}",
+			"arg": "git checkout {{branch_name}} -- {{filename}}",
 			"mods": {
 				"ctrl": {
 					"variables": {
