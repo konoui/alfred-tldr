@@ -10,16 +10,7 @@
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "git checkout",
-      "mods": {
-        "ctrl": {
-          "variables": {
-            "nextAction": "shell"
-          },
-          "arg": "tldr --update",
-          "subtitle": "update tldr repository"
-        }
-      }
+      "autocomplete": "git checkout"
     },
     {
       "variables": {
@@ -31,16 +22,7 @@
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "git check ignore",
-      "mods": {
-        "ctrl": {
-          "variables": {
-            "nextAction": "shell"
-          },
-          "arg": "tldr --update",
-          "subtitle": "update tldr repository"
-        }
-      }
+      "autocomplete": "git check ignore"
     },
     {
       "variables": {
@@ -52,16 +34,7 @@
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "git cherry pick",
-      "mods": {
-        "ctrl": {
-          "variables": {
-            "nextAction": "shell"
-          },
-          "arg": "tldr --update",
-          "subtitle": "update tldr repository"
-        }
-      }
+      "autocomplete": "git cherry pick"
     }
   ]
 }

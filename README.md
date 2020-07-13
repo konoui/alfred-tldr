@@ -2,18 +2,18 @@
 
 ## alfred tldr
 tldr alfred workflow written in go.
-This tldr also works as cli.
 
 ## Install
-- alfred-workflow: Download the workflow form [latest release](https://github.com/konoui/tldr/releases).
-- cli: `go get -u github.com/konoui/tldr`
+Download the workflow form [latest release](https://github.com/konoui/tldr/releases).
 
 ## Usage
-- tldr `<query>` with alfred workflow
-![alfred-tldr](./alfred-tldr.png)
+`tldr <query>`
 
--  tldr `<cmd>` with cli
-![cli-tldr](./cli-tldr.png)
+Options   
+`-u` option updates command list (tldr repository).   
+`-p` option chooses platform from `linux`,`osx`,`sunos`,`windows`.   
+
+![alfred-tldr](./alfred-tldr.png)
 
 ## License
 MIT License.

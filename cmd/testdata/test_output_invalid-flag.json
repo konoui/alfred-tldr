@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "title": "Usage: -p, --platform  chose platform"
+    },
+    {
+      "title": "Usage: -u, --update  update tldr repository"
+    }
+  ]
+}

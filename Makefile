@@ -7,12 +7,12 @@ BINARY := bin/$(BIN_NAME)
 ASSETS_DIR := assets
 ASSETS := $(ASSETS_DIR)/* $(BINARY) README.md
 ARTIFACT_DIR := .artifact
-ARTIFACT_NAME := $(ARTIFACT_DIR)/$(BIN_NAME).alfredworkflow
+ARTIFACT_NAME := $(BIN_NAME).alfredworkflow
 
 ## For local test
 WORKFLOW_DIR := "$${HOME}/Library/Application Support/Alfred/Alfred.alfredpreferences/workflows/user.workflow.2569C1E1-8114-4B77-9506-52AA966313A9"
 
-GOLANGCI_LINT_VERSION := v1.22.2
+GOLANGCI_LINT_VERSION := v1.24.0
 export GO111MODULE=on
 
 ## Build binaries on your environment
@@ -41,12 +41,15 @@ test:
 install: build
 	@(cp $(ASSETS)  $(WORKFLOW_DIR)/)
 
-## GitHub Release and uploads artifacts
-release: darwin
+## Create workflow artifact
+package: darwin
 	@(if ! type ghr >/dev/null 2>&1; then go get -u github.com/tcnksm/ghr ;fi)
 	@(if [ ! -e $(ARTIFACT_DIR) ]; then mkdir $(ARTIFACT_DIR) ; fi)
 	@(cp $(ASSETS) $(ARTIFACT_DIR))
 	@(zip -j $(ARTIFACT_NAME) $(ARTIFACT_DIR)/*)
+
+## GitHub Release and uploads artifacts
+release: package
 	@ghr -replace $(VERSION) $(ARTIFACT_NAME)
 
 ## Clean Binary
