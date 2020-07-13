@@ -3,7 +3,7 @@ package cmd
 import (
 	"bytes"
 	"io/ioutil"
-	"strings"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -11,138 +11,123 @@ import (
 	"github.com/mattn/go-shellwords"
 )
 
-func testWorkflowOutput(t *testing.T, outWantData, outGotData, errWantData, errGotData []byte) {
-	t.Helper()
-	if diff := alfred.DiffScriptFilter(outWantData, outGotData); diff != "" {
-		t.Errorf("+want -got\n%+v", diff)
-	}
-
-	if string(errWantData) != string(errGotData) {
-		t.Errorf("Workflow want: %+v\n, got: %+v\n", string(errWantData), string(errGotData))
-	}
-}
-
-func testCLIOutput(t *testing.T, outWantData, outGotData, errWantData, errGotData []byte) {
-	t.Helper()
-
-	want := string(outWantData)
-	got := string(outGotData)
-	if want != got {
-		t.Errorf("CLI want: %+v\n, got: %+v\n", want, got)
-	}
-
-	want = string(errWantData)
-	got = string(errGotData)
-	if want != got {
-		t.Errorf("CLI want: %+v\n, got: %+v\n", want, got)
-	}
+func testdataPath(file string) string {
+	return filepath.Join("./testdata", file)
 }
 
 func TestExecute(t *testing.T) {
+	type args struct {
+		filepath   string
+		command    string
+		tldrMaxAge time.Duration
+	}
 	tests := []struct {
-		description string
-		expectErr   bool
-		filepath    string
-		command     string
-		tldrMaxAge  time.Duration
-		errMsg      string
+		name   string
+		args   args
+		update bool
 	}{
 		{
-			description: "text output. lsof",
-			expectErr:   false,
-			command:     "lsof --update",
-			filepath:    "./test_output_lsof.txt",
-			tldrMaxAge:  tldrMaxAge,
+			name: "alfred workflow. lsof",
+			args: args{
+				command:    "lsof --update",
+				filepath:   testdataPath("test_output_lsof.json"),
+				tldrMaxAge: tldrMaxAge,
+			},
 		},
 		{
-			description: "text output. sub command git checkout",
-			expectErr:   false,
-			command:     "git checkout",
-			filepath:    "./test_output_git-checkout.txt",
-			tldrMaxAge:  tldrMaxAge,
+			name: "alfred workflow. sub command git checkout",
+			args: args{
+				command:    "git checkout",
+				filepath:   testdataPath("test_output_git-checkout.json"),
+				tldrMaxAge: tldrMaxAge,
+			},
 		},
 		{
-			description: "text output. expired cache",
-			expectErr:   false,
-			command:     "lsof",
-			filepath:    "./test_output_lsof.txt",
-			errMsg:      "more than a week passed, should update tldr using --update\n",
-			tldrMaxAge:  0 * time.Hour,
+			name: "alfred workflow. fuzzy search",
+			args: args{
+				command:    "gitchec --fuzzy",
+				filepath:   testdataPath("test_output_git-checkout_with_fuzzy.json"),
+				tldrMaxAge: tldrMaxAge,
+			},
 		},
 		{
-			description: "text output. page not found",
-			expectErr:   false,
-			command:     "lsoff",
-			filepath:    "./test_output_no_page.txt",
-			errMsg:      "This page doesn't exist yet!\nSubmit new pages here: https://github.com/tldr-pages/tldr\n",
-			tldrMaxAge:  tldrMaxAge,
+			name: "alfred workflow. show no error when cache expired",
+			args: args{
+				command:    "lsof",
+				filepath:   testdataPath("test_output_lsof.json"),
+				tldrMaxAge: 0 * time.Hour,
+			},
 		},
 		{
-			description: "alfred workflow. lsof",
-			expectErr:   false,
-			command:     "lsof --update --workflow",
-			filepath:    "./test_output_lsof.json",
-			tldrMaxAge:  tldrMaxAge,
+			name: "bool invalid flag",
+			args: args{
+				command:    "lsof -a",
+				filepath:   testdataPath("test_output_invalid-flag.json"),
+				tldrMaxAge: 0 * time.Hour,
+			},
 		},
 		{
-			description: "alfred workflow. sub command git checkout",
-			expectErr:   false,
-			command:     "git checkout --workflow",
-			filepath:    "./test_output_git-checkout.json",
-			tldrMaxAge:  tldrMaxAge,
+			name: " bool invalid and valid flags",
+			args: args{
+				command:    "-a -f",
+				filepath:   testdataPath("test_output_invalid-flag.json"),
+				tldrMaxAge: 0 * time.Hour,
+			},
 		},
 		{
-			description: "alfred workflow. fuzzy search",
-			expectErr:   false,
-			command:     " gitchec --workflow --fuzzy",
-			filepath:    "./test_output_git-checkout_with_fuzzy.json",
-			tldrMaxAge:  tldrMaxAge,
+			name: "string flag but no value",
+			args: args{
+				command:    "-p",
+				filepath:   testdataPath("test_output_invalid-flag.json"),
+				tldrMaxAge: 0 * time.Hour,
+			},
 		},
 		{
-			description: "alfred workflow. show no error when cache expired",
-			expectErr:   false,
-			command:     "lsof --workflow",
-			filepath:    "./test_output_lsof.json",
-			tldrMaxAge:  0 * time.Hour,
+			name: "string flag but no value. and invalid flag",
+			args: args{
+				command:    "-p -a",
+				filepath:   testdataPath("./test_output_no-output.json"),
+				tldrMaxAge: 0 * time.Hour,
+			},
 		},
 	}
 
+	rootCmd := NewRootCmd()
 	for _, tt := range tests {
-		t.Run(tt.description, func(t *testing.T) {
-			// set cache max age
-			tldrMaxAge = tt.tldrMaxAge
+		t.Run(tt.name, func(t *testing.T) {
+			// set cache ttl
+			tldrMaxAge = tt.args.tldrMaxAge
 
-			wantData, err := ioutil.ReadFile(tt.filepath)
+			wantData, err := ioutil.ReadFile(tt.args.filepath)
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			outBuf, errBuf := new(bytes.Buffer), new(bytes.Buffer)
 			outStream, errStream = outBuf, errBuf
-			cmdArgs, err := shellwords.Parse(tt.command)
+			cmdArgs, err := shellwords.Parse(tt.args.command)
 			if err != nil {
 				t.Fatalf("args parse error: %+v", err)
 			}
-			rootCmd := NewRootCmd()
 			rootCmd.SetOutput(outStream)
 			rootCmd.SetArgs(cmdArgs)
 
 			err = rootCmd.Execute()
-			if tt.expectErr && err == nil {
-				t.Errorf("expect error happens, but got response")
-			}
-
-			if !tt.expectErr && err != nil {
+			if err != nil {
 				t.Errorf("unexpected error got: %+v", err)
 			}
 
 			outGotData := outBuf.Bytes()
-			errGotData := errBuf.Bytes()
-			// switch test
-			if strings.Contains(tt.command, "--workflow") || strings.Contains(tt.command, "-w") {
-				testWorkflowOutput(t, wantData, outGotData, []byte(tt.errMsg), errGotData)
-			} else {
-				testCLIOutput(t, wantData, outGotData, []byte(tt.errMsg), errGotData)
+
+			// automatically update test data
+			if tt.update {
+				if err := ioutil.WriteFile(tt.args.filepath, outGotData, 0644); err != nil {
+					t.Fatal(err)
+				}
+			}
+
+			if diff := alfred.DiffScriptFilter(wantData, outGotData); diff != "" {
+				t.Errorf("+want -got\n%+v", diff)
 			}
 		})
 	}
