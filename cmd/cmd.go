@@ -57,7 +57,7 @@ func NewRootCmd() *cobra.Command {
 			return run(args, op, enableFuzzy)
 		},
 		SilenceErrors:      true,
-		SilenceUsage:       false,
+		SilenceUsage:       true,
 		DisableSuggestions: true,
 	}
 	rootCmd.PersistentFlags().StringP(platformFlag, string(platformFlag[0]), "", "chose platform")
@@ -66,6 +66,11 @@ func NewRootCmd() *cobra.Command {
 	rootCmd.SetUsageFunc(usageFunc)
 	rootCmd.SetHelpFunc(helpFunc)
 	rootCmd.SetFlagErrorFunc(flagErrorFunc)
+
+	rootCmd.SetHelpCommand(&cobra.Command{
+		Use:    "no-help",
+		Hidden: true,
+	})
 	return rootCmd
 }
 
