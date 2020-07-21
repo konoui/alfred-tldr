@@ -34,11 +34,12 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 
 	p, _ := t.FindPage(cmds)
 	for _, cmd := range p.CmdExamples {
-		awf.Append(&alfred.Item{
-			Title:    cmd.Cmd,
-			Subtitle: cmd.Description,
-			Arg:      cmd.Cmd,
-		})
+		awf.Append(
+			alfred.NewItem().
+				SetTitle(cmd.Cmd).
+				SetSubtitle(cmd.Description).
+				SetArg(cmd.Cmd),
+		)
 	}
 
 	if enableFuzzy && len(p.CmdExamples) == 0 {
@@ -49,18 +50,18 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 
 		suggestions := index.Commands.Search(cmds)
 		for _, cmd := range suggestions {
-			awf.Append(&alfred.Item{
-				Title:        cmd.Name,
-				Subtitle:     fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ",")),
-				Autocomplete: cmd.Name,
-				Variables: map[string]string{
-					nextActionKey: nextActionCmd,
-				},
-				Arg: fmt.Sprintf("%s --%s %s", cmd.Name, platformFlag, cmd.Platform[0]),
-				Icon: &alfred.Icon{
-					Path: "candidate.png",
-				},
-			})
+			awf.Append(
+				alfred.NewItem().
+					SetTitle(cmd.Name).
+					SetSubtitle(fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ","))).
+					SetAutocomplete(cmd.Name).
+					SetArg(fmt.Sprintf("%s --%s %s", cmd.Name, platformFlag, cmd.Platform[0])).
+					SetVariable(nextActionKey, nextActionCmd).
+					SetIcon(
+						alfred.NewIcon().
+							SetPath("candidate.png"),
+					),
+			)
 		}
 	}
 
