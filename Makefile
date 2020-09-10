@@ -12,7 +12,7 @@ ARTIFACT_NAME := $(BIN_NAME).alfredworkflow
 ## For local test
 WORKFLOW_DIR := "$${HOME}/Library/Application Support/Alfred/Alfred.alfredpreferences/workflows/user.workflow.2569C1E1-8114-4B77-9506-52AA966313A9"
 
-GOLANGCI_LINT_VERSION := v1.24.0
+GOLANGCI_LINT_VERSION := v1.30.0
 export GO111MODULE=on
 
 ## Build binaries on your environment

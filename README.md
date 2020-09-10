@@ -4,7 +4,13 @@
 tldr alfred workflow written in go.
 
 ## Install
-Download the workflow form [latest release](https://github.com/konoui/tldr/releases).
+- Download the workflow form [latest release](https://github.com/konoui/tldr/releases).
+- Build the workflow on your computer.
+```
+$ make package
+$ ls
+tldr.alfredworkflow (snip)
+```
 
 ## Usage
 `tldr <query>`
