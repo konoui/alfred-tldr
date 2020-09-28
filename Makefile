@@ -43,13 +43,13 @@ install: build
 
 ## Create workflow artifact
 package: darwin
-	@(if ! type ghr >/dev/null 2>&1; then go get -u github.com/tcnksm/ghr ;fi)
 	@(if [ ! -e $(ARTIFACT_DIR) ]; then mkdir $(ARTIFACT_DIR) ; fi)
 	@(cp $(ASSETS) $(ARTIFACT_DIR))
 	@(zip -j $(ARTIFACT_NAME) $(ARTIFACT_DIR)/*)
 
 ## GitHub Release and uploads artifacts
 release: package
+	@(if ! type ghr >/dev/null 2>&1; then go get -u github.com/tcnksm/ghr ;fi)
 	@ghr -replace $(VERSION) $(ARTIFACT_NAME)
 
 ## Clean Binary
