@@ -33,5 +33,5 @@ func makeUsageMap(cmd *cobra.Command) (m map[string]string) {
 }
 
 func makeDescription(p *pflag.Flag) string {
-	return fmt.Sprintf("Usage: -%s, --%s  %s", p.Shorthand, p.Name, p.Usage)
+	return fmt.Sprintf("Usage: -%s, --%s %s", p.Shorthand, p.Name, p.Usage)
 }

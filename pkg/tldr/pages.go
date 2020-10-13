@@ -35,6 +35,8 @@ type Tldr struct {
 	cacheMaxAge    time.Duration
 }
 
+var ErrNoPage = errors.New("no page found")
+
 // New create a instance of tldr repository
 func New(tldrPath string, op Options) *Tldr {
 	return &Tldr{
@@ -59,7 +61,7 @@ func (t *Tldr) OnInitialize() error {
 	initUpdate := false
 	if !pathExists(t.path) {
 		if err := os.Mkdir(t.path, 0755); err != nil {
-			return errors.Wrap(err, "failed to create tldr dir")
+			return fmt.Errorf("failed to create tldr dir %w", err)
 		}
 		// automatically updated if indexfile does not exist
 		initUpdate = true
@@ -67,7 +69,7 @@ func (t *Tldr) OnInitialize() error {
 
 	if t.update || initUpdate {
 		if err := t.Update(); err != nil {
-			return errors.Wrap(err, "failed to update tldr repository")
+			return fmt.Errorf("failed to update tldr repository %w", err)
 		}
 	}
 
@@ -78,16 +80,16 @@ func (t *Tldr) OnInitialize() error {
 func (t *Tldr) Update() error {
 	_, err := download(t.indexSourceURL, t.path, t.indexFile)
 	if err != nil {
-		return errors.Wrap(err, "failed to download index file")
+		return fmt.Errorf("failed to download a index file %w", err)
 	}
 
 	zipPath, err := download(t.pageSourceURL, t.path, t.zipFile)
 	if err != nil {
-		return errors.Wrap(err, "failed to download tldr repository")
+		return fmt.Errorf("failed to download a tldr repository %w", err)
 	}
 
 	if err := unzip(zipPath, t.path); err != nil {
-		return errors.Wrap(err, "failed to unzip tldr repository")
+		return fmt.Errorf("failed to unzip a tldr repository %w", err)
 	}
 
 	return nil
@@ -95,8 +97,8 @@ func (t *Tldr) Update() error {
 
 // FindPage find tldr page by `cmds`
 func (t *Tldr) FindPage(cmds []string) (*Page, error) {
+	page := strings.Join(cmds, "-") + ".md"
 	for _, pt := range t.platformDirs {
-		page := strings.Join(cmds, "-") + ".md"
 		path := filepath.Join(t.path, t.langDir, pt, page)
 		if !pathExists(path) {
 			// if cmd does not exist, try to find it in next platform
@@ -105,14 +107,14 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 
 		f, err := os.Open(path)
 		if err != nil {
-			return &Page{}, errors.Wrapf(err, "failed to open page (%s)", f.Name())
+			return &Page{}, fmt.Errorf("failed to open the page (%s) %w", f.Name(), err)
 		}
 		defer f.Close()
 
 		return parsePage(f)
 	}
 
-	return &Page{}, fmt.Errorf("not found %s page", cmds)
+	return &Page{}, fmt.Errorf("failed to find %s %w", page, ErrNoPage)
 }
 
 // Expired return true if tldr repository have passed `maxAge`

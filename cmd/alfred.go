@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -14,25 +15,43 @@ const (
 	nextActionCmd = "cmd"
 )
 
-func showWorkflowUsage(usageMap map[string]string) {
-	awf := alfred.NewWorkflow()
+var awf = alfred.NewWorkflow()
+
+func init() {
 	awf.SetOut(outStream)
 	awf.SetErr(errStream)
+}
+
+func showWorkflowUsage(usageMap map[string]string) {
 	for _, u := range usageMap {
-		awf.Append(&alfred.Item{
-			Title: u,
-		})
+		awf.Append(
+			alfred.NewItem().SetTitle(u),
+		)
 	}
 	awf.Output()
 }
 
 func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
-	awf := alfred.NewWorkflow()
-	awf.SetOut(outStream)
-	awf.SetErr(errStream)
-	awf.EmptyWarning("No matching query", "Try a different query")
+	if len(cmds) == 0 {
+		awf.Append(
+			alfred.NewItem().
+				SetTitle("Please input a command").
+				SetSubtitle("e.g.) tldr tar"),
+		).Output()
+		return
+	}
 
-	p, _ := t.FindPage(cmds)
+	awf.EmptyWarning("No matching query", "Try a different query")
+	p, err := t.FindPage(cmds)
+	if err != nil {
+		if errors.Is(err, tldr.ErrNoPage) && enableFuzzy {
+			fuzzyOutput(t, cmds)
+		} else {
+			awf.Output()
+		}
+		return
+	}
+
 	for _, cmd := range p.CmdExamples {
 		awf.Append(
 			alfred.NewItem().
@@ -42,27 +61,29 @@ func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 		)
 	}
 
-	if enableFuzzy && len(p.CmdExamples) == 0 {
-		index, err := t.LoadIndexFile()
-		if err != nil {
-			awf.Fatal("Fatal errors occur", err.Error())
-		}
+	awf.Output()
+}
 
-		suggestions := index.Commands.Search(cmds)
-		for _, cmd := range suggestions {
-			awf.Append(
-				alfred.NewItem().
-					SetTitle(cmd.Name).
-					SetSubtitle(fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ","))).
-					SetAutocomplete(cmd.Name).
-					SetArg(fmt.Sprintf("%s --%s %s", cmd.Name, platformFlag, cmd.Platform[0])).
-					SetVariable(nextActionKey, nextActionCmd).
-					SetIcon(
-						alfred.NewIcon().
-							SetPath("candidate.png"),
-					),
-			)
-		}
+func fuzzyOutput(t *tldr.Tldr, cmds []string) {
+	index, err := t.LoadIndexFile()
+	if err != nil {
+		awf.Fatal("Fatal errors occur", err.Error())
+	}
+
+	suggestions := index.Commands.Search(cmds)
+	for _, cmd := range suggestions {
+		awf.Append(
+			alfred.NewItem().
+				SetTitle(cmd.Name).
+				SetSubtitle(fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ","))).
+				SetAutocomplete(cmd.Name).
+				SetArg(fmt.Sprintf("%s --%s %s", cmd.Name, platformFlag, cmd.Platform[0])).
+				SetVariable(nextActionKey, nextActionCmd).
+				SetIcon(
+					alfred.NewIcon().
+						SetPath("candidate.png"),
+				),
+		)
 	}
 
 	awf.Output()

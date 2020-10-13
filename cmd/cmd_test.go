@@ -86,7 +86,7 @@ func TestExecute(t *testing.T) {
 			name: "string flag but no value. and invalid flag",
 			args: args{
 				command:    "-p -a",
-				filepath:   testdataPath("./test_output_no-output.json"),
+				filepath:   testdataPath("./test_output_no-input.json"),
 				tldrMaxAge: 0 * time.Hour,
 			},
 		},
@@ -103,12 +103,16 @@ func TestExecute(t *testing.T) {
 				t.Fatal(err)
 			}
 
+			// overwrite global awf
+			awf = alfred.NewWorkflow()
 			outBuf, errBuf := new(bytes.Buffer), new(bytes.Buffer)
 			outStream, errStream = outBuf, errBuf
 			cmdArgs, err := shellwords.Parse(tt.args.command)
 			if err != nil {
 				t.Fatalf("args parse error: %+v", err)
 			}
+			awf.SetOut(outBuf)
+			awf.SetErr(errBuf)
 			rootCmd.SetOutput(outStream)
 			rootCmd.SetArgs(cmdArgs)
 

@@ -2,11 +2,11 @@ package tldr
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/pkg/errors"
 	"github.com/sahilm/fuzzy"
 )
 
@@ -62,7 +62,7 @@ func (t *Tldr) LoadIndexFile() (*CmdsIndex, error) {
 	path := filepath.Join(t.path, t.indexFile)
 	f, err := os.Open(path)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to open index file")
+		return nil, fmt.Errorf("failed to open a index file %w", err)
 	}
 	defer f.Close()
 

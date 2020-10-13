@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/konoui/tldr/pkg/tldr"
-	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
 
@@ -60,7 +59,7 @@ func NewRootCmd() *cobra.Command {
 		SilenceUsage:       true,
 		DisableSuggestions: true,
 	}
-	rootCmd.PersistentFlags().StringP(platformFlag, string(platformFlag[0]), "", "chose platform")
+	rootCmd.PersistentFlags().StringP(platformFlag, string(platformFlag[0]), "", "select platform")
 	rootCmd.PersistentFlags().BoolP(updateFlag, string(updateFlag[0]), false, "update tldr repository")
 	rootCmd.PersistentFlags().BoolP(fuzzyFlag, string(fuzzyFlag[0]), false, "use fuzzy search")
 	rootCmd.SetUsageFunc(usageFunc)
@@ -98,7 +97,7 @@ func Execute(rootCmd *cobra.Command) {
 }
 
 func run(cmds []string, op tldr.Options, enableFuzzy bool) error {
-	home, err := homedir.Dir()
+	home, err := os.UserHomeDir()
 	if err != nil {
 		return err
 	}
