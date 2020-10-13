@@ -32,7 +32,6 @@ type Tldr struct {
 	platformDirs   []string
 	langDir        string
 	update         bool
-	cacheMaxAge    time.Duration
 }
 
 var ErrNoPage = errors.New("no page found")
@@ -117,15 +116,15 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 	return &Page{}, fmt.Errorf("failed to find %s %w", page, ErrNoPage)
 }
 
-// Expired return true if tldr repository have passed `maxAge`
-func (t *Tldr) Expired(maxAge time.Duration) bool {
+// Expired return true if tldr repository have passed `ttl`
+func (t *Tldr) Expired(ttl time.Duration) bool {
 	indexPath := filepath.Join(t.path, t.indexFile)
 	age, err := age(indexPath)
 	if err != nil {
 		return true
 	}
 
-	return age > maxAge
+	return age > ttl
 }
 
 // age return the time since the data exist at

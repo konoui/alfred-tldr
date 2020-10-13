@@ -129,7 +129,6 @@ func TestOnInitialize(t *testing.T) {
 				indexFile:      filepath.Base(indexSourceURL),
 				zipFile:        filepath.Base(pageSourceURL),
 				update:         true,
-				cacheMaxAge:    24 * 7 * time.Hour,
 			},
 		},
 		{
@@ -167,7 +166,7 @@ func TestExpired(t *testing.T) {
 		description string
 		tldr        Tldr
 		want        bool
-		tldrMaxAge  time.Duration
+		tldrTTL     time.Duration
 	}{
 		{
 			description: "failed test due to expired cache",
@@ -178,10 +177,9 @@ func TestExpired(t *testing.T) {
 				indexFile:      filepath.Base(indexSourceURL),
 				zipFile:        filepath.Base(pageSourceURL),
 				update:         false,
-				cacheMaxAge:    0 * time.Hour,
 			},
-			tldrMaxAge: 0 * time.Hour,
-			want:       true,
+			tldrTTL: 0 * time.Hour,
+			want:    true,
 		},
 	}
 
@@ -192,7 +190,7 @@ func TestExpired(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			if got := tt.tldr.Expired(tt.tldrMaxAge); got != tt.want {
+			if got := tt.tldr.Expired(tt.tldrTTL); got != tt.want {
 				t.Errorf("want: %+v, got: %+v", tt.want, got)
 			}
 		})

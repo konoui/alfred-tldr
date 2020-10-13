@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/konoui/go-alfred"
 	"github.com/mattn/go-shellwords"
@@ -17,9 +16,8 @@ func testdataPath(file string) string {
 
 func TestExecute(t *testing.T) {
 	type args struct {
-		filepath   string
-		command    string
-		tldrMaxAge time.Duration
+		filepath string
+		command  string
 	}
 	tests := []struct {
 		name   string
@@ -29,65 +27,57 @@ func TestExecute(t *testing.T) {
 		{
 			name: "alfred workflow. lsof",
 			args: args{
-				command:    "lsof --update",
-				filepath:   testdataPath("test_output_lsof.json"),
-				tldrMaxAge: tldrMaxAge,
+				command:  "lsof --update",
+				filepath: testdataPath("test_output_lsof.json"),
 			},
 		},
 		{
 			name: "alfred workflow. sub command git checkout",
 			args: args{
-				command:    "git checkout",
-				filepath:   testdataPath("test_output_git-checkout.json"),
-				tldrMaxAge: tldrMaxAge,
+				command:  "git checkout",
+				filepath: testdataPath("test_output_git-checkout.json"),
 			},
 		},
 		{
 			name: "alfred workflow. fuzzy search",
 			args: args{
-				command:    "gitchec --fuzzy",
-				filepath:   testdataPath("test_output_git-checkout_with_fuzzy.json"),
-				tldrMaxAge: tldrMaxAge,
+				command:  "gitchec --fuzzy",
+				filepath: testdataPath("test_output_git-checkout_with_fuzzy.json"),
 			},
 		},
 		{
 			name: "alfred workflow. show no error when cache expired",
 			args: args{
-				command:    "lsof",
-				filepath:   testdataPath("test_output_lsof.json"),
-				tldrMaxAge: 0 * time.Hour,
+				command:  "lsof",
+				filepath: testdataPath("test_output_lsof.json"),
 			},
 		},
 		{
 			name: "bool invalid flag",
 			args: args{
-				command:    "lsof -a",
-				filepath:   testdataPath("test_output_invalid-flag.json"),
-				tldrMaxAge: 0 * time.Hour,
+				command:  "lsof -a",
+				filepath: testdataPath("test_output_invalid-flag.json"),
 			},
 		},
 		{
 			name: " bool invalid and valid flags",
 			args: args{
-				command:    "-a -f",
-				filepath:   testdataPath("test_output_invalid-flag.json"),
-				tldrMaxAge: 0 * time.Hour,
+				command:  "-a -f",
+				filepath: testdataPath("test_output_invalid-flag.json"),
 			},
 		},
 		{
 			name: "string flag but no value",
 			args: args{
-				command:    "-p",
-				filepath:   testdataPath("test_output_invalid-flag.json"),
-				tldrMaxAge: 0 * time.Hour,
+				command:  "-p",
+				filepath: testdataPath("test_output_invalid-flag.json"),
 			},
 		},
 		{
 			name: "string flag but no value. and invalid flag",
 			args: args{
-				command:    "-p -a",
-				filepath:   testdataPath("./test_output_no-input.json"),
-				tldrMaxAge: 0 * time.Hour,
+				command:  "-p -a",
+				filepath: testdataPath("./test_output_no-input.json"),
 			},
 		},
 	}
@@ -95,9 +85,6 @@ func TestExecute(t *testing.T) {
 	rootCmd := NewRootCmd()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// set cache ttl
-			tldrMaxAge = tt.args.tldrMaxAge
-
 			wantData, err := ioutil.ReadFile(tt.args.filepath)
 			if err != nil {
 				t.Fatal(err)

@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"time"
 
 	"github.com/konoui/tldr/pkg/tldr"
 	"github.com/spf13/cobra"
@@ -17,8 +16,7 @@ var (
 )
 
 var (
-	op         tldr.Options
-	tldrMaxAge time.Duration = 24 * 7 * time.Hour
+	op tldr.Options
 )
 
 const tldrDir = ".tldr"
