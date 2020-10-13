@@ -16,8 +16,8 @@ tldr.alfredworkflow (snip)
 `tldr <query>`
 
 Options   
-`-u` option updates command list (tldr repository).   
-`-p` option chooses platform from `linux`,`osx`,`sunos`,`windows`.   
+`-u` option updates update local database (tldr repository).  
+`-p` option selects platform from `linux`,`osx`,`sunos`,`windows`.  
 
 ![alfred-tldr](./alfred-tldr.png)
 
