@@ -46,7 +46,6 @@ const (
 // NewRootCmd create a new cmd for root
 func NewRootCmd() *cobra.Command {
 	var (
-		platform    string
 		enableFuzzy bool
 		v           bool
 	)
@@ -58,9 +57,6 @@ func NewRootCmd() *cobra.Command {
 			if v {
 				return printVersion(version, revision)
 			}
-			if platform != "" {
-				op.Platform = platform
-			}
 			return run(args, op, enableFuzzy)
 		},
 		SilenceErrors:      true,
@@ -70,7 +66,7 @@ func NewRootCmd() *cobra.Command {
 	rootCmd.PersistentFlags().BoolVarP(&v, versionFlag, string(versionFlag[0]), false, "select platform")
 	rootCmd.PersistentFlags().BoolVarP(&op.Update, updateFlag, string(updateFlag[0]), false, "update tldr repository")
 	rootCmd.PersistentFlags().BoolVarP(&enableFuzzy, fuzzyFlag, string(fuzzyFlag[0]), false, "use fuzzy search")
-	rootCmd.PersistentFlags().StringVarP(&platform, platformFlag, string(platformFlag[0]), "", "select platform, supported are linux/osx/sunos/windows")
+	rootCmd.PersistentFlags().StringVarP(&op.Platform, platformFlag, string(platformFlag[0]), op.Platform, "select platform, supported are linux/osx/sunos/windows")
 
 	rootCmd.SetUsageFunc(usageFunc)
 	rootCmd.SetHelpFunc(helpFunc)
