@@ -1,6 +1,5 @@
 VERSION := $(shell git describe --tags --abbrev=0)
 REVISION := $(shell git rev-parse --short HEAD)
-LDFLAGS := -X 'main. version=$(VERSION)' -X 'main. revision=$(REVISION)'
 SRC_DIR := ./
 BIN_NAME := tldr
 BINARY := bin/$(BIN_NAME)
@@ -8,6 +7,9 @@ ASSETS_DIR := assets
 ASSETS := $(ASSETS_DIR)/* $(BINARY) README.md
 ARTIFACT_DIR := .artifact
 ARTIFACT_NAME := $(BIN_NAME).alfredworkflow
+
+CMD_PACKAGE_DIR := github.com/konoui/alfred-tldr/cmd
+LDFLAGS := -X '$(CMD_PACKAGE_DIR).version=$(VERSION)' -X '$(CMD_PACKAGE_DIR).revision=$(REVISION)'
 
 ## For local test
 WORKFLOW_DIR := "$${HOME}/Library/Application Support/Alfred/Alfred.alfredpreferences/workflows/user.workflow.2569C1E1-8114-4B77-9506-52AA966313A9"
@@ -31,7 +33,7 @@ lint:
 
 ## Build macos binaries
 darwin:
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build  -ldflags "${LDFLAGS} -s -w" -o $(BINARY) $(SRC_DIR)
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build  -ldflags "$(LDFLAGS) -s -w" -o $(BINARY) $(SRC_DIR)
 
 ## Run tests for my project
 test:

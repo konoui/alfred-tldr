@@ -4,7 +4,11 @@
 tldr alfred workflow written in go.
 
 ## Install
-- Download the workflow form [latest release](https://github.com/konoui/tldr/releases).
+- Download and open the workflow with terminal for bypassing GateKeeper on macOS.
+```
+$ curl -O -L https://github.com/konoui/alfred-tldr/releases/latest/download/tldr.alfredworkflow && open tldr.alfredworkflow
+```
+
 - Build the workflow on your computer.
 ```
 $ make package

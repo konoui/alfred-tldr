@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/konoui/alfred-tldr/pkg/tldr"
 	"github.com/konoui/go-alfred"
-	"github.com/konoui/tldr/pkg/tldr"
 )
 
 // decide next action for workflow filter
@@ -31,7 +31,7 @@ func showWorkflowUsage(usageMap map[string]string) {
 	awf.Output()
 }
 
-func renderToWorkflow(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
+func workflowOutput(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 	if len(cmds) == 0 {
 		awf.Append(
 			alfred.NewItem().
@@ -87,4 +87,12 @@ func fuzzyOutput(t *tldr.Tldr, cmds []string) {
 	}
 
 	awf.Output()
+}
+
+func printVersion(v, r string) (_ error) {
+	title := fmt.Sprintf("alfred-tldr %v(%s)", v, r)
+	awf.Append(
+		alfred.NewItem().SetTitle(title),
+	).Output()
+	return
 }

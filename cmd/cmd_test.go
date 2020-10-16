@@ -80,6 +80,13 @@ func TestExecute(t *testing.T) {
 				filepath: testdataPath("./test_output_no-input.json"),
 			},
 		},
+		{
+			name: "version flag is the highest priority",
+			args: args{
+				command:  "-v tldr -p -a",
+				filepath: testdataPath("./test_output_version.json"),
+			},
+		},
 	}
 
 	rootCmd := NewRootCmd()

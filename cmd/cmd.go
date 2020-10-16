@@ -6,20 +6,21 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/konoui/tldr/pkg/tldr"
+	"github.com/konoui/alfred-tldr/pkg/tldr"
 	"github.com/spf13/cobra"
 )
 
 var (
 	outStream io.Writer = os.Stdout
 	errStream io.Writer = os.Stderr
+	version             = "*"
+	revision            = "*"
+	op        tldr.Options
 )
 
-var (
-	op tldr.Options
+const (
+	tldrDir = ".tldr"
 )
-
-const tldrDir = ".tldr"
 
 func init() {
 	platform := runtime.GOOS
@@ -37,6 +38,7 @@ const (
 	platformFlag = "platform"
 	updateFlag   = "update"
 	fuzzyFlag    = "fuzzy"
+	versionFlag  = "version"
 )
 
 // NewRootCmd create a new cmd for root
@@ -48,6 +50,9 @@ func NewRootCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			enableFuzzy := getBoolFlag(cmd, fuzzyFlag)
 			platform := getStringFlag(cmd, platformFlag)
+			if getBoolFlag(cmd, versionFlag) {
+				return printVersion(version, revision)
+			}
 			if platform != "" {
 				op.Platform = platform
 			}
@@ -57,6 +62,7 @@ func NewRootCmd() *cobra.Command {
 		SilenceUsage:       true,
 		DisableSuggestions: true,
 	}
+	rootCmd.PersistentFlags().BoolP(versionFlag, string(versionFlag[0]), false, "select platform")
 	rootCmd.PersistentFlags().StringP(platformFlag, string(platformFlag[0]), "", "select platform")
 	rootCmd.PersistentFlags().BoolP(updateFlag, string(updateFlag[0]), false, "update tldr repository")
 	rootCmd.PersistentFlags().BoolP(fuzzyFlag, string(fuzzyFlag[0]), false, "use fuzzy search")
@@ -108,6 +114,6 @@ func run(cmds []string, op tldr.Options, enableFuzzy bool) error {
 		return err
 	}
 
-	renderToWorkflow(t, cmds, enableFuzzy)
+	workflowOutput(t, cmds, enableFuzzy)
 	return nil
 }

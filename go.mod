@@ -1,4 +1,4 @@
-module github.com/konoui/tldr
+module github.com/konoui/alfred-tldr
 
 go 1.14
 

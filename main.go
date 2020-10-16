@@ -1,6 +1,8 @@
 package main
 
-import "github.com/konoui/tldr/cmd"
+import (
+	"github.com/konoui/alfred-tldr/cmd"
+)
 
 func main() {
 	rootCmd := cmd.NewRootCmd()
