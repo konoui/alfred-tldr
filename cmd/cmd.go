@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/konoui/alfred-tldr/pkg/tldr"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 var (
@@ -43,14 +45,17 @@ const (
 
 // NewRootCmd create a new cmd for root
 func NewRootCmd() *cobra.Command {
+	var (
+		platform    string
+		enableFuzzy bool
+		v           bool
+	)
 	rootCmd := &cobra.Command{
 		Use:   "tldr <cmd>",
 		Short: "show cmd examples",
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			enableFuzzy := getBoolFlag(cmd, fuzzyFlag)
-			platform := getStringFlag(cmd, platformFlag)
-			if getBoolFlag(cmd, versionFlag) {
+			if v {
 				return printVersion(version, revision)
 			}
 			if platform != "" {
@@ -62,14 +67,14 @@ func NewRootCmd() *cobra.Command {
 		SilenceUsage:       true,
 		DisableSuggestions: true,
 	}
-	rootCmd.PersistentFlags().BoolP(versionFlag, string(versionFlag[0]), false, "select platform")
-	rootCmd.PersistentFlags().StringP(platformFlag, string(platformFlag[0]), "", "select platform")
-	rootCmd.PersistentFlags().BoolP(updateFlag, string(updateFlag[0]), false, "update tldr repository")
-	rootCmd.PersistentFlags().BoolP(fuzzyFlag, string(fuzzyFlag[0]), false, "use fuzzy search")
+	rootCmd.PersistentFlags().BoolVarP(&v, versionFlag, string(versionFlag[0]), false, "select platform")
+	rootCmd.PersistentFlags().BoolVarP(&op.Update, updateFlag, string(updateFlag[0]), false, "update tldr repository")
+	rootCmd.PersistentFlags().BoolVarP(&enableFuzzy, fuzzyFlag, string(fuzzyFlag[0]), false, "use fuzzy search")
+	rootCmd.PersistentFlags().StringVarP(&platform, platformFlag, string(platformFlag[0]), "", "select platform, supported are linux/osx/sunos/windows")
+
 	rootCmd.SetUsageFunc(usageFunc)
 	rootCmd.SetHelpFunc(helpFunc)
 	rootCmd.SetFlagErrorFunc(flagErrorFunc)
-
 	rootCmd.SetHelpCommand(&cobra.Command{
 		Use:    "no-help",
 		Hidden: true,
@@ -91,13 +96,17 @@ func flagErrorFunc(cmd *cobra.Command, err error) error {
 	return nil
 }
 
-// Execute Execute root cmd
-func Execute(rootCmd *cobra.Command) {
-	rootCmd.SetOut(outStream)
-	rootCmd.SetErr(errStream)
-	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
-	}
+func makeUsageMap(cmd *cobra.Command) (m map[string]string) {
+	pf := cmd.Flag(platformFlag)
+	uf := cmd.Flag(updateFlag)
+	m = make(map[string]string, 2)
+	m[pf.Name] = makeDescription(pf)
+	m[uf.Name] = makeDescription(uf)
+	return
+}
+
+func makeDescription(p *pflag.Flag) string {
+	return fmt.Sprintf("Usage: -%s, --%s %s", p.Shorthand, p.Name, p.Usage)
 }
 
 func run(cmds []string, op tldr.Options, enableFuzzy bool) error {
@@ -116,4 +125,13 @@ func run(cmds []string, op tldr.Options, enableFuzzy bool) error {
 
 	workflowOutput(t, cmds, enableFuzzy)
 	return nil
+}
+
+// Execute Execute root cmd
+func Execute(rootCmd *cobra.Command) {
+	rootCmd.SetOut(outStream)
+	rootCmd.SetErr(errStream)
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
 }

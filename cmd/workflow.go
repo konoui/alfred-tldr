@@ -36,7 +36,7 @@ func workflowOutput(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 		awf.Append(
 			alfred.NewItem().
 				SetTitle("Please input a command").
-				SetSubtitle("e.g.) tldr tar"),
+				SetSubtitle("e.g.) tldr tar e.g.) tldr --help"),
 		).Output()
 		return
 	}

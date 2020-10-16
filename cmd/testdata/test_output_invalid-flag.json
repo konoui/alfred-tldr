@@ -1,7 +1,7 @@
 {
   "items": [
     {
-      "title": "Usage: -p, --platform select platform"
+      "title": "Usage: -p, --platform select platform, supported are linux/osx/sunos/windows"
     },
     {
       "title": "Usage: -u, --update update tldr repository"
