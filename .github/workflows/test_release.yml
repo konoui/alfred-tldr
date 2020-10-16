@@ -8,17 +8,11 @@ jobs:
     runs-on: macos-latest
     steps:
     - name: set up go
-      uses: actions/setup-go@v1
+      uses: actions/setup-go@v2
       with:
-        go-version: 1.13.x
+        go-version: 1.14.x
     - name: checkout
-      uses: actions/checkout@v1
-    - name: set GOPATH
-      # temporary fix
-      # see https://github.com/actions/setup-go/issues/14
-      run: |
-        echo "##[set-env name=GOPATH;]$(dirname $GITHUB_WORKSPACE)"
-        echo "##[add-path]$(dirname $GITHUB_WORKSPACE)/bin"
+      uses: actions/checkout@v2
     - name: lint
       run: |
         make fmt
@@ -26,7 +20,6 @@ jobs:
     - name: test
       run: |
         make test
-
   release:
     name: release by ghr
     needs: [test]
@@ -34,17 +27,11 @@ jobs:
     runs-on: macos-latest
     steps:
     - name: set up go
-      uses: actions/setup-go@v1
+      uses: actions/setup-go@v2
       with:
-        go-version: 1.13.x
+        go-version: 1.14.x
     - name: checkout
       uses: actions/checkout@master
-    - name: set GOPATH
-      # temporary fix
-      # see https://github.com/actions/setup-go/issues/14
-      run: |
-        echo "##[set-env name=GOPATH;]$(dirname $GITHUB_WORKSPACE)"
-        echo "##[add-path]$(dirname $GITHUB_WORKSPACE)/bin"
     - name: release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
