@@ -1,4 +1,4 @@
-![Generic badge](https://github.com/konoui/tldr/workflows/test/badge.svg)
+![Generic badge](https://github.com/konoui/alfred-tldr/workflows/test/badge.svg)
 
 ## alfred tldr
 tldr alfred workflow written in go.
