@@ -22,6 +22,10 @@ func init() {
 	awf.SetErr(errStream)
 }
 
+func getDataDir() (string, error) {
+	return alfred.GetDataDir()
+}
+
 func showWorkflowUsage(usageMap map[string]string) {
 	for _, u := range usageMap {
 		awf.Append(
@@ -67,7 +71,7 @@ func workflowOutput(t *tldr.Tldr, cmds []string, enableFuzzy bool) {
 func fuzzyOutput(t *tldr.Tldr, cmds []string) {
 	index, err := t.LoadIndexFile()
 	if err != nil {
-		awf.Fatal("Fatal errors occur", err.Error())
+		fatal(err)
 	}
 
 	suggestions := index.Commands.Search(cmds)
@@ -95,4 +99,8 @@ func printVersion(v, r string) (_ error) {
 		alfred.NewItem().SetTitle(title),
 	).Output()
 	return
+}
+
+func fatal(err error) {
+	awf.Fatal("Fatal errors occur", err.Error())
 }

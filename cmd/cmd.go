@@ -20,10 +20,6 @@ var (
 	op        tldr.Options
 )
 
-const (
-	tldrDir = ".tldr"
-)
-
 func init() {
 	platform := runtime.GOOS
 	if platform == "darwin" {
@@ -105,22 +101,27 @@ func makeDescription(p *pflag.Flag) string {
 	return fmt.Sprintf("Usage: -%s, --%s %s", p.Shorthand, p.Name, p.Usage)
 }
 
-func run(cmds []string, op tldr.Options, enableFuzzy bool) error {
-	home, err := os.UserHomeDir()
+func run(cmds []string, op tldr.Options, enableFuzzy bool) (err error) {
+	var base string
+	base, err = getDataDir()
 	if err != nil {
-		return err
+		// Note fallback to home directory
+		base, err = os.UserHomeDir()
+		if err != nil {
+			return
+		}
 	}
-	path := filepath.Join(home, tldrDir)
 
+	path := filepath.Join(base, ".alfred-tldr")
 	t := tldr.New(path, op)
 
 	err = t.OnInitialize()
 	if err != nil {
-		return err
+		return
 	}
 
 	workflowOutput(t, cmds, enableFuzzy)
-	return nil
+	return
 }
 
 // Execute Execute root cmd
@@ -128,6 +129,6 @@ func Execute(rootCmd *cobra.Command) {
 	rootCmd.SetOut(outStream)
 	rootCmd.SetErr(errStream)
 	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
+		fatal(err)
 	}
 }

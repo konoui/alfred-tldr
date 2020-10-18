@@ -59,7 +59,7 @@ func convertToLangDir(lang string) string {
 func (t *Tldr) OnInitialize() error {
 	initUpdate := false
 	if !pathExists(t.path) {
-		if err := os.Mkdir(t.path, 0755); err != nil {
+		if err := os.MkdirAll(t.path, os.ModePerm); err != nil {
 			return fmt.Errorf("failed to create tldr dir %w", err)
 		}
 		// automatically updated if indexfile does not exist

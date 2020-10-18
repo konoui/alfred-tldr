@@ -13,7 +13,6 @@ import (
 func download(url, dstDir, filename string) (string, error) {
 	path := filepath.Join(dstDir, filename)
 	if pathExists(path) {
-		// TODO removing existing file is cache role
 		if err := os.RemoveAll(path); err != nil {
 			return "", err
 		}
@@ -23,6 +22,7 @@ func download(url, dstDir, filename string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer f.Close()
 
 	res, err := http.Get(url)
 	if err != nil {

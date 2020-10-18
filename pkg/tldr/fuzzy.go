@@ -34,8 +34,8 @@ func (c Cmds) Len() int {
 	return len(c)
 }
 
-// Filter fuzzy search commands by query
-func (c Cmds) Filter(query string) Cmds {
+// filter fuzzy search commands by query
+func (c Cmds) filter(query string) Cmds {
 	cmds := Cmds{}
 	results := fuzzy.FindFrom(query, c)
 	for _, r := range results {
@@ -49,12 +49,12 @@ func (c Cmds) Filter(query string) Cmds {
 	return cmds
 }
 
-// Search fuzzy search commands by query. This is wrapped Filtter
+// Search fuzzy search commands by query. This is wrapped filtter
 func (c Cmds) Search(args []string) Cmds {
 	// Note: We should replace space with highfun as a index file format is joined with highfun
 	// e.g.) git checkout -> git-checkout.md
 	query := strings.Join(args, "-")
-	return c.Filter(query)
+	return c.filter(query)
 }
 
 // LoadIndexFile load command index file

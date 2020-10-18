@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>dev.konoui.tldr</string>
+	<string>dev.konoui.alfred-tldr</string>
 	<key>category</key>
 	<string>Tools</string>
 	<key>connections</key>
@@ -278,6 +278,6 @@
 		</dict>
 	</dict>
 	<key>webaddress</key>
-	<string>https://github.com/konoui/tldr</string>
+	<string>https://github.com/konoui/alfred-tldr</string>
 </dict>
 </plist>
