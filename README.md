@@ -23,7 +23,7 @@ Options
 `-u` option updates update local database (tldr repository).  
 `-p` option selects platform from `linux`,`osx`,`sunos`,`windows`.  
 
-![alfred-tldr](./alfred-tldr.png)
+![alfred-tldr](./alfred-tldr.gif)
 
 ## License
 MIT License.
