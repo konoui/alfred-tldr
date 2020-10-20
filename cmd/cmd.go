@@ -8,6 +8,7 @@ import (
 	"runtime"
 
 	"github.com/konoui/alfred-tldr/pkg/tldr"
+	"github.com/konoui/go-alfred"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -59,10 +60,10 @@ func NewRootCmd() *cobra.Command {
 		SilenceUsage:       true,
 		DisableSuggestions: true,
 	}
-	rootCmd.PersistentFlags().BoolVarP(&v, versionFlag, string(versionFlag[0]), false, "select platform")
-	rootCmd.PersistentFlags().BoolVarP(&op.Update, updateFlag, string(updateFlag[0]), false, "update tldr repository")
+	rootCmd.PersistentFlags().BoolVarP(&v, versionFlag, string(versionFlag[0]), false, "show the client version")
+	rootCmd.PersistentFlags().BoolVarP(&op.Update, updateFlag, string(updateFlag[0]), false, "update tldr database")
 	rootCmd.PersistentFlags().BoolVarP(&enableFuzzy, fuzzyFlag, string(fuzzyFlag[0]), false, "use fuzzy search")
-	rootCmd.PersistentFlags().StringVarP(&op.Platform, platformFlag, string(platformFlag[0]), op.Platform, "select platform, supported are linux/osx/sunos/windows")
+	rootCmd.PersistentFlags().StringVarP(&op.Platform, platformFlag, string(platformFlag[0]), op.Platform, "select from linux/osx/sunos/windows")
 
 	rootCmd.SetUsageFunc(usageFunc)
 	rootCmd.SetHelpFunc(helpFunc)
@@ -88,17 +89,25 @@ func flagErrorFunc(cmd *cobra.Command, err error) error {
 	return nil
 }
 
-func makeUsageMap(cmd *cobra.Command) (m map[string]string) {
-	pf := cmd.Flag(platformFlag)
-	uf := cmd.Flag(updateFlag)
-	m = make(map[string]string, 2)
-	m[pf.Name] = makeDescription(pf)
-	m[uf.Name] = makeDescription(uf)
-	return
+func makeUsageMap(cmd *cobra.Command) map[string]*alfred.Item {
+	flags := []*pflag.Flag{
+		cmd.Flag(platformFlag),
+		cmd.Flag(updateFlag),
+		cmd.Flag(versionFlag),
+	}
+
+	m := make(map[string]*alfred.Item, len(flags))
+	for _, f := range flags {
+		m[f.Name] = makeItem(f)
+	}
+	return m
 }
 
-func makeDescription(p *pflag.Flag) string {
-	return fmt.Sprintf("Usage: -%s, --%s %s", p.Shorthand, p.Name, p.Usage)
+func makeItem(p *pflag.Flag) *alfred.Item {
+	title := fmt.Sprintf("-%s, --%s %s", p.Shorthand, p.Name, p.Usage)
+	return alfred.NewItem().
+		SetTitle(title).
+		SetSubtitle(p.Usage)
 }
 
 func run(cmds []string, op tldr.Options, enableFuzzy bool) (err error) {

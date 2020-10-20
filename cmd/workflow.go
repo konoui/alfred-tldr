@@ -26,10 +26,10 @@ func getDataDir() (string, error) {
 	return alfred.GetDataDir()
 }
 
-func showWorkflowUsage(usageMap map[string]string) {
-	for _, u := range usageMap {
+func showWorkflowUsage(usageMap map[string]*alfred.Item) {
+	for _, i := range usageMap {
 		awf.Append(
-			alfred.NewItem().SetTitle(u),
+			i,
 		)
 	}
 	awf.Output()

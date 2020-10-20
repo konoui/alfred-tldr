@@ -20,8 +20,9 @@ tldr.alfredworkflow (snip)
 `tldr <query>`
 
 Options   
-`-u` option updates update local database (tldr repository).  
-`-p` option selects platform from `linux`,`osx`,`sunos`,`windows`.  
+`--version`/`-v` option shows the current version of the client.   
+`--update`/`-u` option updates local database (tldr repository).  
+`--platform`/`-p` option selects platform from `linux`,`osx`,`sunos`,`windows`.  
 
 ![alfred-tldr](./alfred-tldr.gif)
 
