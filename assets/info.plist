@@ -57,11 +57,47 @@
 				<false/>
 			</dict>
 		</array>
+		<key>A6248A62-FD01-4D8D-8896-F93E87BDA4B0</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>63B95191-D6F1-4E7A-A5AA-594FE1FD48B0</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>BE3CF337-953B-46C7-8003-F61536857703</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>A6248A62-FD01-4D8D-8896-F93E87BDA4B0</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>CA38E469-AAA8-4B30-9FBD-DA5E02F4E718</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
 				<string>7B74E407-A98B-42B6-9994-39ADD96B446D</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>BE3CF337-953B-46C7-8003-F61536857703</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -138,6 +174,8 @@
 				<false/>
 				<key>clipboardtext</key>
 				<string>{query}</string>
+				<key>ignoredynamicplaceholders</key>
+				<false/>
 				<key>transient</key>
 				<false/>
 			</dict>
@@ -219,6 +257,8 @@
 			<dict>
 				<key>argument</key>
 				<string></string>
+				<key>passthroughargument</key>
+				<false/>
 				<key>variables</key>
 				<dict>
 					<key>nextCmd</key>
@@ -229,6 +269,70 @@
 			<string>alfred.workflow.utility.argument</string>
 			<key>uid</key>
 			<string>CA38E469-AAA8-4B30-9FBD-DA5E02F4E718</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>./tldr ${nextCmd} --fuzzy &amp;&gt; /dev/null &amp;&amp; echo -n "succeeded" || echo -n "failed"
+echo " to update tldr database"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>A6248A62-FD01-4D8D-8896-F93E87BDA4B0</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<false/>
+				<key>removeextension</key>
+				<false/>
+				<key>text</key>
+				<string>{query}</string>
+				<key>title</key>
+				<string>Result:</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.notification</string>
+			<key>uid</key>
+			<string>63B95191-D6F1-4E7A-A5AA-594FE1FD48B0</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>inputstring</key>
+				<string>{var:nextAction}</string>
+				<key>matchcasesensitive</key>
+				<false/>
+				<key>matchmode</key>
+				<integer>0</integer>
+				<key>matchstring</key>
+				<string>shell</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.filter</string>
+			<key>uid</key>
+			<string>BE3CF337-953B-46C7-8003-F61536857703</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -255,12 +359,33 @@
 			<key>ypos</key>
 			<integer>120</integer>
 		</dict>
+		<key>63B95191-D6F1-4E7A-A5AA-594FE1FD48B0</key>
+		<dict>
+			<key>xpos</key>
+			<integer>770</integer>
+			<key>ypos</key>
+			<integer>360</integer>
+		</dict>
 		<key>7B74E407-A98B-42B6-9994-39ADD96B446D</key>
 		<dict>
 			<key>xpos</key>
 			<integer>390</integer>
 			<key>ypos</key>
 			<integer>240</integer>
+		</dict>
+		<key>A6248A62-FD01-4D8D-8896-F93E87BDA4B0</key>
+		<dict>
+			<key>xpos</key>
+			<integer>485</integer>
+			<key>ypos</key>
+			<integer>360</integer>
+		</dict>
+		<key>BE3CF337-953B-46C7-8003-F61536857703</key>
+		<dict>
+			<key>xpos</key>
+			<integer>395</integer>
+			<key>ypos</key>
+			<integer>390</integer>
 		</dict>
 		<key>CA38E469-AAA8-4B30-9FBD-DA5E02F4E718</key>
 		<dict>

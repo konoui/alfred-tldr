@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/konoui/alfred-tldr/pkg/tldr"
@@ -11,8 +12,9 @@ import (
 
 // decide next action for workflow filter
 const (
-	nextActionKey = "nextAction"
-	nextActionCmd = "cmd"
+	nextActionKey   = "nextAction"
+	nextActionCmd   = "cmd"
+	nextActionShell = "shell"
 )
 
 var awf = alfred.NewWorkflow()
@@ -99,6 +101,22 @@ func printVersion(v, r string) (_ error) {
 		alfred.NewItem().SetTitle(title),
 	).Output()
 	return
+}
+
+func printUpdate(updateFlag string) (_ error) {
+	awf.Append(
+		alfred.NewItem().
+			SetTitle("Please Enter if update tldr database").
+			SetVariable(nextActionKey, nextActionShell).
+			SetArg(updateFlag),
+	).Output()
+	return
+}
+
+func shouldUpdateShell(updateFlag string) bool {
+	// nextCmd is defined alfred workflow
+	v := os.Getenv("nextCmd")
+	return v == updateFlag
 }
 
 func fatal(err error) {

@@ -54,6 +54,9 @@ func NewRootCmd() *cobra.Command {
 			if v {
 				return printVersion(version, revision)
 			}
+			if op.Update && !shouldUpdateShell("--"+updateFlag) {
+				return printUpdate("--" + updateFlag)
+			}
 			return run(args, op, enableFuzzy)
 		},
 		SilenceErrors:      true,

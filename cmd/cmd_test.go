@@ -27,7 +27,7 @@ func TestExecute(t *testing.T) {
 		{
 			name: "alfred workflow. lsof",
 			args: args{
-				command:  "lsof --update",
+				command:  "lsof",
 				filepath: testdataPath("test_output_lsof.json"),
 			},
 		},
@@ -87,9 +87,15 @@ func TestExecute(t *testing.T) {
 				filepath: testdataPath("./test_output_version.json"),
 			},
 		},
+		{
+			name: "print update confirmation when specified --update flag",
+			args: args{
+				command:  "--update tldr",
+				filepath: testdataPath("./test_output_update-confirmation.json"),
+			},
+		},
 	}
 
-	rootCmd := NewRootCmd()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			wantData, err := ioutil.ReadFile(tt.args.filepath)
@@ -99,6 +105,7 @@ func TestExecute(t *testing.T) {
 
 			// overwrite global awf
 			awf = alfred.NewWorkflow()
+			rootCmd := NewRootCmd()
 			outBuf, errBuf := new(bytes.Buffer), new(bytes.Buffer)
 			outStream, errStream = outBuf, errBuf
 			cmdArgs, err := shellwords.Parse(tt.args.command)
