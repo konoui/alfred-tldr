@@ -37,7 +37,11 @@ type Tldr struct {
 var ErrNoPage = errors.New("no page found")
 
 // New create a instance of tldr repository
-func New(tldrPath string, op Options) *Tldr {
+func New(tldrPath string, op *Options) *Tldr {
+	if op == nil {
+		op = new(Options)
+	}
+
 	return &Tldr{
 		path:           tldrPath,
 		pageSourceURL:  pageSourceURL,

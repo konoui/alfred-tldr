@@ -18,7 +18,7 @@ var (
 	errStream io.Writer = os.Stderr
 	version             = "*"
 	revision            = "*"
-	op        tldr.Options
+	op        *tldr.Options
 )
 
 func init() {
@@ -26,7 +26,7 @@ func init() {
 	if platform == "darwin" {
 		platform = "osx"
 	}
-	op = tldr.Options{
+	op = &tldr.Options{
 		Platform: platform,
 		Language: "",
 		Update:   false,
@@ -110,7 +110,7 @@ func makeItem(p *pflag.Flag) *alfred.Item {
 		SetSubtitle(p.Usage)
 }
 
-func run(cmds []string, op tldr.Options, enableFuzzy bool) (err error) {
+func run(cmds []string, op *tldr.Options, enableFuzzy bool) (err error) {
 	var base string
 	base, err = getDataDir()
 	if err != nil {

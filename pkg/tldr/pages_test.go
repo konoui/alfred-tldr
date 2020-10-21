@@ -37,7 +37,7 @@ func TestFindPage(t *testing.T) {
 		t.Run(tt.description, func(t *testing.T) {
 			tldr := New(
 				filepath.Join(os.TempDir(), ".tldr"),
-				Options{Update: true},
+				&Options{Update: true},
 			)
 			err := tldr.OnInitialize()
 			if err != nil {
