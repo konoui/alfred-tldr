@@ -53,45 +53,52 @@ func TestExecute(t *testing.T) {
 			},
 		},
 		{
-			name: "bool invalid flag",
+			name: "version flag is the highest priority",
 			args: args{
-				command:  "lsof -a",
-				filepath: testdataPath("test_output_invalid-flag.json"),
+				command:  "-v tldr -p -a",
+				filepath: testdataPath("test_output_version.json"),
 			},
 		},
 		{
-			name: " bool invalid and valid flags",
+			name: "print update confirmation when specified --update flag and ignore argument",
 			args: args{
-				command:  "-a -f",
-				filepath: testdataPath("test_output_invalid-flag.json"),
+				command:  "--update tldr",
+				filepath: testdataPath("test_output_update-confirmation.json"),
+			},
+		},
+		{
+			name: "no input",
+			args: args{
+				command:  "",
+				filepath: testdataPath("test_output_no-input.json"),
+			},
+		},
+		{
+			name: "string flag but no value and invalid flag",
+			args: args{
+				command:  "-p -a",
+				filepath: testdataPath("test_output_no-input.json"),
 			},
 		},
 		{
 			name: "string flag but no value",
 			args: args{
 				command:  "-p",
-				filepath: testdataPath("test_output_invalid-flag.json"),
+				filepath: testdataPath("test_output_usage.json"),
 			},
 		},
 		{
-			name: "string flag but no value. and invalid flag",
+			name: "bool invalid flag",
 			args: args{
-				command:  "-p -a",
-				filepath: testdataPath("./test_output_no-input.json"),
+				command:  "lsof -a",
+				filepath: testdataPath("test_output_usage.json"),
 			},
 		},
 		{
-			name: "version flag is the highest priority",
+			name: " bool invalid and valid flags",
 			args: args{
-				command:  "-v tldr -p -a",
-				filepath: testdataPath("./test_output_version.json"),
-			},
-		},
-		{
-			name: "print update confirmation when specified --update flag",
-			args: args{
-				command:  "--update tldr",
-				filepath: testdataPath("./test_output_update-confirmation.json"),
+				command:  "-a -u",
+				filepath: testdataPath("test_output_usage.json"),
 			},
 		},
 	}

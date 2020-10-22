@@ -1,11 +1,14 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
+	"time"
 
 	"github.com/konoui/alfred-tldr/pkg/tldr"
 	"github.com/konoui/go-alfred"
@@ -18,19 +21,14 @@ var (
 	errStream io.Writer = os.Stderr
 	version             = "*"
 	revision            = "*"
-	op        *tldr.Options
 )
 
-func init() {
+func initPlatform() string {
 	platform := runtime.GOOS
 	if platform == "darwin" {
 		platform = "osx"
 	}
-	op = &tldr.Options{
-		Platform: platform,
-		Language: "",
-		Update:   false,
-	}
+	return platform
 }
 
 const (
@@ -40,33 +38,42 @@ const (
 	versionFlag  = "version"
 )
 
+type config struct {
+	platform   string
+	language   string
+	update     bool
+	fuzzy      bool
+	version    bool
+	tldrClinet *tldr.Tldr
+}
+
 // NewRootCmd create a new cmd for root
 func NewRootCmd() *cobra.Command {
-	var (
-		enableFuzzy bool
-		v           bool
-	)
+	cfg := new(config)
 	rootCmd := &cobra.Command{
 		Use:   "tldr <cmd>",
 		Short: "show cmd examples",
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if v {
-				return printVersion(version, revision)
+			if err := cfg.initTldr(); err != nil {
+				return err
 			}
-			if op.Update && !shouldUpdateShell("--"+updateFlag) {
-				return printUpdate("--" + updateFlag)
+			if cfg.version {
+				return cfg.printVersion(version, revision)
 			}
-			return run(args, op, enableFuzzy)
+			if cfg.update {
+				return cfg.updateDB()
+			}
+			return cfg.printPage(args)
 		},
 		SilenceErrors:      true,
 		SilenceUsage:       true,
 		DisableSuggestions: true,
 	}
-	rootCmd.PersistentFlags().BoolVarP(&v, versionFlag, string(versionFlag[0]), false, "show the client version")
-	rootCmd.PersistentFlags().BoolVarP(&op.Update, updateFlag, string(updateFlag[0]), false, "update tldr database")
-	rootCmd.PersistentFlags().BoolVarP(&enableFuzzy, fuzzyFlag, string(fuzzyFlag[0]), false, "use fuzzy search")
-	rootCmd.PersistentFlags().StringVarP(&op.Platform, platformFlag, string(platformFlag[0]), op.Platform, "select from linux/osx/sunos/windows")
+	rootCmd.PersistentFlags().BoolVarP(&cfg.version, versionFlag, string(versionFlag[0]), false, "show the client version")
+	rootCmd.PersistentFlags().BoolVarP(&cfg.update, updateFlag, string(updateFlag[0]), false, "update tldr database")
+	rootCmd.PersistentFlags().BoolVarP(&cfg.fuzzy, fuzzyFlag, string(fuzzyFlag[0]), false, "use fuzzy search")
+	rootCmd.PersistentFlags().StringVarP(&cfg.platform, platformFlag, string(platformFlag[0]), initPlatform(), "select from linux/osx/sunos/windows")
 
 	rootCmd.SetUsageFunc(usageFunc)
 	rootCmd.SetHelpFunc(helpFunc)
@@ -79,61 +86,148 @@ func NewRootCmd() *cobra.Command {
 }
 
 func usageFunc(cmd *cobra.Command) error {
-	showWorkflowUsage(makeUsageMap(cmd))
+	showWorkflowUsage(cmd)
 	return nil
 }
 
 func helpFunc(cmd *cobra.Command, args []string) {
-	showWorkflowUsage(makeUsageMap(cmd))
+	showWorkflowUsage(cmd)
 }
 
 func flagErrorFunc(cmd *cobra.Command, err error) error {
-	showWorkflowUsage(makeUsageMap(cmd))
+	showWorkflowUsage(cmd)
 	return nil
 }
 
-func makeUsageMap(cmd *cobra.Command) map[string]*alfred.Item {
-	flags := []*pflag.Flag{
+func showWorkflowUsage(cmd *cobra.Command) {
+	pflags := []*pflag.Flag{
 		cmd.Flag(platformFlag),
 		cmd.Flag(updateFlag),
 		cmd.Flag(versionFlag),
 	}
 
-	m := make(map[string]*alfred.Item, len(flags))
-	for _, f := range flags {
-		m[f.Name] = makeItem(f)
+	for _, p := range pflags {
+		awf.Append(
+			makeUsageItem(p),
+		)
 	}
-	return m
+	awf.Output()
 }
 
-func makeItem(p *pflag.Flag) *alfred.Item {
+func makeUsageItem(p *pflag.Flag) *alfred.Item {
 	title := fmt.Sprintf("-%s, --%s %s", p.Shorthand, p.Name, p.Usage)
 	return alfred.NewItem().
 		SetTitle(title).
 		SetSubtitle(p.Usage)
 }
 
-func run(cmds []string, op *tldr.Options, enableFuzzy bool) (err error) {
-	var base string
-	base, err = getDataDir()
+func (cfg *config) initTldr() error {
+	base, err := getDataDir()
 	if err != nil {
-		// Note fallback to home directory
-		base, err = os.UserHomeDir()
-		if err != nil {
-			return
-		}
+		return err
 	}
-
 	path := filepath.Join(base, ".alfred-tldr")
-	t := tldr.New(path, op)
-
-	err = t.OnInitialize()
-	if err != nil {
-		return
+	// Note update option is turn off as we update database explicitly
+	opt := &tldr.Options{
+		Update:   false,
+		Platform: cfg.platform,
+		Language: cfg.language,
 	}
 
-	workflowOutput(t, cmds, enableFuzzy)
+	cfg.tldrClinet = tldr.New(path, opt)
+	return cfg.tldrClinet.OnInitialize()
+}
+
+func (cfg *config) printPage(cmds []string) error {
+	if len(cmds) == 0 {
+		awf.Append(
+			alfred.NewItem().
+				SetTitle("Please input a command").
+				SetSubtitle("e.g.) tldr tar e.g.) tldr --help"),
+		).Output()
+		return nil
+	}
+
+	awf.EmptyWarning("No matching query", "Try a different query")
+	p, err := cfg.tldrClinet.FindPage(cmds)
+	if err != nil {
+		if errors.Is(err, tldr.ErrNoPage) && cfg.fuzzy {
+			cfg.printFuzzyPages(cmds)
+		} else {
+			awf.Output()
+		}
+		return nil
+	}
+
+	for _, cmd := range p.CmdExamples {
+		awf.Append(
+			alfred.NewItem().
+				SetTitle(cmd.Cmd).
+				SetSubtitle(cmd.Description).
+				SetArg(cmd.Cmd),
+		)
+	}
+
+	awf.Output()
+	return nil
+}
+
+func (cfg *config) printFuzzyPages(cmds []string) {
+	index, err := cfg.tldrClinet.LoadIndexFile()
+	if err != nil {
+		fatal(err)
+	}
+
+	suggestions := index.Commands.Search(cmds)
+	for _, cmd := range suggestions {
+		awf.Append(
+			alfred.NewItem().
+				SetTitle(cmd.Name).
+				SetSubtitle(fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ","))).
+				SetAutocomplete(cmd.Name).
+				SetArg(fmt.Sprintf("%s --%s %s", cmd.Name, platformFlag, cmd.Platform[0])).
+				SetVariable(nextActionKey, nextActionCmd).
+				SetIcon(
+					alfred.NewIcon().
+						SetPath("candidate.png"),
+				),
+		)
+	}
+
+	awf.Output()
+}
+
+func (cfg *config) printVersion(v, r string) (_ error) {
+	title := fmt.Sprintf("alfred-tldr %v(%s)", v, r)
+	awf.Append(
+		alfred.NewItem().SetTitle(title),
+	).Output()
 	return
+}
+
+func (cfg *config) updateDB() error {
+	if !cfg.update {
+		return errors.New("update is called even though update flag is not specified")
+	}
+
+	updateFlagWithHyphen := "--" + updateFlag
+	if shouldUpdateInShell(updateFlagWithHyphen) {
+		// update explicitly
+		return cfg.tldrClinet.Update()
+	}
+
+	subtitle := ""
+	if cfg.tldrClinet.Expired(2 * 7 * 24 * time.Hour) {
+		subtitle = "tldr repository is older than 2 weeks"
+	}
+	awf.Append(
+		alfred.NewItem().
+			SetTitle("Please Enter if update tldr database").
+			SetSubtitle(subtitle).
+			SetVariable(nextActionKey, nextActionShell).
+			SetArg(updateFlagWithHyphen),
+	).Output()
+	return nil
 }
 
 // Execute Execute root cmd

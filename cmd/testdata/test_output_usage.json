@@ -1,16 +1,16 @@
 {
   "items": [
     {
+      "title": "-p, --platform select from linux/osx/sunos/windows",
+      "subtitle": "select from linux/osx/sunos/windows"
+    },
+    {
       "title": "-u, --update update tldr database",
       "subtitle": "update tldr database"
     },
     {
       "title": "-v, --version show the client version",
       "subtitle": "show the client version"
-    },
-    {
-      "title": "-p, --platform select from linux/osx/sunos/windows",
-      "subtitle": "select from linux/osx/sunos/windows"
     }
   ]
 }
