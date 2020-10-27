@@ -7,5 +7,8 @@
       "title": "Please Enter if update tldr database",
       "arg": "--update"
     }
-  ]
+  ],
+  "Variables": {
+   "ALFRED_TLDR_UPDATE": "true"
+  }
 }

@@ -11,6 +11,7 @@ const (
 	nextActionKey   = "nextAction"
 	nextActionCmd   = "cmd"
 	nextActionShell = "shell"
+	updateEnvKey    = "ALFRED_TLDR_UPDATE"
 )
 
 var awf = alfred.NewWorkflow()
@@ -32,10 +33,10 @@ func getDataDir() (string, error) {
 	return base, nil
 }
 
-func shouldUpdateInShell(updateFlag string) bool {
-	// nextCmd is defined alfred workflow
-	v := os.Getenv("nextCmd")
-	return v == updateFlag
+func shouldUpdateWithShell() bool {
+	// will use auto update for self execution
+	v := os.Getenv(updateEnvKey)
+	return v != ""
 }
 
 func fatal(err error) {

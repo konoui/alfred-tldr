@@ -21,6 +21,7 @@ var (
 	errStream io.Writer = os.Stderr
 	version             = "*"
 	revision            = "*"
+	twoWeeks            = 2 * 7 * 24 * time.Hour
 )
 
 func initPlatform() string {
@@ -127,7 +128,7 @@ func (cfg *config) initTldr() error {
 		return err
 	}
 	path := filepath.Join(base, ".alfred-tldr")
-	// Note update option is turn off as we update database explicitly
+	// Note turn off update option as we update database explicitly
 	opt := &tldr.Options{
 		Update:   false,
 		Platform: cfg.platform,
@@ -139,6 +140,9 @@ func (cfg *config) initTldr() error {
 }
 
 func (cfg *config) printPage(cmds []string) error {
+	defer func() {
+		_ = cfg.updateDBInBackground()
+	}()
 	if len(cmds) == 0 {
 		awf.Append(
 			alfred.NewItem().
@@ -210,14 +214,13 @@ func (cfg *config) updateDB() error {
 		return errors.New("update is called even though update flag is not specified")
 	}
 
-	updateFlagWithHyphen := "--" + updateFlag
-	if shouldUpdateInShell(updateFlagWithHyphen) {
+	if shouldUpdateWithShell() {
 		// update explicitly
 		return cfg.tldrClinet.Update()
 	}
 
 	subtitle := ""
-	if cfg.tldrClinet.Expired(2 * 7 * 24 * time.Hour) {
+	if cfg.tldrClinet.Expired(twoWeeks) {
 		subtitle = "tldr repository is older than 2 weeks"
 	}
 	awf.Append(
@@ -225,9 +228,27 @@ func (cfg *config) updateDB() error {
 			SetTitle("Please Enter if update tldr database").
 			SetSubtitle(subtitle).
 			SetVariable(nextActionKey, nextActionShell).
-			SetArg(updateFlagWithHyphen),
-	).Output()
+			SetArg("--"+updateFlag),
+	// pass key/value as environment variable to next worfklow action
+	).SetVariable(updateEnvKey, "true").Output()
 	return nil
+}
+
+func (cfg *config) updateDBInBackground() error {
+	if !cfg.tldrClinet.Expired(twoWeeks) {
+		return nil
+	}
+
+	jobName := "update"
+	if awf.Job(jobName).IsRunning() {
+		return nil
+	}
+
+	if err := os.Setenv(updateEnvKey, "true"); err != nil {
+		return err
+	}
+	_, err := awf.Job(jobName).Start(os.Args[0], "--"+updateFlag)
+	return err
 }
 
 // Execute Execute root cmd

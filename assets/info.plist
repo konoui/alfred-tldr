@@ -280,8 +280,7 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>./tldr ${nextCmd} --fuzzy &amp;&gt; /dev/null &amp;&amp; echo -n "succeeded" || echo -n "failed"
-echo " to update tldr database"</string>
+				<string>./tldr ${nextCmd} --fuzzy &amp;&amp; echo -n "succeeded to update tldr database"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>

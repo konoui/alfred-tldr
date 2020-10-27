@@ -1,7 +1,7 @@
 ![Generic badge](https://github.com/konoui/alfred-tldr/workflows/test/badge.svg)
 
 ## alfred tldr
-tldr alfred workflow written in go.
+[tldr](https://github.com/tldr-pages/tldr) alfred workflow written in go.
 
 ## Install
 - Download and open the workflow with terminal for bypassing GateKeeper on macOS.
