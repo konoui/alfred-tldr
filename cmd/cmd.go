@@ -45,7 +45,7 @@ type config struct {
 	update     bool
 	fuzzy      bool
 	version    bool
-	tldrClinet *tldr.Tldr
+	tldrClient *tldr.Tldr
 }
 
 // NewRootCmd create a new cmd for root
@@ -135,8 +135,8 @@ func (cfg *config) initTldr() error {
 		Language: cfg.language,
 	}
 
-	cfg.tldrClinet = tldr.New(path, opt)
-	return cfg.tldrClinet.OnInitialize()
+	cfg.tldrClient = tldr.New(path, opt)
+	return cfg.tldrClient.OnInitialize()
 }
 
 func (cfg *config) printPage(cmds []string) error {
@@ -153,7 +153,7 @@ func (cfg *config) printPage(cmds []string) error {
 	}
 
 	awf.EmptyWarning("No matching query", "Try a different query")
-	p, err := cfg.tldrClinet.FindPage(cmds)
+	p, err := cfg.tldrClient.FindPage(cmds)
 	if err != nil {
 		if errors.Is(err, tldr.ErrNoPage) && cfg.fuzzy {
 			cfg.printFuzzyPages(cmds)
@@ -177,7 +177,7 @@ func (cfg *config) printPage(cmds []string) error {
 }
 
 func (cfg *config) printFuzzyPages(cmds []string) {
-	index, err := cfg.tldrClinet.LoadIndexFile()
+	index, err := cfg.tldrClient.LoadIndexFile()
 	if err != nil {
 		fatal(err)
 	}
@@ -216,11 +216,11 @@ func (cfg *config) updateDB() error {
 
 	if shouldUpdateWithShell() {
 		// update explicitly
-		return cfg.tldrClinet.Update()
+		return cfg.tldrClient.Update()
 	}
 
 	subtitle := ""
-	if cfg.tldrClinet.Expired(twoWeeks) {
+	if cfg.tldrClient.Expired(twoWeeks) {
 		subtitle = "tldr repository is older than 2 weeks"
 	}
 	awf.Append(
@@ -235,7 +235,7 @@ func (cfg *config) updateDB() error {
 }
 
 func (cfg *config) updateDBInBackground() error {
-	if !cfg.tldrClinet.Expired(twoWeeks) {
+	if !cfg.tldrClient.Expired(twoWeeks) {
 		return nil
 	}
 
