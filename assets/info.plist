@@ -146,7 +146,7 @@
 				<string></string>
 				<key>script</key>
 				<string>q="$1"
-./tldr ${q} --fuzzy</string>
+./tldr --fuzzy ${q}</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -212,7 +212,7 @@
 				<key>runningsubtext</key>
 				<string></string>
 				<key>script</key>
-				<string>./tldr ${nextCmd} --fuzzy</string>
+				<string>./tldr --fuzzy ${nextCmd}</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>

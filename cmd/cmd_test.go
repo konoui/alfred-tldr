@@ -84,7 +84,7 @@ func TestExecute(t *testing.T) {
 		{
 			name: "string flag but no value",
 			args: args{
-				command:  "-p",
+				command:  "--fuzzy -p",
 				filepath: testdataPath("test_output_usage.json"),
 			},
 		},
