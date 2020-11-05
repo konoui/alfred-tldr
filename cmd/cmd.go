@@ -216,12 +216,13 @@ func (cfg *config) updateDB() error {
 
 	if shouldUpdateWithShell() {
 		// update explicitly
+		awf.Logf("updating tldr database...\n")
 		return cfg.tldrClient.Update()
 	}
 
 	subtitle := ""
 	if cfg.tldrClient.Expired(twoWeeks) {
-		subtitle = "tldr repository is older than 2 weeks"
+		subtitle = "tldr database is older than 2 weeks"
 	}
 	awf.Append(
 		alfred.NewItem().
@@ -235,6 +236,11 @@ func (cfg *config) updateDB() error {
 }
 
 func (cfg *config) updateDBInBackground() error {
+	if !isAutoUpdateEnabled() {
+		awf.Logf("skip auto-update check as auto-update env is not enabled\n")
+		return nil
+	}
+
 	if !cfg.tldrClient.Expired(twoWeeks) {
 		return nil
 	}

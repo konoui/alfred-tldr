@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"strconv"
 
 	"github.com/konoui/go-alfred"
 )
@@ -12,6 +13,8 @@ const (
 	nextActionCmd   = "cmd"
 	nextActionShell = "shell"
 	updateEnvKey    = "ALFRED_TLDR_UPDATE"
+	// Note the key is also defined in workflow environment variable
+	autoUpdateEnvKey = "ALFRED_TLDR_AUTO_UPDATE"
 )
 
 var awf = alfred.NewWorkflow()
@@ -37,6 +40,15 @@ func shouldUpdateWithShell() bool {
 	// will use auto update for self execution
 	v := os.Getenv(updateEnvKey)
 	return v != ""
+}
+
+func isAutoUpdateEnabled() bool {
+	sv := os.Getenv(autoUpdateEnvKey)
+	bv, err := strconv.ParseBool(sv)
+	if err != nil {
+		return false
+	}
+	return bv
 }
 
 func fatal(err error) {

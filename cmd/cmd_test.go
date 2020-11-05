@@ -3,7 +3,6 @@ package cmd
 import (
 	"bytes"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -106,9 +105,6 @@ func TestExecute(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := os.Unsetenv(updateEnvKey); err != nil {
-				t.Fatal(err)
-			}
 			wantData, err := ioutil.ReadFile(tt.args.filepath)
 			if err != nil {
 				t.Fatal(err)
