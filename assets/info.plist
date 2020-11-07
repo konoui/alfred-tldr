@@ -156,7 +156,7 @@
 				<key>queuemode</key>
 				<integer>1</integer>
 				<key>runningsubtext</key>
-				<string></string>
+				<string>initializing....</string>
 				<key>script</key>
 				<string>q="$1"
 ./tldr --fuzzy ${q}</string>
