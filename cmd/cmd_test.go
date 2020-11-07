@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
@@ -25,28 +26,29 @@ func TestExecute(t *testing.T) {
 		update bool
 	}{
 		{
-			name: "alfred workflow. lsof",
+			name: "lsof",
 			args: args{
 				command:  "lsof",
 				filepath: testdataPath("test_output_lsof.json"),
 			},
+			update: true,
 		},
 		{
-			name: "alfred workflow. sub command git checkout",
+			name: "sub command git checkout",
 			args: args{
 				command:  "git checkout",
 				filepath: testdataPath("test_output_git-checkout.json"),
 			},
 		},
 		{
-			name: "alfred workflow. fuzzy search",
+			name: "fuzzy search",
 			args: args{
 				command:  "gitchec --fuzzy",
 				filepath: testdataPath("test_output_git-checkout_with_fuzzy.json"),
 			},
 		},
 		{
-			name: "alfred workflow. show no error when cache expired",
+			name: "show no error when cache expired",
 			args: args{
 				command:  "lsof",
 				filepath: testdataPath("test_output_lsof.json"),
@@ -133,7 +135,7 @@ func TestExecute(t *testing.T) {
 
 			// automatically update test data
 			if tt.update {
-				if err := ioutil.WriteFile(tt.args.filepath, outGotData, 0644); err != nil {
+				if err := writeFile(tt.args.filepath, outGotData); err != nil {
 					t.Fatal(err)
 				}
 			}
@@ -143,4 +145,16 @@ func TestExecute(t *testing.T) {
 			}
 		})
 	}
+}
+
+func writeFile(filename string, data []byte) error {
+	pretty := new(bytes.Buffer)
+	if err := json.Indent(pretty, data, "", "  "); err != nil {
+		return err
+	}
+
+	if err := ioutil.WriteFile(filename, pretty.Bytes(), 0600); err != nil {
+		return err
+	}
+	return nil
 }

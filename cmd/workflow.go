@@ -10,6 +10,7 @@ import (
 // decide next action for workflow filter
 const (
 	nextActionKey   = "nextAction"
+	nextActionCopy  = "copy"
 	nextActionCmd   = "cmd"
 	nextActionShell = "shell"
 	updateEnvKey    = "ALFRED_TLDR_UPDATE"

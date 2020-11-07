@@ -1,9 +1,9 @@
 {
+  "variables": {
+    "nextAction": "cmd"
+  },
   "items": [
     {
-      "variables": {
-        "nextAction": "cmd"
-      },
       "title": "git checkout",
       "subtitle": "Platforms: common",
       "arg": "git checkout --platform common",
@@ -13,9 +13,6 @@
       "autocomplete": "git checkout"
     },
     {
-      "variables": {
-        "nextAction": "cmd"
-      },
       "title": "git check ignore",
       "subtitle": "Platforms: common",
       "arg": "git check ignore --platform common",
@@ -25,9 +22,6 @@
       "autocomplete": "git check ignore"
     },
     {
-      "variables": {
-        "nextAction": "cmd"
-      },
       "title": "git cherry pick",
       "subtitle": "Platforms: common",
       "arg": "git cherry pick --platform common",

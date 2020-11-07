@@ -25,7 +25,7 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>E07B8BD1-1F99-4F81-97EA-A84B26C81DF6</string>
+				<string>D31EDAFF-A49C-4375-81DA-12E9C09EF0A6</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -98,6 +98,19 @@
 			<dict>
 				<key>destinationuid</key>
 				<string>BE3CF337-953B-46C7-8003-F61536857703</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>D31EDAFF-A49C-4375-81DA-12E9C09EF0A6</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>E07B8BD1-1F99-4F81-97EA-A84B26C81DF6</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -185,6 +198,25 @@
 			<string>E07B8BD1-1F99-4F81-97EA-A84B26C81DF6</string>
 			<key>version</key>
 			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>inputstring</key>
+				<string>{var:nextAction}</string>
+				<key>matchcasesensitive</key>
+				<false/>
+				<key>matchmode</key>
+				<integer>0</integer>
+				<key>matchstring</key>
+				<string>copy</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.filter</string>
+			<key>uid</key>
+			<string>D31EDAFF-A49C-4375-81DA-12E9C09EF0A6</string>
+			<key>version</key>
+			<integer>1</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -398,7 +430,14 @@ echo -n "succeeded to update tldr database"</string>
 			<key>xpos</key>
 			<integer>290</integer>
 			<key>ypos</key>
-			<integer>240</integer>
+			<integer>310</integer>
+		</dict>
+		<key>D31EDAFF-A49C-4375-81DA-12E9C09EF0A6</key>
+		<dict>
+			<key>xpos</key>
+			<integer>390</integer>
+			<key>ypos</key>
+			<integer>130</integer>
 		</dict>
 		<key>E07B8BD1-1F99-4F81-97EA-A84B26C81DF6</key>
 		<dict>

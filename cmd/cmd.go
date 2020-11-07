@@ -169,7 +169,7 @@ func (cfg *config) printPage(cmds []string) error {
 				SetTitle(cmd.Cmd).
 				SetSubtitle(cmd.Description).
 				SetArg(cmd.Cmd),
-		)
+		).SetVariable(nextActionKey, nextActionCopy)
 	}
 
 	awf.Output()
@@ -190,12 +190,11 @@ func (cfg *config) printFuzzyPages(cmds []string) {
 				SetSubtitle(fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ","))).
 				SetAutocomplete(cmd.Name).
 				SetArg(fmt.Sprintf("%s --%s %s", cmd.Name, platformFlag, cmd.Platform[0])).
-				SetVariable(nextActionKey, nextActionCmd).
 				SetIcon(
 					alfred.NewIcon().
 						SetPath("candidate.png"),
 				),
-		)
+		).SetVariable(nextActionKey, nextActionCmd)
 	}
 
 	awf.Output()
@@ -228,10 +227,11 @@ func (cfg *config) updateDB() error {
 		alfred.NewItem().
 			SetTitle("Please Enter if update tldr database").
 			SetSubtitle(subtitle).
-			SetVariable(nextActionKey, nextActionShell).
 			SetArg("--"+updateFlag),
-	// pass key/value as environment variable to next worfklow action
-	).SetVariable(updateEnvKey, "true").Output()
+	).
+		SetVariable(nextActionKey, nextActionShell).
+		// pass key/value as environment variable to next worfklow action
+		SetVariable(updateEnvKey, "true").Output()
 	return nil
 }
 
@@ -262,6 +262,7 @@ func Execute(rootCmd *cobra.Command) {
 	rootCmd.SetOut(outStream)
 	rootCmd.SetErr(errStream)
 	if err := rootCmd.Execute(); err != nil {
+		awf.Logf(err.Error() + "\n")
 		fatal(err)
 	}
 }
