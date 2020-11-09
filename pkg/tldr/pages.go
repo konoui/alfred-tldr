@@ -37,9 +37,9 @@ type Tldr struct {
 var ErrNoPage = errors.New("no page found")
 
 // New create a instance of tldr repository
-func New(tldrPath string, op *Options) *Tldr {
-	if op == nil {
-		op = new(Options)
+func New(tldrPath string, opt *Options) *Tldr {
+	if opt == nil {
+		opt = new(Options)
 	}
 
 	return &Tldr{
@@ -48,9 +48,9 @@ func New(tldrPath string, op *Options) *Tldr {
 		indexSourceURL: indexSourceURL,
 		indexFile:      filepath.Base(indexSourceURL),
 		zipFile:        filepath.Base(pageSourceURL),
-		platformDirs:   []string{op.Platform, "common"},
-		langDir:        convertToLangDir(op.Language),
-		update:         op.Update,
+		platformDirs:   []string{opt.Platform, "common"},
+		langDir:        convertToLangDir(opt.Language),
+		update:         opt.Update,
 	}
 }
 
