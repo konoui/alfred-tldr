@@ -141,7 +141,7 @@ func TestExecute(t *testing.T) {
 			}
 
 			if diff := alfred.DiffScriptFilter(wantData, outGotData); diff != "" {
-				t.Errorf("+want -got\n%+v", diff)
+				t.Errorf("-want +got\n%+v", diff)
 			}
 		})
 	}

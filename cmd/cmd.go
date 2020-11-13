@@ -118,8 +118,8 @@ func showWorkflowUsage(cmd *cobra.Command) {
 func makeUsageItem(p *pflag.Flag) *alfred.Item {
 	title := fmt.Sprintf("-%s, --%s %s", p.Shorthand, p.Name, p.Usage)
 	return alfred.NewItem().
-		SetTitle(title).
-		SetSubtitle(p.Usage)
+		Title(title).
+		Subtitle(p.Usage)
 }
 
 func (cfg *config) initTldr() error {
@@ -146,13 +146,13 @@ func (cfg *config) printPage(cmds []string) error {
 	if len(cmds) == 0 {
 		awf.Append(
 			alfred.NewItem().
-				SetTitle("Please input a command").
-				SetSubtitle("e.g.) tldr tar e.g.) tldr --help"),
+				Title("Please input a command").
+				Subtitle("e.g.) tldr tar e.g.) tldr --help"),
 		).Output()
 		return nil
 	}
 
-	awf.EmptyWarning("No matching query", "Try a different query")
+	awf.SetEmptyWarning("No matching query", "Try a different query")
 	p, err := cfg.tldrClient.FindPage(cmds)
 	if err != nil {
 		if errors.Is(err, tldr.ErrNoPage) && cfg.fuzzy {
@@ -166,10 +166,10 @@ func (cfg *config) printPage(cmds []string) error {
 	for _, cmd := range p.CmdExamples {
 		awf.Append(
 			alfred.NewItem().
-				SetTitle(cmd.Cmd).
-				SetSubtitle(cmd.Description).
-				SetArg(cmd.Cmd),
-		).SetVariable(nextActionKey, nextActionCopy)
+				Title(cmd.Cmd).
+				Subtitle(cmd.Description).
+				Arg(cmd.Cmd),
+		).Variable(nextActionKey, nextActionCopy)
 	}
 
 	awf.Output()
@@ -186,15 +186,15 @@ func (cfg *config) printFuzzyPages(cmds []string) {
 	for _, cmd := range suggestions {
 		awf.Append(
 			alfred.NewItem().
-				SetTitle(cmd.Name).
-				SetSubtitle(fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ","))).
-				SetAutocomplete(cmd.Name).
-				SetArg(fmt.Sprintf("%s --%s %s", cmd.Name, platformFlag, cmd.Platform[0])).
-				SetIcon(
+				Title(cmd.Name).
+				Subtitle(fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ","))).
+				Autocomplete(cmd.Name).
+				Arg(fmt.Sprintf("%s --%s %s", cmd.Name, platformFlag, cmd.Platform[0])).
+				Icon(
 					alfred.NewIcon().
-						SetPath("candidate.png"),
+						Path("candidate.png"),
 				),
-		).SetVariable(nextActionKey, nextActionCmd)
+		).Variable(nextActionKey, nextActionCmd)
 	}
 
 	awf.Output()
@@ -203,7 +203,7 @@ func (cfg *config) printFuzzyPages(cmds []string) {
 func (cfg *config) printVersion(v, r string) (_ error) {
 	title := fmt.Sprintf("alfred-tldr %v(%s)", v, r)
 	awf.Append(
-		alfred.NewItem().SetTitle(title),
+		alfred.NewItem().Title(title),
 	).Output()
 	return
 }
@@ -225,13 +225,13 @@ func (cfg *config) updateDB() error {
 	}
 	awf.Append(
 		alfred.NewItem().
-			SetTitle("Please Enter if update tldr database").
-			SetSubtitle(subtitle).
-			SetArg("--"+updateFlag),
+			Title("Please Enter if update tldr database").
+			Subtitle(subtitle).
+			Arg("--"+updateFlag),
 	).
-		SetVariable(nextActionKey, nextActionShell).
+		Variable(nextActionKey, nextActionShell).
 		// pass key/value as environment variable to next worfklow action
-		SetVariable(updateEnvKey, "true").Output()
+		Variable(updateEnvKey, "true").Output()
 	return nil
 }
 
