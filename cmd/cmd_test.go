@@ -69,6 +69,27 @@ func TestExecute(t *testing.T) {
 			},
 		},
 		{
+			name: "specify language flag but not found",
+			args: args{
+				command:  "-L ja tar",
+				filepath: testdataPath("test_output_language-empty-result.json"),
+			},
+		},
+		{
+			name: "empty result",
+			args: args{
+				command:  "ta",
+				filepath: testdataPath("test_output_empty-result.json"),
+			},
+		},
+		{
+			name: "fuzzy but empty result",
+			args: args{
+				command:  "--fuzzy aaaaa",
+				filepath: testdataPath("test_output_empty-result.json"),
+			},
+		},
+		{
 			name: "no input",
 			args: args{
 				command:  "",

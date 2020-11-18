@@ -37,6 +37,7 @@ const (
 	updateFlag   = "update"
 	fuzzyFlag    = "fuzzy"
 	versionFlag  = "version"
+	languageFlag = "language"
 )
 
 type config struct {
@@ -75,6 +76,7 @@ func NewRootCmd() *cobra.Command {
 	rootCmd.PersistentFlags().BoolVarP(&cfg.update, updateFlag, string(updateFlag[0]), false, "update tldr database")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.fuzzy, fuzzyFlag, string(fuzzyFlag[0]), false, "use fuzzy search")
 	rootCmd.PersistentFlags().StringVarP(&cfg.platform, platformFlag, string(platformFlag[0]), initPlatform(), "select from linux/osx/sunos/windows")
+	rootCmd.PersistentFlags().StringVarP(&cfg.language, languageFlag, "L", "", "select language e.g.) en")
 
 	rootCmd.SetUsageFunc(usageFunc)
 	rootCmd.SetHelpFunc(helpFunc)
@@ -105,6 +107,7 @@ func showWorkflowUsage(cmd *cobra.Command) {
 		cmd.Flag(platformFlag),
 		cmd.Flag(updateFlag),
 		cmd.Flag(versionFlag),
+		cmd.Flag(languageFlag),
 	}
 
 	for _, p := range pflags {
@@ -155,12 +158,22 @@ func (cfg *config) printPage(cmds []string) error {
 	awf.SetEmptyWarning("No matching query", "Try a different query")
 	p, err := cfg.tldrClient.FindPage(cmds)
 	if err != nil {
-		if errors.Is(err, tldr.ErrNoPage) && cfg.fuzzy {
-			cfg.printFuzzyPages(cmds)
-		} else {
+		if errors.Is(err, tldr.ErrNotFoundPage) {
+			if cfg.language != "" {
+				awf.SetEmptyWarning(
+					"Not found the command in selected language",
+					"Try not to specify language option",
+				).Clear().Output()
+				return nil
+			}
+			if cfg.fuzzy {
+				cfg.printFuzzyPages(cmds)
+				return nil
+			}
 			awf.Output()
+			return nil
 		}
-		return nil
+		fatal(err)
 	}
 
 	for _, cmd := range p.CmdExamples {

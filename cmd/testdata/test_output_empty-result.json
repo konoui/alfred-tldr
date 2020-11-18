@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "title": "No matching query",
+      "subtitle": "Try a different query",
+      "icon": {
+        "path": "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertNoteIcon.icns"
+      },
+      "valid": true
+    }
+  ]
+}

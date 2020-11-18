@@ -11,6 +11,10 @@
     {
       "title": "-v, --version show the client version",
       "subtitle": "show the client version"
+    },
+    {
+      "title": "-L, --language select language e.g.) en",
+      "subtitle": "select language e.g.) en"
     }
   ]
 }
