@@ -141,7 +141,7 @@ func TestOnInitialize(t *testing.T) {
 				indexSourceURL: indexSourceURL,
 				indexFile:      filepath.Base(indexSourceURL),
 				zipFile:        filepath.Base(pageSourceURL),
-				platformDirs:   []string{"linux", "common"},
+				platforms:      []string{"linux", "common"},
 				languages:      []string{},
 				update:         false,
 			},

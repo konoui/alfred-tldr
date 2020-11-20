@@ -30,7 +30,7 @@ type Tldr struct {
 	indexSourceURL string
 	indexFile      string
 	zipFile        string
-	platformDirs   []string
+	platforms      []string
 	languages      []string
 	update         bool
 }
@@ -49,7 +49,7 @@ func New(tldrPath string, opt *Options) *Tldr {
 		indexSourceURL: indexSourceURL,
 		indexFile:      filepath.Base(indexSourceURL),
 		zipFile:        filepath.Base(pageSourceURL),
-		platformDirs:   []string{opt.Platform, "common"},
+		platforms:      []string{opt.Platform, "common"},
 		languages:      getLanguages(opt.Language),
 		update:         opt.Update,
 	}
@@ -118,7 +118,7 @@ func getLanguageCode(language string) string {
 }
 
 func getLangDir(lang string) string {
-	if lang == "en" {
+	if lang == languageCodeEN {
 		return "pages"
 	}
 
@@ -167,9 +167,9 @@ func (t *Tldr) Update() error {
 // FindPage find tldr page by `cmds`
 func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 	page := strings.Join(cmds, "-") + ".md"
-	for _, pt := range t.platformDirs {
+	for _, ptDir := range t.platforms {
 		for _, lang := range t.languages {
-			path := filepath.Join(t.path, getLangDir(lang), pt, page)
+			path := filepath.Join(t.path, getLangDir(lang), ptDir, page)
 			if !pathExists(path) {
 				// if cmd does not exist, try to find it in next platform
 				continue

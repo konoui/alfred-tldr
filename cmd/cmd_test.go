@@ -97,6 +97,13 @@ func TestExecute(t *testing.T) {
 			},
 		},
 		{
+			name: "specify help flag",
+			args: args{
+				command:  "--help",
+				filepath: testdataPath("test_output_usage.json"),
+			},
+		},
+		{
 			name: "string flag but no value and invalid flag",
 			args: args{
 				command:  "-p -a",
