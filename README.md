@@ -23,7 +23,7 @@ Options
 `--version`/`-v` option shows the current version of the client.   
 `--update`/`-u` option updates local database (tldr repository).  
 `--platform`/`-p` option selects platform from `linux`,`osx`,`sunos`,`windows`.  
-
+`--language`/`-L` option selects preferred language for the page.
 ![alfred-tldr](./alfred-tldr.gif)
 
 ## License
