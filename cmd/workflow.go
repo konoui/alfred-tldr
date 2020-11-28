@@ -18,12 +18,11 @@ const (
 	autoUpdateEnvKey = "ALFRED_TLDR_AUTO_UPDATE"
 )
 
-var awf = alfred.NewWorkflow()
-
-func init() {
-	awf.SetOut(outStream)
-	awf.SetErr(errStream)
-}
+var awf = alfred.NewWorkflow(
+	alfred.WithMaxResults(30),
+	alfred.WithOutStream(outStream),
+	alfred.WithLogStream(errStream),
+)
 
 func getDataDir() (string, error) {
 	base, err := alfred.GetDataDir()

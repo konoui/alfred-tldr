@@ -228,7 +228,7 @@ func (cfg *config) updateDB() error {
 
 	if shouldUpdateWithShell() {
 		// update explicitly
-		awf.Logf("updating tldr database...\n")
+		awf.Logger().Infoln("updating tldr database...")
 		return cfg.tldrClient.Update()
 	}
 
@@ -250,7 +250,7 @@ func (cfg *config) updateDB() error {
 
 func (cfg *config) updateDBInBackground() error {
 	if !isAutoUpdateEnabled() {
-		awf.Logf("skip auto-update check as auto-update env is not enabled\n")
+		awf.Logger().Infoln("skip auto-update check as auto-update env is not enabled")
 		return nil
 	}
 
@@ -275,7 +275,6 @@ func Execute(rootCmd *cobra.Command) {
 	rootCmd.SetOut(outStream)
 	rootCmd.SetErr(errStream)
 	if err := rootCmd.Execute(); err != nil {
-		awf.Logf(err.Error() + "\n")
 		fatal(err)
 	}
 }

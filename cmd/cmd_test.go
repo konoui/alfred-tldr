@@ -31,7 +31,6 @@ func TestExecute(t *testing.T) {
 				command:  "lsof",
 				filepath: testdataPath("test_output_lsof.json"),
 			},
-			update: true,
 		},
 		{
 			name: "sub command git checkout",
@@ -140,18 +139,18 @@ func TestExecute(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			// overwrite global awf
-			awf = alfred.NewWorkflow()
-			rootCmd := NewRootCmd()
 			outBuf, errBuf := new(bytes.Buffer), new(bytes.Buffer)
-			outStream, errStream = outBuf, errBuf
+			// overwrite global awf
+			awf = alfred.NewWorkflow(
+				alfred.WithOutStream(outBuf),
+				alfred.WithLogStream(errBuf),
+			)
+			rootCmd := NewRootCmd()
 			cmdArgs, err := shellwords.Parse(tt.args.command)
 			if err != nil {
 				t.Fatalf("args parse error: %+v", err)
 			}
-			awf.SetOut(outBuf)
-			awf.SetErr(errBuf)
-			rootCmd.SetOutput(outStream)
+			rootCmd.SetOutput(outBuf)
 			rootCmd.SetArgs(cmdArgs)
 
 			err = rootCmd.Execute()
@@ -168,7 +167,7 @@ func TestExecute(t *testing.T) {
 				}
 			}
 
-			if diff := alfred.DiffScriptFilter(wantData, outGotData); diff != "" {
+			if diff := alfred.DiffOutput(wantData, outGotData); diff != "" {
 				t.Errorf("-want +got\n%+v", diff)
 			}
 		})
