@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"time"
 
@@ -25,11 +24,7 @@ var (
 )
 
 func initPlatform() string {
-	platform := runtime.GOOS
-	if platform == "darwin" {
-		platform = "osx"
-	}
-	return platform
+	return "osx"
 }
 
 const (
@@ -160,20 +155,19 @@ func (cfg *config) printPage(cmds []string) error {
 	if err != nil {
 		if errors.Is(err, tldr.ErrNotFoundPage) {
 			if cfg.language != "" {
-				awf.SetEmptyWarning(
+				awf.Clear().SetEmptyWarning(
 					"Not found the command in selected language",
 					"Try not to specify language option",
-				).Clear().Output()
+				).Output()
 				return nil
 			}
 			if cfg.fuzzy {
-				cfg.printFuzzyPages(cmds)
-				return nil
+				return cfg.printFuzzyPages(cmds)
 			}
 			awf.Output()
 			return nil
 		}
-		fatal(err)
+		return err
 	}
 
 	for _, cmd := range p.CmdExamples {
@@ -189,10 +183,10 @@ func (cfg *config) printPage(cmds []string) error {
 	return nil
 }
 
-func (cfg *config) printFuzzyPages(cmds []string) {
+func (cfg *config) printFuzzyPages(cmds []string) error {
 	index, err := cfg.tldrClient.LoadIndexFile()
 	if err != nil {
-		fatal(err)
+		return err
 	}
 
 	suggestions := index.Commands.Search(cmds)
@@ -211,6 +205,7 @@ func (cfg *config) printFuzzyPages(cmds []string) {
 	}
 
 	awf.Output()
+	return nil
 }
 
 func (cfg *config) printVersion(v, r string) (_ error) {

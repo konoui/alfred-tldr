@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
@@ -52,5 +53,5 @@ func isAutoUpdateEnabled() bool {
 }
 
 func fatal(err error) {
-	awf.Fatal("Fatal errors occur", err.Error())
+	awf.Fatal("Fatal errors occur", fmt.Sprint(err))
 }

@@ -12,7 +12,6 @@ import (
 
 const (
 	pageSourceURL  = "https://tldr.sh/assets/tldr.zip"
-	indexSourceURL = "https://tldr.sh/assets/index.json"
 	languageCodeEN = "en"
 )
 
@@ -25,14 +24,11 @@ type Options struct {
 
 // Tldr Repository of tldir pages
 type Tldr struct {
-	path           string
-	pageSourceURL  string
-	indexSourceURL string
-	indexFile      string
-	zipFile        string
-	platforms      []string
-	languages      []string
-	update         bool
+	path          string
+	pageSourceURL string
+	platforms     []string
+	languages     []string
+	update        bool
 }
 
 var ErrNotFoundPage = errors.New("no page found")
@@ -44,93 +40,20 @@ func New(tldrPath string, opt *Options) *Tldr {
 	}
 
 	return &Tldr{
-		path:           tldrPath,
-		pageSourceURL:  pageSourceURL,
-		indexSourceURL: indexSourceURL,
-		indexFile:      filepath.Base(indexSourceURL),
-		zipFile:        filepath.Base(pageSourceURL),
-		platforms:      []string{opt.Platform, "common"},
-		languages:      getLanguages(opt.Language),
-		update:         opt.Update,
+		path:          tldrPath,
+		pageSourceURL: pageSourceURL,
+		platforms:     []string{opt.Platform, "common"},
+		languages:     getLanguages(opt.Language),
+		update:        opt.Update,
 	}
-}
-
-func getLanguages(optionLang string) (priorities []string) {
-	if optionLang != "" {
-		return []string{optionLang}
-	}
-
-	// see https://github.com/tldr-pages/tldr/blob/master/CLIENT-SPECIFICATION.md#language
-	langCode := getLanguageCode(os.Getenv("LANG"))
-	if langCode == "" {
-		return []string{languageCodeEN}
-	}
-	defer func() {
-		if !contains(langCode, priorities) {
-			priorities = append(priorities, langCode)
-		}
-		if !contains(languageCodeEN, priorities) {
-			priorities = append(priorities, languageCodeEN)
-		}
-	}()
-
-	languageEnv := os.Getenv("LANGUAGE")
-	if languageEnv == "" {
-		return
-	}
-
-	for _, language := range strings.Split(languageEnv, ":") {
-		code := getLanguageCode(language)
-		if contains(code, priorities) {
-			continue
-		}
-		priorities = append(priorities, code)
-	}
-	return
-}
-
-func contains(target string, list []string) bool {
-	for _, v := range list {
-		if v == target {
-			return true
-		}
-	}
-	return false
-}
-
-func getLanguageCode(language string) string {
-	code := strings.SplitN(language, ".", 2)[0]
-	if code == "C" || code == "POSIX" {
-		return ""
-	}
-
-	for _, v := range []string{"pt_PT", "pt_BR", "zh_TW"} {
-		if v == code {
-			return code
-		}
-	}
-
-	if code == "pt" {
-		return "pt_PT"
-	}
-
-	return strings.SplitN(code, "_", 2)[0]
-}
-
-func getLangDir(lang string) string {
-	if lang == languageCodeEN {
-		return "pages"
-	}
-
-	return "pages" + "." + lang
 }
 
 // OnInitialize create and update tldr directory
 func (t *Tldr) OnInitialize() error {
 	initUpdate := false
-	if !pathExists(t.path) {
+	if !pathExists(t.indexFilePath()) {
 		if err := os.MkdirAll(t.path, os.ModePerm); err != nil {
-			return fmt.Errorf("failed to create tldr dir %w", err)
+			return fmt.Errorf("failed to create tldr dir: %w", err)
 		}
 		// automatically updated if indexfile does not exist
 		initUpdate = true
@@ -138,8 +61,12 @@ func (t *Tldr) OnInitialize() error {
 
 	if t.update || initUpdate {
 		if err := t.Update(); err != nil {
-			return fmt.Errorf("failed to update tldr repository %w", err)
+			return fmt.Errorf("failed to update tldr repository: %w", err)
 		}
+	}
+
+	if f := t.indexFilePath(); !pathExists(f) {
+		return fmt.Errorf("tldr database may be broken %s", f)
 	}
 
 	return nil
@@ -147,18 +74,15 @@ func (t *Tldr) OnInitialize() error {
 
 // Update tldr pages from remote zip file
 func (t *Tldr) Update() error {
-	_, err := download(t.indexSourceURL, t.path, t.indexFile)
+	zipPath, err := download(t.pageSourceURL, t.path, filepath.Base(t.pageSourceURL))
 	if err != nil {
-		return fmt.Errorf("failed to download a index file %w", err)
+		return fmt.Errorf("failed to download a tldr repository: %w", err)
 	}
+	defer os.Remove(zipPath)
 
-	zipPath, err := download(t.pageSourceURL, t.path, t.zipFile)
+	err = unzip(zipPath, t.path)
 	if err != nil {
-		return fmt.Errorf("failed to download a tldr repository %w", err)
-	}
-
-	if err := unzip(zipPath, t.path); err != nil {
-		return fmt.Errorf("failed to unzip a tldr repository %w", err)
+		return fmt.Errorf("failed to unzip a tldr repository: %w", err)
 	}
 
 	return nil
@@ -171,13 +95,14 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 		for _, lang := range t.languages {
 			path := filepath.Join(t.path, getLangDir(lang), ptDir, page)
 			if !pathExists(path) {
-				// if cmd does not exist, try to find it in next platform
+				// if cmd does not exist, try to find it in next platform/language
 				continue
 			}
 
 			f, err := os.Open(path)
 			if err != nil {
-				return &Page{}, fmt.Errorf("failed to open the page (%s) %w", f.Name(), err)
+				return &Page{}, fmt.Errorf("failed to open the page (%s): %w", f.Name(),
+					err)
 			}
 			defer f.Close()
 
@@ -185,18 +110,21 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 		}
 	}
 
-	return &Page{}, fmt.Errorf("failed to find %s %w", page, ErrNotFoundPage)
+	return &Page{}, fmt.Errorf("failed to find %s: %w", page, ErrNotFoundPage)
 }
 
 // Expired return true if tldr repository have passed `ttl`
 func (t *Tldr) Expired(ttl time.Duration) bool {
-	indexPath := filepath.Join(t.path, t.indexFile)
-	age, err := age(indexPath)
+	age, err := age(t.indexFilePath())
 	if err != nil {
 		return true
 	}
 
 	return age > ttl
+}
+
+func (t *Tldr) indexFilePath() string {
+	return filepath.Join(t.path, getLangDir(languageCodeEN), "index.json")
 }
 
 // age return the time since the data exist at

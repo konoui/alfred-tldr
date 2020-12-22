@@ -4,3 +4,4 @@ pages/*
 *.md
 !README.md
 .artifact/
+cover.*

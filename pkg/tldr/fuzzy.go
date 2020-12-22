@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/sahilm/fuzzy"
@@ -54,10 +53,9 @@ func (c Cmds) Search(args []string) Cmds {
 
 // LoadIndexFile load command index file
 func (t *Tldr) LoadIndexFile() (*CmdsIndex, error) {
-	path := filepath.Join(t.path, t.indexFile)
-	f, err := os.Open(path)
+	f, err := os.Open(t.indexFilePath())
 	if err != nil {
-		return nil, fmt.Errorf("failed to open a index file %w", err)
+		return nil, fmt.Errorf("failed to open a index file: %w", err)
 	}
 	defer f.Close()
 
