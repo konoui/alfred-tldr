@@ -51,7 +51,7 @@ func New(tldrPath string, opt *Options) *Tldr {
 // OnInitialize create and update tldr directory
 func (t *Tldr) OnInitialize() error {
 	initUpdate := false
-	if !pathExists(t.indexFilePath()) {
+	if !pathExists(t.path) {
 		if err := os.MkdirAll(t.path, os.ModePerm); err != nil {
 			return fmt.Errorf("failed to create tldr dir: %w", err)
 		}
