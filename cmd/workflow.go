@@ -25,18 +25,6 @@ var awf = alfred.NewWorkflow(
 	alfred.WithLogStream(errStream),
 )
 
-func getDataDir() (string, error) {
-	base, err := alfred.GetDataDir()
-	if err != nil {
-		// Note fallback to home directory
-		base, err = os.UserHomeDir()
-		if err != nil {
-			return "", err
-		}
-	}
-	return base, nil
-}
-
 func shouldUpdateWithShell() bool {
 	// will use auto update for self execution
 	v := os.Getenv(updateEnvKey)

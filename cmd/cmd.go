@@ -121,11 +121,11 @@ func makeUsageItem(p *pflag.Flag) *alfred.Item {
 }
 
 func (cfg *config) initTldr() error {
-	base, err := getDataDir()
+	base, err := alfred.GetDataDir()
 	if err != nil {
 		return err
 	}
-	path := filepath.Join(base, ".alfred-tldr")
+	path := filepath.Join(base, "data")
 	// Note turn off update option as we update database explicitly
 	opt := &tldr.Options{
 		Update:   false,

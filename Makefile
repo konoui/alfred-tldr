@@ -37,6 +37,7 @@ darwin:
 
 ## Run tests for my project
 test:
+	export alfred_workflow_data=$(shell mktemp -d); \
 	go test -v ./...
 
 ## Install Binary and Assets to Workflow Directory
