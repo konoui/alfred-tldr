@@ -101,8 +101,7 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 
 			f, err := os.Open(path)
 			if err != nil {
-				return &Page{}, fmt.Errorf("failed to open the page (%s): %w", f.Name(),
-					err)
+				return &Page{}, fmt.Errorf("failed to open the page (%s): %w", f.Name(), err)
 			}
 			defer f.Close()
 
