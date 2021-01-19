@@ -66,7 +66,7 @@ func (t *Tldr) OnInitialize() error {
 	}
 
 	if f := t.indexFilePath(); !pathExists(f) {
-		return fmt.Errorf("tldr database may be broken %s", f)
+		return fmt.Errorf("tldr database is broken %s", f)
 	}
 
 	return nil
@@ -101,8 +101,7 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 
 			f, err := os.Open(path)
 			if err != nil {
-				return &Page{}, fmt.Errorf("failed to open the page (%s): %w", f.Name(),
-					err)
+				return &Page{}, fmt.Errorf("failed to open the page (%s): %w", f.Name(), err)
 			}
 			defer f.Close()
 

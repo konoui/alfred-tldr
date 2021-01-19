@@ -41,5 +41,5 @@ func isAutoUpdateEnabled() bool {
 }
 
 func fatal(err error) {
-	awf.Fatal("Fatal errors occur", fmt.Sprint(err))
+	awf.Fatal("a fatal error occurred", fmt.Sprint(err))
 }
