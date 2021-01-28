@@ -2,7 +2,8 @@ VERSION := $(shell git describe --tags --abbrev=0)
 REVISION := $(shell git rev-parse --short HEAD)
 SRC_DIR := ./
 BIN_NAME := tldr
-BINARY := bin/$(BIN_NAME)
+BIN_DIR := bin
+BINARY := $(BIN_DIR)/$(BIN_NAME)
 ASSETS_DIR := assets
 ASSETS := $(ASSETS_DIR)/* $(BINARY) README.md
 ARTIFACT_DIR := .artifact
@@ -33,7 +34,9 @@ lint:
 
 ## Build macos binaries
 darwin:
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build  -ldflags "$(LDFLAGS) -s -w" -o $(BINARY) $(SRC_DIR)
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags "$(LDFLAGS) -s -w" -o  $(BIN_DIR)/amd64 $(SRC_DIR)
+	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags "$(LDFLAGS) -s -w" -o  $(BIN_DIR)/arm64 $(SRC_DIR)
+	lipo -create $(BIN_DIR)/amd64 $(BIN_DIR)/arm64 -output $(BINARY)
 
 ## Run tests for my project
 test:
@@ -57,7 +60,7 @@ release: package
 
 ## Clean Binary
 clean:
-	rm -f $(BIN_NAME)
+	rm -f $(BIN_DIR)/*
 	rm -f $(ARTIFACT_DIR)/*
 
 
