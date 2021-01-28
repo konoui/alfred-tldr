@@ -123,7 +123,7 @@ func (t *Tldr) Expired(ttl time.Duration) bool {
 }
 
 func (t *Tldr) indexFilePath() string {
-	return filepath.Join(t.path, getLangDir(languageCodeEN), "index.json")
+	return filepath.Join(t.path, "index.json")
 }
 
 // age return the time since the data exist at

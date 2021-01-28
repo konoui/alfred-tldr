@@ -63,6 +63,7 @@ clean:
 
 ## Report coverage
 cover:
+	export alfred_workflow_data=$(shell mktemp -d); \
 	go test -coverprofile=cover.out ./...
 	go tool cover -html=cover.out -o cover.html
 

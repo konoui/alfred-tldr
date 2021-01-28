@@ -13,6 +13,15 @@
       "autocomplete": "git checkout"
     },
     {
+      "title": "git check attr",
+      "subtitle": "Platforms: common",
+      "arg": "git check attr --platform common",
+      "icon": {
+        "path": "candidate.png"
+      },
+      "autocomplete": "git check attr"
+    },
+    {
       "title": "git check ignore",
       "subtitle": "Platforms: common",
       "arg": "git check ignore --platform common",
@@ -20,6 +29,33 @@
         "path": "candidate.png"
       },
       "autocomplete": "git check ignore"
+    },
+    {
+      "title": "git check mailmap",
+      "subtitle": "Platforms: common",
+      "arg": "git check mailmap --platform common",
+      "icon": {
+        "path": "candidate.png"
+      },
+      "autocomplete": "git check mailmap"
+    },
+    {
+      "title": "git checkout index",
+      "subtitle": "Platforms: common",
+      "arg": "git checkout index --platform common",
+      "icon": {
+        "path": "candidate.png"
+      },
+      "autocomplete": "git checkout index"
+    },
+    {
+      "title": "git check ref format",
+      "subtitle": "Platforms: common",
+      "arg": "git check ref format --platform common",
+      "icon": {
+        "path": "candidate.png"
+      },
+      "autocomplete": "git check ref format"
     },
     {
       "title": "git cherry pick",
