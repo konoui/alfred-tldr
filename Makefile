@@ -33,7 +33,9 @@ lint:
 
 ## Build macos binaries
 darwin:
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build  -ldflags "$(LDFLAGS) -s -w" -o $(BINARY) $(SRC_DIR)
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build  -ldflags "$(LDFLAGS) -s -w" -o  bin/amd64 $(SRC_DIR)
+	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build  -ldflags "$(LDFLAGS) -s -w" -o  bin/arm64 $(SRC_DIR)
+	lipo -create bin/amd64 bin/arm64 -output $(BINARY)
 
 ## Run tests for my project
 test:
