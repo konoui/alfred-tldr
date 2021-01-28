@@ -66,7 +66,7 @@ func (t *Tldr) OnInitialize() error {
 	}
 
 	if f := t.indexFilePath(); !pathExists(f) {
-		return fmt.Errorf("tldr database may be broken %s", f)
+		return fmt.Errorf("tldr database is broken %s", f)
 	}
 
 	return nil
