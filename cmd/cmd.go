@@ -30,6 +30,7 @@ func initPlatform() string {
 const (
 	platformFlag = "platform"
 	updateFlag   = "update"
+	confirmFlag  = "confirm"
 	fuzzyFlag    = "fuzzy"
 	versionFlag  = "version"
 	languageFlag = "language"
@@ -39,6 +40,7 @@ type config struct {
 	platform   string
 	language   string
 	update     bool
+	confirm    bool
 	fuzzy      bool
 	version    bool
 	tldrClient *tldr.Tldr
@@ -69,9 +71,12 @@ func NewRootCmd() *cobra.Command {
 	}
 	rootCmd.PersistentFlags().BoolVarP(&cfg.version, versionFlag, string(versionFlag[0]), false, "show the client version")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.update, updateFlag, string(updateFlag[0]), false, "update tldr database")
-	rootCmd.PersistentFlags().BoolVarP(&cfg.fuzzy, fuzzyFlag, string(fuzzyFlag[0]), false, "use fuzzy search")
 	rootCmd.PersistentFlags().StringVarP(&cfg.platform, platformFlag, string(platformFlag[0]), initPlatform(), "select from linux/osx/sunos/windows")
 	rootCmd.PersistentFlags().StringVarP(&cfg.language, languageFlag, "L", "", "select language e.g.) en")
+
+	// internal flag
+	rootCmd.PersistentFlags().BoolVarP(&cfg.confirm, confirmFlag, string(confirmFlag[0]), false, "confirmation for update")
+	rootCmd.PersistentFlags().BoolVar(&cfg.fuzzy, fuzzyFlag, false, "use fuzzy search")
 
 	rootCmd.SetUsageFunc(usageFunc)
 	rootCmd.SetHelpFunc(helpFunc)
@@ -221,7 +226,7 @@ func (cfg *config) updateDB() error {
 		return errors.New("update is called even though update flag is not specified")
 	}
 
-	if shouldUpdateWithShell() {
+	if cfg.confirm {
 		// update explicitly
 		awf.Logger().Infoln("updating tldr database...")
 		return cfg.tldrClient.Update()
@@ -235,11 +240,11 @@ func (cfg *config) updateDB() error {
 		alfred.NewItem().
 			Title("Please Enter if update tldr database").
 			Subtitle(subtitle).
-			Arg("--"+updateFlag),
+			Arg(fmt.Sprintf("--%s --%s", updateFlag, confirmFlag)),
 	).
 		Variable(nextActionKey, nextActionShell).
-		// pass key/value as environment variable to next worfklow action
-		Variable(updateEnvKey, "true").Output()
+		Output()
+
 	return nil
 }
 
@@ -255,13 +260,12 @@ func (cfg *config) updateDBInBackground() error {
 
 	jobName := "update"
 	if awf.Job(jobName).IsRunning() {
+		awf.Logger().Infoln("update job is running in background")
 		return nil
 	}
 
-	if err := os.Setenv(updateEnvKey, "true"); err != nil {
-		return err
-	}
-	_, err := awf.Job(jobName).Start(os.Args[0], "--"+updateFlag)
+	awf.Logger().Infoln("executing auto update...")
+	_, err := awf.Job(jobName).Start(os.Args[0], "--"+updateFlag, "--"+confirmFlag)
 	return err
 }
 

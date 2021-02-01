@@ -14,7 +14,6 @@ const (
 	nextActionCopy  = "copy"
 	nextActionCmd   = "cmd"
 	nextActionShell = "shell"
-	updateEnvKey    = "ALFRED_TLDR_UPDATE"
 	// Note the key is also defined in workflow environment variable
 	autoUpdateEnvKey = "ALFRED_TLDR_AUTO_UPDATE"
 )
@@ -24,12 +23,6 @@ var awf = alfred.NewWorkflow(
 	alfred.WithOutStream(outStream),
 	alfred.WithLogStream(errStream),
 )
-
-func shouldUpdateWithShell() bool {
-	// will use auto update for self execution
-	v := os.Getenv(updateEnvKey)
-	return v != ""
-}
 
 func isAutoUpdateEnabled() bool {
 	sv := os.Getenv(autoUpdateEnvKey)

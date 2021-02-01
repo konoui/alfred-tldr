@@ -1,12 +1,11 @@
 {
   "variables": {
-    "ALFRED_TLDR_UPDATE": "true",
     "nextAction": "shell"
   },
   "items": [
     {
       "title": "Please Enter if update tldr database",
-      "arg": "--update"
+      "arg": "--update --confirm"
     }
   ]
 }
