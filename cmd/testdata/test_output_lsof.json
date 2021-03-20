@@ -4,6 +4,14 @@
   },
   "items": [
     {
+      "title": "Lists open files and the corresponding processes.",
+      "subtitle": "Note: Root privileges (or sudo) is required to list files opened by others.",
+      "icon": {
+        "path": "description.png"
+      },
+      "valid": false
+    },
+    {
       "title": "lsof {{path/to/file}}",
       "subtitle": "Find the processes that have a given file open:",
       "arg": "lsof {{path/to/file}}"

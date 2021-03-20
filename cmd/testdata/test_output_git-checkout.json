@@ -4,6 +4,14 @@
   },
   "items": [
     {
+      "title": "Checkout a branch or paths to the working tree.",
+      "subtitle": "More information: \u003chttps://git-scm.com/docs/git-checkout\u003e.",
+      "icon": {
+        "path": "description.png"
+      },
+      "valid": false
+    },
+    {
       "title": "git checkout -b {{branch_name}}",
       "subtitle": "Create and switch to a new branch:",
       "arg": "git checkout -b {{branch_name}}"

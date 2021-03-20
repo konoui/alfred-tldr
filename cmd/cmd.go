@@ -177,6 +177,24 @@ func (cfg *config) printPage(cmds []string) error {
 		return err
 	}
 
+	// TODO change icon for usage
+	// descriptions has one line at least
+	// see: https://github.com/tldr-pages/tldr/blob/master/contributing-guides/style-guide.md
+	title := p.CmdDescriptions[0]
+	subtitle := ""
+	if len(p.CmdDescriptions) >= 2 {
+		subtitle = p.CmdDescriptions[1]
+	}
+	awf.Append(
+		alfred.NewItem().
+			Title(title).
+			Subtitle(subtitle).
+			Valid(false).
+			Icon(
+				alfred.NewIcon().
+					Path("description.png"),
+			),
+	)
 	for _, cmd := range p.CmdExamples {
 		awf.Append(
 			alfred.NewItem().

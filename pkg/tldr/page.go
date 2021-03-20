@@ -8,9 +8,9 @@ import (
 
 // Page contents of a tldr page
 type Page struct {
-	CmdName        string
-	CmdDescription string
-	CmdExamples    []*CmdExample
+	CmdName         string
+	CmdDescriptions []string
+	CmdExamples     []*CmdExample
 }
 
 // CmdExample a command example in a tldr page
@@ -21,7 +21,8 @@ type CmdExample struct {
 
 func parsePage(s io.Reader) (*Page, error) {
 	cmdExamples := make([]*CmdExample, 0)
-	var cmdName, cmdDescription, description, cmd string
+	var cmdName, description, cmd string
+	var cmdDescriptions []string
 	scanner := bufio.NewScanner(s)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -33,7 +34,7 @@ func parsePage(s io.Reader) (*Page, error) {
 		}
 		if strings.HasPrefix(line, ">") {
 			trimedLine := strings.TrimSpace(strings.TrimLeft(line, ">"))
-			cmdDescription += trimedLine + "\n"
+			cmdDescriptions = append(cmdDescriptions, trimedLine)
 		}
 		if strings.HasPrefix(line, "-") {
 			description = strings.TrimSpace(strings.TrimLeft(line, "-"))
@@ -52,8 +53,8 @@ func parsePage(s io.Reader) (*Page, error) {
 	}
 
 	return &Page{
-		CmdName:        cmdName,
-		CmdDescription: cmdDescription,
-		CmdExamples:    cmdExamples,
+		CmdName:         cmdName,
+		CmdDescriptions: cmdDescriptions,
+		CmdExamples:     cmdExamples,
 	}, nil
 }
