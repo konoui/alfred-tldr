@@ -6,7 +6,7 @@
       "icon": {
         "path": "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertNoteIcon.icns"
       },
-      "valid": true
+      "valid": false
     }
   ]
 }

@@ -2,7 +2,8 @@
   "items": [
     {
       "title": "Please input a command",
-      "subtitle": "e.g.) tldr tar e.g.) tldr --help"
+      "subtitle": "e.g.) tldr tar e.g.) tldr --help",
+      "valid": false
     }
   ]
 }

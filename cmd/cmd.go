@@ -122,7 +122,8 @@ func makeUsageItem(p *pflag.Flag) *alfred.Item {
 	title := fmt.Sprintf("-%s, --%s %s", p.Shorthand, p.Name, p.Usage)
 	return alfred.NewItem().
 		Title(title).
-		Subtitle(p.Usage)
+		Subtitle(p.Usage).
+		Valid(false)
 }
 
 func (cfg *config) initTldr() error {
@@ -150,7 +151,8 @@ func (cfg *config) printPage(cmds []string) error {
 		awf.Append(
 			alfred.NewItem().
 				Title("Please input a command").
-				Subtitle("e.g.) tldr tar e.g.) tldr --help"),
+				Subtitle("e.g.) tldr tar e.g.) tldr --help").
+				Valid(false),
 		).Output()
 		return nil
 	}

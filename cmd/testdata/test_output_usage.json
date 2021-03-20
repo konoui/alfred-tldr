@@ -2,19 +2,23 @@
   "items": [
     {
       "title": "-p, --platform select from linux/osx/sunos/windows",
-      "subtitle": "select from linux/osx/sunos/windows"
+      "subtitle": "select from linux/osx/sunos/windows",
+      "valid": false
     },
     {
       "title": "-u, --update update tldr database",
-      "subtitle": "update tldr database"
+      "subtitle": "update tldr database",
+      "valid": false
     },
     {
       "title": "-v, --version show the client version",
-      "subtitle": "show the client version"
+      "subtitle": "show the client version",
+      "valid": false
     },
     {
       "title": "-L, --language select language e.g.) en",
-      "subtitle": "select language e.g.) en"
+      "subtitle": "select language e.g.) en",
+      "valid": false
     }
   ]
 }

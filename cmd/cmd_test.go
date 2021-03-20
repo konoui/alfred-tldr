@@ -77,14 +77,14 @@ func TestExecute(t *testing.T) {
 		{
 			name: "empty result",
 			args: args{
-				command:  "ta",
+				command:  "dummy-empty-result",
 				filepath: testdataPath("test_output_empty-result.json"),
 			},
 		},
 		{
 			name: "fuzzy but empty result",
 			args: args{
-				command:  "--fuzzy aaaaa",
+				command:  "--fuzzy dummy-empty-result",
 				filepath: testdataPath("test_output_empty-result.json"),
 			},
 		},
@@ -141,10 +141,9 @@ func TestExecute(t *testing.T) {
 
 			outBuf, errBuf := new(bytes.Buffer), new(bytes.Buffer)
 			// overwrite global awf
-			awf = alfred.NewWorkflow(
-				alfred.WithOutStream(outBuf),
-				alfred.WithLogStream(errBuf),
-			)
+			awf = alfred.NewWorkflow()
+			awf.SetOut(outBuf)
+			awf.SetLog(errBuf)
 			rootCmd := NewRootCmd()
 			cmdArgs, err := shellwords.Parse(tt.args.command)
 			if err != nil {

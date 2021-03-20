@@ -18,11 +18,15 @@ const (
 	autoUpdateEnvKey = "ALFRED_TLDR_AUTO_UPDATE"
 )
 
-var awf = alfred.NewWorkflow(
-	alfred.WithMaxResults(30),
-	alfred.WithOutStream(outStream),
-	alfred.WithLogStream(errStream),
-)
+var awf *alfred.Workflow
+
+func init() {
+	awf = alfred.NewWorkflow(
+		alfred.WithMaxResults(30),
+	)
+	awf.SetOut(outStream)
+	awf.SetLog(errStream)
+}
 
 func isAutoUpdateEnabled() bool {
 	sv := os.Getenv(autoUpdateEnvKey)
