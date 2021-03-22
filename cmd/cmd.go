@@ -216,17 +216,25 @@ func (cfg *config) printFuzzyPages(cmds []string) error {
 
 	suggestions := index.Commands.Search(cmds)
 	for _, cmd := range suggestions {
+		complete := cmd.Name
+		if cmd.Platform[0] != "common" {
+			complete = fmt.Sprintf("-%s %s %s",
+				string(platformFlag[0]),
+				cmd.Platform[0],
+				cmd.Name,
+			)
+		}
 		awf.Append(
 			alfred.NewItem().
 				Title(cmd.Name).
 				Subtitle(fmt.Sprintf("Platforms: %s", strings.Join(cmd.Platform, ","))).
-				Autocomplete(cmd.Name).
-				Arg(fmt.Sprintf("%s --%s %s", cmd.Name, platformFlag, cmd.Platform[0])).
+				Valid(false).
+				Autocomplete(complete).
 				Icon(
 					alfred.NewIcon().
 						Path("candidate.png"),
 				),
-		).Variable(nextActionKey, nextActionCmd)
+		)
 	}
 
 	awf.Output()

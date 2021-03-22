@@ -1,0 +1,13 @@
+{
+  "items": [
+    {
+      "title": "pstree",
+      "subtitle": "Platforms: linux",
+      "icon": {
+        "path": "candidate.png"
+      },
+      "autocomplete": "-p linux pstree",
+      "valid": false
+    }
+  ]
+}

@@ -47,6 +47,13 @@ func TestExecute(t *testing.T) {
 			},
 		},
 		{
+			name: "fuzzy search return non-common platform",
+			args: args{
+				command:  "pstree --fuzzy",
+				filepath: testdataPath("test_output_pstree_with_fuzzy.json"),
+			},
+		},
+		{
 			name: "show no error when cache expired",
 			args: args{
 				command:  "lsof",

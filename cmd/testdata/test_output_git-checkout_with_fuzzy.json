@@ -1,70 +1,67 @@
 {
-  "variables": {
-    "nextAction": "cmd"
-  },
   "items": [
     {
       "title": "git checkout",
       "subtitle": "Platforms: common",
-      "arg": "git checkout --platform common",
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "git checkout"
+      "autocomplete": "git checkout",
+      "valid": false
     },
     {
       "title": "git check attr",
       "subtitle": "Platforms: common",
-      "arg": "git check attr --platform common",
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "git check attr"
+      "autocomplete": "git check attr",
+      "valid": false
     },
     {
       "title": "git check ignore",
       "subtitle": "Platforms: common",
-      "arg": "git check ignore --platform common",
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "git check ignore"
+      "autocomplete": "git check ignore",
+      "valid": false
     },
     {
       "title": "git check mailmap",
       "subtitle": "Platforms: common",
-      "arg": "git check mailmap --platform common",
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "git check mailmap"
+      "autocomplete": "git check mailmap",
+      "valid": false
     },
     {
       "title": "git checkout index",
       "subtitle": "Platforms: common",
-      "arg": "git checkout index --platform common",
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "git checkout index"
+      "autocomplete": "git checkout index",
+      "valid": false
     },
     {
       "title": "git check ref format",
       "subtitle": "Platforms: common",
-      "arg": "git check ref format --platform common",
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "git check ref format"
+      "autocomplete": "git check ref format",
+      "valid": false
     },
     {
       "title": "git cherry pick",
       "subtitle": "Platforms: common",
-      "arg": "git cherry pick --platform common",
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "git cherry pick"
+      "autocomplete": "git cherry pick",
+      "valid": false
     }
   ]
 }

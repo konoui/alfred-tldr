@@ -8,19 +8,6 @@
 	<string>Tools</string>
 	<key>connections</key>
 	<dict>
-		<key>15F87A1B-0525-43F3-A55A-B5901B9222F8</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>E07B8BD1-1F99-4F81-97EA-A84B26C81DF6</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-		</array>
 		<key>1D881CA9-D4C5-412D-8F3A-E40DC1034FD3</key>
 		<array>
 			<dict>
@@ -36,19 +23,6 @@
 			<dict>
 				<key>destinationuid</key>
 				<string>CA38E469-AAA8-4B30-9FBD-DA5E02F4E718</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-		</array>
-		<key>7B74E407-A98B-42B6-9994-39ADD96B446D</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>15F87A1B-0525-43F3-A55A-B5901B9222F8</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -85,16 +59,6 @@
 		</array>
 		<key>CA38E469-AAA8-4B30-9FBD-DA5E02F4E718</key>
 		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>7B74E407-A98B-42B6-9994-39ADD96B446D</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
 			<dict>
 				<key>destinationuid</key>
 				<string>BE3CF337-953B-46C7-8003-F61536857703</string>
@@ -221,72 +185,6 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>alfredfiltersresults</key>
-				<false/>
-				<key>alfredfiltersresultsmatchmode</key>
-				<integer>0</integer>
-				<key>argumenttreatemptyqueryasnil</key>
-				<false/>
-				<key>argumenttrimmode</key>
-				<integer>0</integer>
-				<key>argumenttype</key>
-				<integer>1</integer>
-				<key>escaping</key>
-				<integer>127</integer>
-				<key>queuedelaycustom</key>
-				<integer>3</integer>
-				<key>queuedelayimmediatelyinitially</key>
-				<true/>
-				<key>queuedelaymode</key>
-				<integer>0</integer>
-				<key>queuemode</key>
-				<integer>1</integer>
-				<key>runningsubtext</key>
-				<string></string>
-				<key>script</key>
-				<string>./tldr --fuzzy ${nextCmd}</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
-				<string>test.sh</string>
-				<key>subtext</key>
-				<string></string>
-				<key>title</key>
-				<string>tldr</string>
-				<key>type</key>
-				<integer>0</integer>
-				<key>withspace</key>
-				<true/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.input.scriptfilter</string>
-			<key>uid</key>
-			<string>15F87A1B-0525-43F3-A55A-B5901B9222F8</string>
-			<key>version</key>
-			<integer>3</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>inputstring</key>
-				<string>{var:nextAction}</string>
-				<key>matchcasesensitive</key>
-				<false/>
-				<key>matchmode</key>
-				<integer>0</integer>
-				<key>matchstring</key>
-				<string>cmd</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.utility.filter</string>
-			<key>uid</key>
-			<string>7B74E407-A98B-42B6-9994-39ADD96B446D</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>argument</key>
 				<string></string>
 				<key>passthroughargument</key>
@@ -379,15 +277,6 @@ echo -n "succeeded to update tldr database"</string>
 	<string></string>
 	<key>uidata</key>
 	<dict>
-		<key>15F87A1B-0525-43F3-A55A-B5901B9222F8</key>
-		<dict>
-			<key>note</key>
-			<string></string>
-			<key>xpos</key>
-			<integer>480</integer>
-			<key>ypos</key>
-			<integer>210</integer>
-		</dict>
 		<key>1D881CA9-D4C5-412D-8F3A-E40DC1034FD3</key>
 		<dict>
 			<key>note</key>
@@ -403,13 +292,6 @@ echo -n "succeeded to update tldr database"</string>
 			<integer>770</integer>
 			<key>ypos</key>
 			<integer>360</integer>
-		</dict>
-		<key>7B74E407-A98B-42B6-9994-39ADD96B446D</key>
-		<dict>
-			<key>xpos</key>
-			<integer>390</integer>
-			<key>ypos</key>
-			<integer>240</integer>
 		</dict>
 		<key>A6248A62-FD01-4D8D-8896-F93E87BDA4B0</key>
 		<dict>

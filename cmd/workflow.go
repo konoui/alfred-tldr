@@ -12,7 +12,6 @@ import (
 const (
 	nextActionKey   = "nextAction"
 	nextActionCopy  = "copy"
-	nextActionCmd   = "cmd"
 	nextActionShell = "shell"
 	// Note the key is also defined in workflow environment variable
 	autoUpdateEnvKey = "ALFRED_TLDR_AUTO_UPDATE"
