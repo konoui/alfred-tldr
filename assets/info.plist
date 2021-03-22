@@ -331,7 +331,7 @@ echo -n "succeeded to update tldr database"</string>
 	</dict>
 	<key>variables</key>
 	<dict>
-		<key>ALFRED_TLDR_AUTO_UPDATE</key>
+		<key>ALFRED_TLDR_UPDATE_RECOMMEND</key>
 		<string>true</string>
 	</dict>
 	<key>version</key>

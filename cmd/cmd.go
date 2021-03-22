@@ -144,9 +144,17 @@ func (cfg *config) initTldr() error {
 }
 
 func (cfg *config) printPage(cmds []string) error {
-	defer func() {
-		_ = cfg.updateDBInBackground()
-	}()
+	// insert update recommendation first
+	if isUpdateRecommendEnabled() && cfg.tldrClient.Expired(twoWeeks) {
+		awf.Append(
+			alfred.NewItem().
+				Title("Please Enter! Tldr database is older than 2 weeks").
+				Arg(fmt.Sprintf("--%s --%s", updateFlag, confirmFlag)).
+				Icon(alfred.IconAlertNote),
+		).Variable(nextActionKey, nextActionShell)
+	}
+
+	// no input case
 	if len(cmds) == 0 {
 		awf.Append(
 			alfred.NewItem().
@@ -169,6 +177,7 @@ func (cfg *config) printPage(cmds []string) error {
 				return nil
 			}
 			if cfg.fuzzy {
+				// list suggestions
 				return cfg.printFuzzyPages(cmds)
 			}
 			awf.Output()
@@ -260,41 +269,15 @@ func (cfg *config) updateDB() error {
 		return cfg.tldrClient.Update()
 	}
 
-	subtitle := ""
-	if cfg.tldrClient.Expired(twoWeeks) {
-		subtitle = "tldr database is older than 2 weeks"
-	}
 	awf.Append(
 		alfred.NewItem().
 			Title("Please Enter if update tldr database").
-			Subtitle(subtitle).
 			Arg(fmt.Sprintf("--%s --%s", updateFlag, confirmFlag)),
 	).
 		Variable(nextActionKey, nextActionShell).
 		Output()
 
 	return nil
-}
-
-func (cfg *config) updateDBInBackground() error {
-	if !isAutoUpdateEnabled() {
-		awf.Logger().Infoln("skip auto-update check as auto-update env is not enabled")
-		return nil
-	}
-
-	if !cfg.tldrClient.Expired(twoWeeks) {
-		return nil
-	}
-
-	jobName := "update"
-	if awf.Job(jobName).IsRunning() {
-		awf.Logger().Infoln("update job is running in background")
-		return nil
-	}
-
-	awf.Logger().Infoln("executing auto update...")
-	_, err := awf.Job(jobName).Start(os.Args[0], "--"+updateFlag, "--"+confirmFlag)
-	return err
 }
 
 // Execute Execute root cmd

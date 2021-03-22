@@ -14,7 +14,7 @@ const (
 	nextActionCopy  = "copy"
 	nextActionShell = "shell"
 	// Note the key is also defined in workflow environment variable
-	autoUpdateEnvKey = "ALFRED_TLDR_AUTO_UPDATE"
+	updateRecommendEnvKey = "ALFRED_TLDR_UPDATE_RECOMMEND"
 )
 
 var awf *alfred.Workflow
@@ -27,8 +27,8 @@ func init() {
 	awf.SetLog(errStream)
 }
 
-func isAutoUpdateEnabled() bool {
-	sv := os.Getenv(autoUpdateEnvKey)
+func isUpdateRecommendEnabled() bool {
+	sv := os.Getenv(updateRecommendEnvKey)
 	bv, err := strconv.ParseBool(sv)
 	if err != nil {
 		return false
