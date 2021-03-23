@@ -24,7 +24,7 @@ var (
 )
 
 func initPlatform() string {
-	return "osx"
+	return tldr.PlatformOSX.String()
 }
 
 const (
@@ -37,7 +37,7 @@ const (
 )
 
 type config struct {
-	platform   string
+	platform   tldr.Platform
 	language   string
 	update     bool
 	confirm    bool
@@ -49,11 +49,18 @@ type config struct {
 // NewRootCmd create a new cmd for root
 func NewRootCmd() *cobra.Command {
 	cfg := new(config)
+	var ptString string
 	rootCmd := &cobra.Command{
 		Use:   "tldr <cmd>",
 		Short: "show cmd examples",
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := cfg.setPlatform(ptString); err != nil {
+				awf.SetEmptyWarning(strings.Title(err.Error()),
+					"supported are linux/osx/sunos/windows").
+					Output()
+				return nil
+			}
 			if err := cfg.initTldr(); err != nil {
 				return err
 			}
@@ -71,7 +78,8 @@ func NewRootCmd() *cobra.Command {
 	}
 	rootCmd.PersistentFlags().BoolVarP(&cfg.version, versionFlag, string(versionFlag[0]), false, "show the client version")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.update, updateFlag, string(updateFlag[0]), false, "update tldr database")
-	rootCmd.PersistentFlags().StringVarP(&cfg.platform, platformFlag, string(platformFlag[0]), initPlatform(), "select from linux/osx/sunos/windows")
+	rootCmd.PersistentFlags().StringVarP(&ptString, platformFlag, string(platformFlag[0]),
+		initPlatform(), "select from linux/osx/sunos/windows")
 	rootCmd.PersistentFlags().StringVarP(&cfg.language, languageFlag, "L", "", "select language e.g.) en")
 
 	// internal flag
@@ -126,12 +134,30 @@ func makeUsageItem(p *pflag.Flag) *alfred.Item {
 		Valid(false)
 }
 
+func (cfg *config) setPlatform(ptString string) error {
+	platforms := []tldr.Platform{
+		tldr.PlatformCommon,
+		tldr.PlatformLinux,
+		tldr.PlatformOSX,
+		tldr.PlatformWindows,
+		tldr.PlatformSunos,
+	}
+	for _, pt := range platforms {
+		if ptString == pt.String() {
+			cfg.platform = pt
+			return nil
+		}
+	}
+	return fmt.Errorf("%s is unsupported platform", ptString)
+}
+
 func (cfg *config) initTldr() error {
 	base, err := alfred.GetDataDir()
 	if err != nil {
 		return err
 	}
 	path := filepath.Join(base, "data")
+
 	// Note turn off update option as we update database explicitly
 	opt := &tldr.Options{
 		Update:   false,
@@ -226,7 +252,7 @@ func (cfg *config) printFuzzyPages(cmds []string) error {
 	suggestions := index.Commands.Search(cmds)
 	for _, cmd := range suggestions {
 		complete := cmd.Name
-		if cmd.Platform[0] != "common" {
+		if cmd.Platform[0] != tldr.PlatformCommon.String() {
 			complete = fmt.Sprintf("-%s %s %s",
 				string(platformFlag[0]),
 				cmd.Platform[0],

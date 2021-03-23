@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "title": "A Is Unsupported Platform",
+      "subtitle": "supported are linux/osx/sunos/windows",
+      "icon": {
+        "path": "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertNoteIcon.icns"
+      },
+      "valid": false
+    }
+  ]
+}

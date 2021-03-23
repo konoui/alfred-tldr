@@ -10,6 +10,20 @@ import (
 	"github.com/pkg/errors"
 )
 
+type Platform string
+
+const (
+	PlatformCommon  Platform = "common"
+	PlatformWindows Platform = "windows"
+	PlatformLinux   Platform = "linux"
+	PlatformSunos   Platform = "sunos"
+	PlatformOSX     Platform = "osx"
+)
+
+func (pt Platform) String() string {
+	return string(pt)
+}
+
 const (
 	pageSourceURL  = "https://tldr.sh/assets/tldr.zip"
 	languageCodeEN = "en"
@@ -17,7 +31,7 @@ const (
 
 // Options are tldr functions
 type Options struct {
-	Platform string
+	Platform Platform
 	Language string
 	Update   bool
 }
@@ -26,7 +40,7 @@ type Options struct {
 type Tldr struct {
 	path          string
 	pageSourceURL string
-	platforms     []string
+	platforms     []Platform
 	languages     []string
 	update        bool
 }
@@ -42,7 +56,7 @@ func New(tldrPath string, opt *Options) *Tldr {
 	return &Tldr{
 		path:          tldrPath,
 		pageSourceURL: pageSourceURL,
-		platforms:     []string{opt.Platform, "common"},
+		platforms:     []Platform{opt.Platform, PlatformCommon},
 		languages:     getLanguages(opt.Language),
 		update:        opt.Update,
 	}
@@ -93,7 +107,7 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 	page := strings.Join(cmds, "-") + ".md"
 	for _, ptDir := range t.platforms {
 		for _, lang := range t.languages {
-			path := filepath.Join(t.path, getLangDir(lang), ptDir, page)
+			path := filepath.Join(t.path, getLangDir(lang), ptDir.String(), page)
 			if !pathExists(path) {
 				// if cmd does not exist, try to find it in next platform/language
 				continue
