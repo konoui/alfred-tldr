@@ -2,7 +2,7 @@
   "items": [
     {
       "title": "pstree",
-      "subtitle": "Platforms: linux",
+      "subtitle": "Platforms: [linux]",
       "icon": {
         "path": "candidate.png"
       },

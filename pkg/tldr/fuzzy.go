@@ -11,9 +11,9 @@ import (
 
 // CmdInfo contains name, platform, language
 type CmdInfo struct {
-	Name     string   `json:"name"`
-	Platform []string `json:"platform"`
-	Language []string `json:"language"`
+	Name      string     `json:"name"`
+	Platforms []Platform `json:"platform"`
+	Languages []string   `json:"language"`
 }
 
 // Cmds a slice of CmdInfo
