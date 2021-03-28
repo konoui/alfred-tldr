@@ -63,7 +63,7 @@ func TestExecute(t *testing.T) {
 		{
 			name: "version flag is the highest priority",
 			args: args{
-				command:  "-v tldr -p -a",
+				command:  "-v tldr -L -a",
 				filepath: testdataPath("test_output_version.json"),
 			},
 		},
@@ -112,14 +112,14 @@ func TestExecute(t *testing.T) {
 		{
 			name: "string flag but no value and invalid flag",
 			args: args{
-				command:  "-p -a",
+				command:  "-L -a",
 				filepath: testdataPath("test_output_no-input.json"),
 			},
 		},
 		{
 			name: "string flag but no value",
 			args: args{
-				command:  "--fuzzy -p",
+				command:  "--fuzzy -L",
 				filepath: testdataPath("test_output_usage.json"),
 			},
 		},
@@ -135,6 +135,13 @@ func TestExecute(t *testing.T) {
 			args: args{
 				command:  "-a -u",
 				filepath: testdataPath("test_output_usage.json"),
+			},
+		},
+		{
+			name: "invalid platform flag",
+			args: args{
+				command:  "-p a",
+				filepath: testdataPath("test_output_platform-error.json"),
 			},
 		},
 	}

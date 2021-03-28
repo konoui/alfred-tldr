@@ -125,7 +125,7 @@ func TestOnInitialize(t *testing.T) {
 			tldr: Tldr{
 				path:          "/.tldr",
 				pageSourceURL: pageSourceURL,
-				platforms:     []string{"linux", "common"},
+				platforms:     []Platform{PlatformLinux, PlatformCommon},
 				languages:     []string{},
 				update:        false,
 			},

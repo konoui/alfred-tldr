@@ -2,7 +2,7 @@
   "items": [
     {
       "title": "git checkout",
-      "subtitle": "Platforms: common",
+      "subtitle": "Platforms: [common]",
       "icon": {
         "path": "candidate.png"
       },
@@ -11,7 +11,7 @@
     },
     {
       "title": "git check attr",
-      "subtitle": "Platforms: common",
+      "subtitle": "Platforms: [common]",
       "icon": {
         "path": "candidate.png"
       },
@@ -20,7 +20,7 @@
     },
     {
       "title": "git check ignore",
-      "subtitle": "Platforms: common",
+      "subtitle": "Platforms: [common]",
       "icon": {
         "path": "candidate.png"
       },
@@ -29,7 +29,7 @@
     },
     {
       "title": "git check mailmap",
-      "subtitle": "Platforms: common",
+      "subtitle": "Platforms: [common]",
       "icon": {
         "path": "candidate.png"
       },
@@ -38,7 +38,7 @@
     },
     {
       "title": "git checkout index",
-      "subtitle": "Platforms: common",
+      "subtitle": "Platforms: [common]",
       "icon": {
         "path": "candidate.png"
       },
@@ -47,7 +47,7 @@
     },
     {
       "title": "git check ref format",
-      "subtitle": "Platforms: common",
+      "subtitle": "Platforms: [common]",
       "icon": {
         "path": "candidate.png"
       },
@@ -56,7 +56,7 @@
     },
     {
       "title": "git cherry pick",
-      "subtitle": "Platforms: common",
+      "subtitle": "Platforms: [common]",
       "icon": {
         "path": "candidate.png"
       },
