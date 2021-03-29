@@ -210,14 +210,7 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>./tldr ${nextCmd} --fuzzy 1&gt; /dev/null 
-ret=$?
-
-if [ $ret -ne 0 ]; then
-    echo -n "failed to update tldr database"
-    exit 1
-fi
-echo -n "succeeded to update tldr database"</string>
+				<string>./tldr ${nextCmd} --fuzzy</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -331,7 +324,9 @@ echo -n "succeeded to update tldr database"</string>
 	</dict>
 	<key>variables</key>
 	<dict>
-		<key>ALFRED_TLDR_UPDATE_RECOMMEND</key>
+		<key>ALFRED_TLDR_WORKFLOW_UPDATE_RECOMMEND</key>
+		<string>true</string>
+		<key>ALFRED_TLDR_DB_UPDATE_RECOMMEND</key>
 		<string>true</string>
 	</dict>
 	<key>version</key>

@@ -1,4 +1,5 @@
 ![Generic badge](https://github.com/konoui/alfred-tldr/workflows/test/badge.svg)
+![Code Grade](https://www.code-inspector.com/project/20715/status/svg)
 
 ## alfred tldr
 

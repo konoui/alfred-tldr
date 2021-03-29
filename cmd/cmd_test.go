@@ -4,17 +4,48 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/konoui/alfred-tldr/pkg/tldr"
 	"github.com/konoui/go-alfred"
+	"github.com/konoui/go-alfred/update"
 	"github.com/mattn/go-shellwords"
+	"github.com/spf13/cobra"
 )
 
 func testdataPath(file string) string {
 	return filepath.Join("./testdata", file)
+}
+
+func setup(t *testing.T, awf *alfred.Workflow, command string) (*bytes.Buffer, *bytes.Buffer, *cobra.Command) {
+	t.Helper()
+
+	outBuf, errBuf := new(bytes.Buffer), new(bytes.Buffer)
+	outStream = outBuf
+	errStream = outBuf
+	awf.SetOut(outBuf)
+	awf.SetLog(errBuf)
+	rootCmd := NewRootCmd()
+	cmdArgs, err := shellwords.Parse(command)
+	if err != nil {
+		t.Fatalf("args parse error: %+v", err)
+	}
+	rootCmd.SetOutput(outBuf)
+	rootCmd.SetArgs(cmdArgs)
+
+	return outBuf, errBuf, rootCmd
+}
+
+func execute(t *testing.T, rootCmd *cobra.Command) {
+	err := rootCmd.Execute()
+	if err != nil {
+		t.Errorf("unexpected error got: %+v", err)
+	}
 }
 
 func TestExecute(t *testing.T) {
@@ -169,24 +200,10 @@ func TestExecute(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			outBuf, errBuf := new(bytes.Buffer), new(bytes.Buffer)
 			// overwrite global awf
 			awf = alfred.NewWorkflow()
-			awf.SetOut(outBuf)
-			awf.SetLog(errBuf)
-			rootCmd := NewRootCmd()
-			cmdArgs, err := shellwords.Parse(tt.args.command)
-			if err != nil {
-				t.Fatalf("args parse error: %+v", err)
-			}
-			rootCmd.SetOutput(outBuf)
-			rootCmd.SetArgs(cmdArgs)
-
-			err = rootCmd.Execute()
-			if err != nil {
-				t.Errorf("unexpected error got: %+v", err)
-			}
-
+			outBuf, _, cmd := setup(t, awf, tt.args.command)
+			execute(t, cmd)
 			outGotData := outBuf.Bytes()
 
 			// automatically update test data
@@ -198,6 +215,164 @@ func TestExecute(t *testing.T) {
 
 			if diff := alfred.DiffOutput(wantData, outGotData); diff != "" {
 				t.Errorf("-want +got\n%+v", diff)
+			}
+		})
+	}
+}
+
+func TestUpdateConfirmation(t *testing.T) {
+	type args struct {
+		filepath       string
+		command        string
+		currentVersion string
+		ttl            time.Duration
+	}
+	tests := []struct {
+		name   string
+		args   args
+		update bool
+	}{
+		{
+			name: "no-input-and-update-recommendations",
+			args: args{
+				currentVersion: "v0.0.1",
+				ttl:            0,
+				command:        "",
+				filepath:       testdataPath("output_update-recommendations.json"),
+			},
+		},
+		{
+			name: "lsof-with-workflow-update-recommendation",
+			args: args{
+				currentVersion: "v0.0.1",
+				ttl:            1000 * time.Hour,
+				command:        "lsof",
+				filepath:       testdataPath("output_lsof-with-update-workflow-recommendation.json"),
+			},
+		},
+		{
+			name: "lsof-with-db-recommendation",
+			args: args{
+				currentVersion: "v100.0.0",
+				ttl:            0,
+				command:        "lsof",
+				filepath:       testdataPath("output_lsof-with-update-db-recommendation.json"),
+			},
+		},
+		{
+			name: "update-db-confirmation",
+			args: args{
+				currentVersion: "v100.0.0",
+				ttl:            0,
+				command:        "--update",
+				filepath:       testdataPath("output_update-db-confirmation.json"),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := os.Setenv(updateDBRecommendEnvKey, "true"); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.Setenv(updateWorkflowRecommendEnvKey, "true"); err != nil {
+				t.Fatal(err)
+			}
+			defer func() {
+				if err := os.Unsetenv(updateDBRecommendEnvKey); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.Unsetenv(updateWorkflowRecommendEnvKey); err != nil {
+					t.Fatal(err)
+				}
+			}()
+
+			wantData, err := ioutil.ReadFile(tt.args.filepath)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// disable ttl
+			twoWeeks = tt.args.ttl
+			version = tt.args.currentVersion
+			awf = alfred.NewWorkflow(
+				alfred.WithGitHubUpdater(
+					"konoui", "alfred-tldr", version,
+					update.WithCheckInterval(0),
+				),
+			)
+
+			outBuf, _, cmd := setup(t, awf, tt.args.command)
+			execute(t, cmd)
+			outGotData := outBuf.Bytes()
+
+			// automatically update test data
+			if tt.update {
+				if err := writeFile(tt.args.filepath, outGotData); err != nil {
+					t.Fatal(err)
+				}
+			}
+
+			if diff := alfred.DiffOutput(wantData, outGotData); diff != "" {
+				t.Errorf("-want +got\n%+v", diff)
+			}
+		})
+	}
+}
+
+func TestUpdateExecution(t *testing.T) {
+	type args struct {
+		command string
+	}
+	tests := []struct {
+		name        string
+		args        args
+		expectedErr bool
+		errMsg      string
+		wantMsg     string
+	}{
+		{
+			name: "update db",
+			args: args{
+				command: "--update --confirm",
+			},
+			wantMsg:     "update succeeded",
+			expectedErr: false,
+		},
+		{
+			name: "update-workflow confirmation does not support",
+			args: args{
+				command: "--update-workflow",
+			},
+			expectedErr: true,
+			errMsg:      "direct update via flag is not supported",
+		},
+		{
+			name: "update-workflow but nil updater return error. update execution output to stdout",
+			args: args{
+				command: "--update-workflow --confirm",
+			},
+			expectedErr: false,
+			wantMsg:     "update failed due to no implemented",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			awf = alfred.NewWorkflow()
+			outBuf, _, cmd := setup(t, awf, tt.args.command)
+			err := cmd.Execute()
+			if tt.expectedErr && err == nil {
+				t.Errorf("unexpected results")
+			}
+			if tt.expectedErr && err != nil {
+				if !strings.Contains(err.Error(), tt.errMsg) {
+					t.Errorf("want: %v\n got: %v", tt.errMsg, err.Error())
+				}
+			}
+			got := outBuf.String()
+			if got != tt.wantMsg {
+				t.Errorf("want: %v\n got: %v", tt.wantMsg, got)
 			}
 		})
 	}

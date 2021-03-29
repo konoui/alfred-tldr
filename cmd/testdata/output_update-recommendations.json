@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "variables": {
+        "nextAction": "shell"
+      },
+      "title": "Newer tldr wrokflow is available!",
+      "subtitle": "Please Enter!",
+      "arg": "--update-workflow --confirm",
+      "icon": {
+        "path": "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertNoteIcon.icns"
+      }
+    },
+    {
+      "variables": {
+        "nextAction": "shell"
+      },
+      "title": "Tldr database is older than 2 weeks",
+      "subtitle": "Please Enter!",
+      "arg": "--update --confirm",
+      "icon": {
+        "path": "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertNoteIcon.icns"
+      }
+    },
+    {
+      "title": "Please input a command",
+      "subtitle": "e.g.) tldr tar e.g.) tldr --help",
+      "valid": false
+    }
+  ]
+}
