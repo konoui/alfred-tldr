@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
+	"reflect"
 	"testing"
 
+	"github.com/konoui/alfred-tldr/pkg/tldr"
 	"github.com/konoui/go-alfred"
 	"github.com/mattn/go-shellwords"
 )
@@ -51,6 +53,20 @@ func TestExecute(t *testing.T) {
 			args: args{
 				command:  "pstree --fuzzy",
 				filepath: testdataPath("test_output_pstree_with_fuzzy.json"),
+			},
+		},
+		{
+			name: "multi platform command yank without -p flag return computer pt OSX",
+			args: args{
+				command:  "yan --fuzzy",
+				filepath: testdataPath("test_output_yank_without_p-flag_fuzzy.json"),
+			},
+		},
+		{
+			name: "multi platform command yank with -p flag return specified pt",
+			args: args{
+				command:  "yan -p linux --fuzzy",
+				filepath: testdataPath("test_output_yank_with_p-flag_with_fuzzy.json"),
 			},
 		},
 		{
@@ -197,4 +213,56 @@ func writeFile(filename string, data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func Test_choicePlatform(t *testing.T) {
+	type args struct {
+		pts      []tldr.Platform
+		selected tldr.Platform
+	}
+	tests := []struct {
+		name string
+		args args
+		want tldr.Platform
+	}{
+		{
+			name: "common return linux",
+			args: args{
+				pts: []tldr.Platform{
+					tldr.PlatformCommon,
+				},
+				selected: tldr.PlatformLinux,
+			},
+			want: tldr.PlatformCommon,
+		},
+		{
+			name: "common,linux return linux",
+			args: args{
+				pts: []tldr.Platform{
+					tldr.PlatformCommon,
+					tldr.PlatformLinux,
+				},
+				selected: tldr.PlatformLinux,
+			},
+			want: tldr.PlatformLinux,
+		},
+		{
+			name: "common,linux return common",
+			args: args{
+				pts: []tldr.Platform{
+					tldr.PlatformCommon,
+					tldr.PlatformLinux,
+				},
+				selected: tldr.PlatformOSX,
+			},
+			want: tldr.PlatformCommon,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := choicePlatform(tt.args.pts, tt.args.selected); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("choicePlatform() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

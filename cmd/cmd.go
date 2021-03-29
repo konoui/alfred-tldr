@@ -23,9 +23,7 @@ var (
 	twoWeeks            = 2 * 7 * 24 * time.Hour
 )
 
-func initPlatform() string {
-	return tldr.PlatformOSX.String()
-}
+var defaultPlatform = tldr.PlatformOSX
 
 const (
 	platformFlag = "platform"
@@ -79,7 +77,7 @@ func NewRootCmd() *cobra.Command {
 	rootCmd.PersistentFlags().BoolVarP(&cfg.version, versionFlag, string(versionFlag[0]), false, "show the client version")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.update, updateFlag, string(updateFlag[0]), false, "update tldr database")
 	rootCmd.PersistentFlags().StringVarP(&ptString, platformFlag, string(platformFlag[0]),
-		initPlatform(), "select from linux/osx/sunos/windows")
+		defaultPlatform.String(), "select from linux/osx/sunos/windows")
 	rootCmd.PersistentFlags().StringVarP(&cfg.language, languageFlag, "L", "", "select language e.g.) en")
 
 	// internal flag
@@ -252,8 +250,8 @@ func (cfg *config) printFuzzyPages(cmds []string) error {
 	suggestions := index.Commands.Search(cmds)
 	for _, cmd := range suggestions {
 		complete := cmd.Name
-		// TODO when multi pt, computer pt must be used
-		if pt := cmd.Platforms[0]; pt != tldr.PlatformCommon && pt != cfg.platform {
+		pt := choicePlatform(cmd.Platforms, cfg.platform)
+		if pt != tldr.PlatformCommon && pt != defaultPlatform {
 			complete = fmt.Sprintf("-%s %s %s",
 				string(platformFlag[0]),
 				pt,
@@ -305,6 +303,27 @@ func (cfg *config) updateDB() error {
 		Output()
 
 	return nil
+}
+
+func choicePlatform(pts []tldr.Platform, selected tldr.Platform) tldr.Platform {
+	if len(pts) >= 2 {
+		// if there are more than two platforms,
+		// priority are follow
+		// selected pt, common, others
+		for _, pt := range pts {
+			if pt == selected {
+				return selected
+			}
+		}
+
+		for _, pt := range pts {
+			if pt == tldr.PlatformCommon {
+				return tldr.PlatformCommon
+			}
+		}
+	}
+
+	return pts[0]
 }
 
 // Execute Execute root cmd

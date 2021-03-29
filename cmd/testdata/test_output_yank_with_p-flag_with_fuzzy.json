@@ -1,0 +1,58 @@
+{
+  "items": [
+    {
+      "title": "yank",
+      "subtitle": "Platforms: [osx linux]",
+      "icon": {
+        "path": "candidate.png"
+      },
+      "autocomplete": "-p linux yank",
+      "valid": false
+    },
+    {
+      "title": "yarn",
+      "subtitle": "Platforms: [common]",
+      "icon": {
+        "path": "candidate.png"
+      },
+      "autocomplete": "yarn",
+      "valid": false
+    },
+    {
+      "title": "yarn why",
+      "subtitle": "Platforms: [common]",
+      "icon": {
+        "path": "candidate.png"
+      },
+      "autocomplete": "yarn why",
+      "valid": false
+    },
+    {
+      "title": "systemd analyze",
+      "subtitle": "Platforms: [linux]",
+      "icon": {
+        "path": "candidate.png"
+      },
+      "autocomplete": "-p linux systemd analyze",
+      "valid": false
+    },
+    {
+      "title": "ssh keyscan",
+      "subtitle": "Platforms: [common]",
+      "icon": {
+        "path": "candidate.png"
+      },
+      "autocomplete": "ssh keyscan",
+      "valid": false
+    },
+    {
+      "title": "pyenv virtualenv",
+      "subtitle": "Platforms: [common]",
+      "icon": {
+        "path": "candidate.png"
+      },
+      "autocomplete": "pyenv virtualenv",
+      "valid": false
+    }
+  ]
+}
