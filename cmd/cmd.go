@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -26,22 +25,31 @@ var (
 var defaultPlatform = tldr.PlatformOSX
 
 const (
-	platformFlag = "platform"
-	updateFlag   = "update"
-	confirmFlag  = "confirm"
-	fuzzyFlag    = "fuzzy"
-	versionFlag  = "version"
-	languageFlag = "language"
+	longPlatformFlag   = "platform"
+	longUpdateFlag     = "update"
+	longVersionFlag    = "version"
+	longLanguageFlag   = "language"
+	confirmFlag        = "confirm"
+	fuzzyFlag          = "fuzzy"
+	updateWorkflowFlag = "update-workflow"
+)
+
+var (
+	platformFlag = string(longPlatformFlag[0])
+	updateFlag   = string(longUpdateFlag[0])
+	versionFlag  = string(longVersionFlag[0])
+	languageFlag = strings.ToUpper(string(longLanguageFlag[0]))
 )
 
 type config struct {
-	platform   tldr.Platform
-	language   string
-	update     bool
-	confirm    bool
-	fuzzy      bool
-	version    bool
-	tldrClient *tldr.Tldr
+	platform       tldr.Platform
+	language       string
+	update         bool
+	updateWorkflow bool
+	confirm        bool
+	fuzzy          bool
+	version        bool
+	tldrClient     *tldr.Tldr
 }
 
 // NewRootCmd create a new cmd for root
@@ -62,11 +70,14 @@ func NewRootCmd() *cobra.Command {
 			if err := cfg.initTldr(); err != nil {
 				return err
 			}
-			if cfg.version {
-				return cfg.printVersion(version, revision)
+			if cfg.updateWorkflow {
+				return cfg.updateTLDRWorkflow()
 			}
 			if cfg.update {
 				return cfg.updateDB()
+			}
+			if cfg.version {
+				return cfg.printVersion(version, revision)
 			}
 			return cfg.printPage(args)
 		},
@@ -74,15 +85,20 @@ func NewRootCmd() *cobra.Command {
 		SilenceUsage:       true,
 		DisableSuggestions: true,
 	}
-	rootCmd.PersistentFlags().BoolVarP(&cfg.version, versionFlag, string(versionFlag[0]), false, "show the client version")
-	rootCmd.PersistentFlags().BoolVarP(&cfg.update, updateFlag, string(updateFlag[0]), false, "update tldr database")
-	rootCmd.PersistentFlags().StringVarP(&ptString, platformFlag, string(platformFlag[0]),
+	rootCmd.PersistentFlags().BoolVarP(&cfg.version, longVersionFlag, versionFlag,
+		false, "show the client version")
+	rootCmd.PersistentFlags().BoolVarP(&cfg.update, longUpdateFlag, updateFlag,
+		false, "update tldr database")
+	rootCmd.PersistentFlags().StringVarP(&ptString, longPlatformFlag, platformFlag,
 		defaultPlatform.String(), "select from linux/osx/sunos/windows")
-	rootCmd.PersistentFlags().StringVarP(&cfg.language, languageFlag, "L", "", "select language e.g.) en")
+	rootCmd.PersistentFlags().StringVarP(&cfg.language, longLanguageFlag, languageFlag, "", "select language e.g.) en")
 
 	// internal flag
-	rootCmd.PersistentFlags().BoolVarP(&cfg.confirm, confirmFlag, string(confirmFlag[0]), false, "confirmation for update")
+	rootCmd.PersistentFlags().BoolVar(&cfg.confirm, confirmFlag,
+		false, "confirmation for update")
 	rootCmd.PersistentFlags().BoolVar(&cfg.fuzzy, fuzzyFlag, false, "use fuzzy search")
+	rootCmd.PersistentFlags().BoolVar(&cfg.updateWorkflow, updateWorkflowFlag, false,
+		"update tldr workflow if possible")
 
 	rootCmd.SetUsageFunc(usageFunc)
 	rootCmd.SetHelpFunc(helpFunc)
@@ -110,10 +126,10 @@ func flagErrorFunc(cmd *cobra.Command, err error) error {
 
 func showWorkflowUsage(cmd *cobra.Command) {
 	pflags := []*pflag.Flag{
-		cmd.Flag(platformFlag),
-		cmd.Flag(updateFlag),
-		cmd.Flag(versionFlag),
-		cmd.Flag(languageFlag),
+		cmd.Flag(longPlatformFlag),
+		cmd.Flag(longUpdateFlag),
+		cmd.Flag(longVersionFlag),
+		cmd.Flag(longLanguageFlag),
 	}
 
 	for _, p := range pflags {
@@ -165,165 +181,6 @@ func (cfg *config) initTldr() error {
 
 	cfg.tldrClient = tldr.New(path, opt)
 	return cfg.tldrClient.OnInitialize()
-}
-
-func (cfg *config) printPage(cmds []string) error {
-	// insert update recommendation first
-	if isUpdateRecommendEnabled() && cfg.tldrClient.Expired(twoWeeks) {
-		awf.Append(
-			alfred.NewItem().
-				Title("Please Enter! Tldr database is older than 2 weeks").
-				Arg(fmt.Sprintf("--%s --%s", updateFlag, confirmFlag)).
-				Icon(alfred.IconAlertNote),
-		).Variable(nextActionKey, nextActionShell)
-	}
-
-	// no input case
-	if len(cmds) == 0 {
-		awf.Append(
-			alfred.NewItem().
-				Title("Please input a command").
-				Subtitle("e.g.) tldr tar e.g.) tldr --help").
-				Valid(false),
-		).Output()
-		return nil
-	}
-
-	awf.SetEmptyWarning("No matching query", "Try a different query")
-	p, err := cfg.tldrClient.FindPage(cmds)
-	if err != nil {
-		if errors.Is(err, tldr.ErrNotFoundPage) {
-			if cfg.language != "" {
-				awf.Clear().SetEmptyWarning(
-					"Not found the command in selected language",
-					"Try not to specify language option",
-				).Output()
-				return nil
-			}
-			if cfg.fuzzy {
-				// list suggestions
-				return cfg.printFuzzyPages(cmds)
-			}
-			awf.Output()
-			return nil
-		}
-		return err
-	}
-
-	// TODO change icon for usage
-	// descriptions has one line at least
-	// see: https://github.com/tldr-pages/tldr/blob/master/contributing-guides/style-guide.md
-	title := p.CmdDescriptions[0]
-	subtitle := ""
-	if len(p.CmdDescriptions) >= 2 {
-		subtitle = p.CmdDescriptions[1]
-	}
-	awf.Append(
-		alfred.NewItem().
-			Title(title).
-			Subtitle(subtitle).
-			Valid(false).
-			Icon(
-				alfred.NewIcon().
-					Path("description.png"),
-			),
-	)
-	for _, cmd := range p.CmdExamples {
-		awf.Append(
-			alfred.NewItem().
-				Title(cmd.Cmd).
-				Subtitle(cmd.Description).
-				Arg(cmd.Cmd),
-		).Variable(nextActionKey, nextActionCopy)
-	}
-
-	awf.Output()
-	return nil
-}
-
-func (cfg *config) printFuzzyPages(cmds []string) error {
-	index, err := cfg.tldrClient.LoadIndexFile()
-	if err != nil {
-		return err
-	}
-
-	suggestions := index.Commands.Search(cmds)
-	for _, cmd := range suggestions {
-		complete := cmd.Name
-		pt := choicePlatform(cmd.Platforms, cfg.platform)
-		if pt != tldr.PlatformCommon && pt != defaultPlatform {
-			complete = fmt.Sprintf("-%s %s %s",
-				string(platformFlag[0]),
-				pt,
-				cmd.Name,
-			)
-		}
-		awf.Append(
-			alfred.NewItem().
-				Title(cmd.Name).
-				Subtitle(fmt.Sprintf("Platforms: %s", fmt.Sprintf("%s", cmd.Platforms))).
-				Valid(false).
-				Autocomplete(complete).
-				Icon(
-					alfred.NewIcon().
-						Path("candidate.png"),
-				),
-		)
-	}
-
-	awf.Output()
-	return nil
-}
-
-func (cfg *config) printVersion(v, r string) (_ error) {
-	title := fmt.Sprintf("alfred-tldr %v(%s)", v, r)
-	awf.Append(
-		alfred.NewItem().Title(title),
-	).Output()
-	return
-}
-
-func (cfg *config) updateDB() error {
-	if !cfg.update {
-		return errors.New("update is called even though update flag is not specified")
-	}
-
-	if cfg.confirm {
-		// update explicitly
-		awf.Logger().Infoln("updating tldr database...")
-		return cfg.tldrClient.Update()
-	}
-
-	awf.Append(
-		alfred.NewItem().
-			Title("Please Enter if update tldr database").
-			Arg(fmt.Sprintf("--%s --%s", updateFlag, confirmFlag)),
-	).
-		Variable(nextActionKey, nextActionShell).
-		Output()
-
-	return nil
-}
-
-func choicePlatform(pts []tldr.Platform, selected tldr.Platform) tldr.Platform {
-	if len(pts) >= 2 {
-		// if there are more than two platforms,
-		// priority are follow
-		// selected pt, common, others
-		for _, pt := range pts {
-			if pt == selected {
-				return selected
-			}
-		}
-
-		for _, pt := range pts {
-			if pt == tldr.PlatformCommon {
-				return tldr.PlatformCommon
-			}
-		}
-	}
-
-	return pts[0]
 }
 
 // Execute Execute root cmd

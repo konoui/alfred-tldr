@@ -1,0 +1,11 @@
+{
+  "variables": {
+    "nextAction": "shell"
+  },
+  "items": [
+    {
+      "title": "Please Enter if update tldr database",
+      "arg": "--update --confirm"
+    }
+  ]
+}

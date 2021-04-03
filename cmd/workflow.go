@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/konoui/go-alfred"
+	"github.com/konoui/go-alfred/update"
 )
 
 // decide next action for workflow filter
@@ -14,7 +15,8 @@ const (
 	nextActionCopy  = "copy"
 	nextActionShell = "shell"
 	// Note the key is also defined in workflow environment variable
-	updateRecommendEnvKey = "ALFRED_TLDR_UPDATE_RECOMMEND"
+	updateDBRecommendEnvKey       = "ALFRED_TLDR_DB_UPDATE_RECOMMEND"
+	updateWorkflowRecommendEnvKey = "ALFRED_TLDR_WORKFLOW_UPDATE_RECOMMEND"
 )
 
 var awf *alfred.Workflow
@@ -22,13 +24,27 @@ var awf *alfred.Workflow
 func init() {
 	awf = alfred.NewWorkflow(
 		alfred.WithMaxResults(30),
+		alfred.WithGitHubUpdater(
+			"konoui",
+			"alfred-tldr",
+			version,
+			update.WithCheckInterval(twoWeeks),
+		),
 	)
 	awf.SetOut(outStream)
 	awf.SetLog(errStream)
 }
 
-func isUpdateRecommendEnabled() bool {
-	sv := os.Getenv(updateRecommendEnvKey)
+func isUpdateDBRecommendEnabled() bool {
+	return parseBool(updateDBRecommendEnvKey)
+}
+
+func isUpdateWorkflowRecommendEnabled() bool {
+	return parseBool(updateWorkflowRecommendEnvKey)
+}
+
+func parseBool(key string) bool {
+	sv := os.Getenv(key)
 	bv, err := strconv.ParseBool(sv)
 	if err != nil {
 		return false
