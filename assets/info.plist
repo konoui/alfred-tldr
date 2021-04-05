@@ -324,13 +324,13 @@
 	</dict>
 	<key>variables</key>
 	<dict>
-		<key>ALFRED_TLDR_WORKFLOW_UPDATE_RECOMMEND</key>
-		<string>true</string>
 		<key>ALFRED_TLDR_DB_UPDATE_RECOMMEND</key>
+		<string>true</string>
+		<key>ALFRED_TLDR_WORKFLOW_UPDATE_RECOMMEND</key>
 		<string>true</string>
 	</dict>
 	<key>version</key>
-	<string></string>
+	<string>v0.6.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/konoui/alfred-tldr</string>
 </dict>

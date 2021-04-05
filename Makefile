@@ -43,12 +43,16 @@ test:
 	export alfred_workflow_data=$(shell mktemp -d); \
 	go test -v ./...
 
+## embed current version into workflow config
+embed-version:
+	@(plutil -replace version -string $(VERSION) $(ASSETS_DIR)/info.plist)
+
 ## Install Binary and Assets to Workflow Directory
-install: build
+install: build embed-version
 	@(cp $(ASSETS)  $(WORKFLOW_DIR)/)
 
 ## Create workflow artifact
-package: darwin
+package: darwin embed-version
 	@(if [ ! -e $(ARTIFACT_DIR) ]; then mkdir $(ARTIFACT_DIR) ; fi)
 	@(cp $(ASSETS) $(ARTIFACT_DIR))
 	@(zip -j $(ARTIFACT_NAME) $(ARTIFACT_DIR)/*)
