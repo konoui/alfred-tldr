@@ -222,10 +222,11 @@ func TestExecute(t *testing.T) {
 
 func TestUpdateConfirmation(t *testing.T) {
 	type args struct {
-		filepath       string
-		command        string
-		currentVersion string
-		ttl            time.Duration
+		filepath         string
+		command          string
+		currentVersion   string
+		dbTTL            time.Duration
+		workflowInterval time.Duration
 	}
 	tests := []struct {
 		name   string
@@ -235,54 +236,58 @@ func TestUpdateConfirmation(t *testing.T) {
 		{
 			name: "no-input-and-update-recommendations",
 			args: args{
-				currentVersion: "v0.0.1",
-				ttl:            0,
-				command:        "",
-				filepath:       testdataPath("output_update-recommendations.json"),
+				currentVersion:   "v0.0.1",
+				dbTTL:            0,
+				workflowInterval: 0,
+				command:          "",
+				filepath:         testdataPath("output_update-recommendations.json"),
 			},
 		},
 		{
 			name: "lsof-with-workflow-update-recommendation",
 			args: args{
-				currentVersion: "v0.0.1",
-				ttl:            1000 * time.Hour,
-				command:        "lsof",
-				filepath:       testdataPath("output_lsof-with-update-workflow-recommendation.json"),
+				currentVersion:   "v0.0.1",
+				dbTTL:            1000 * time.Hour,
+				workflowInterval: 0,
+				command:          "lsof",
+				filepath:         testdataPath("output_lsof-with-update-workflow-recommendation.json"),
 			},
 		},
 		{
 			name: "lsof-with-db-recommendation",
 			args: args{
-				currentVersion: "v100.0.0",
-				ttl:            0,
-				command:        "lsof",
-				filepath:       testdataPath("output_lsof-with-update-db-recommendation.json"),
+				currentVersion:   "v0.0.1",
+				dbTTL:            0,
+				workflowInterval: 1000 * time.Hour,
+				command:          "lsof",
+				filepath:         testdataPath("output_lsof-with-update-db-recommendation.json"),
 			},
 		},
 		{
 			name: "update-db-confirmation",
 			args: args{
-				currentVersion: "v100.0.0",
-				ttl:            0,
-				command:        "--update",
-				filepath:       testdataPath("output_update-db-confirmation.json"),
+				currentVersion:   "v0.0.1",
+				dbTTL:            0,
+				workflowInterval: 1000 * time.Hour,
+				command:          "--update",
+				filepath:         testdataPath("output_update-db-confirmation.json"),
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := os.Setenv(updateDBRecommendEnvKey, "true"); err != nil {
+			if err := os.Setenv(updateDBRecommendationEnvKey, "true"); err != nil {
 				t.Fatal(err)
 			}
-			if err := os.Setenv(updateWorkflowRecommendEnvKey, "true"); err != nil {
+			if err := os.Setenv(updateWorkflowRecommendationEnvKey, "true"); err != nil {
 				t.Fatal(err)
 			}
 			defer func() {
-				if err := os.Unsetenv(updateDBRecommendEnvKey); err != nil {
+				if err := os.Unsetenv(updateDBRecommendationEnvKey); err != nil {
 					t.Fatal(err)
 				}
-				if err := os.Unsetenv(updateWorkflowRecommendEnvKey); err != nil {
+				if err := os.Unsetenv(updateWorkflowRecommendationEnvKey); err != nil {
 					t.Fatal(err)
 				}
 			}()
@@ -293,16 +298,16 @@ func TestUpdateConfirmation(t *testing.T) {
 			}
 
 			// disable ttl
-			twoWeeks = tt.args.ttl
+			twoWeeks = tt.args.dbTTL
 			version = tt.args.currentVersion
 			awf = alfred.NewWorkflow(
 				alfred.WithGitHubUpdater(
 					"konoui", "alfred-tldr", version,
-					update.WithCheckInterval(0),
+					update.WithCheckInterval(tt.args.workflowInterval),
 				),
 			)
 
-			outBuf, _, cmd := setup(t, awf, tt.args.command)
+			outBuf, errBuf, cmd := setup(t, awf, tt.args.command)
 			execute(t, cmd)
 			outGotData := outBuf.Bytes()
 
@@ -314,7 +319,8 @@ func TestUpdateConfirmation(t *testing.T) {
 			}
 
 			if diff := alfred.DiffOutput(wantData, outGotData); diff != "" {
-				t.Errorf("-want +got\n%+v", diff)
+				t.Errorf("-want +got\n%+v\n", diff)
+				t.Errorf("error output: %s", errBuf.String())
 			}
 		})
 	}

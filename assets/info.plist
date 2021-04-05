@@ -324,9 +324,11 @@
 	</dict>
 	<key>variables</key>
 	<dict>
-		<key>ALFRED_TLDR_DB_UPDATE_RECOMMEND</key>
+		<key>TLDR_DB_UPDATE_RECOMMENDATION</key>
 		<string>true</string>
-		<key>ALFRED_TLDR_WORKFLOW_UPDATE_RECOMMEND</key>
+		<key>TLDR_WORKFLOW_UPDATE_INTERVAL_DAYS</key>
+		<string>7</string>
+		<key>TLDR_WORKFLOW_UPDATE_RECOMMENDATION</key>
 		<string>true</string>
 	</dict>
 	<key>version</key>
