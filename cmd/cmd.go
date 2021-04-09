@@ -142,9 +142,11 @@ func showWorkflowUsage(cmd *cobra.Command) {
 
 func makeUsageItem(p *pflag.Flag) *alfred.Item {
 	title := fmt.Sprintf("-%s, --%s %s", p.Shorthand, p.Name, p.Usage)
+	complete := fmt.Sprintf("--%s", p.Name)
 	return alfred.NewItem().
 		Title(title).
 		Subtitle(p.Usage).
+		Autocomplete(complete).
 		Valid(false)
 }
 
