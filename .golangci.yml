@@ -35,24 +35,24 @@ linters:
   enable:
     # Enabled By Default Linters
     - govet
-    - errcheck 
-    - staticcheck 
-    - unused 
-    - gosimple 
-    - structcheck 
+    - errcheck
+    - staticcheck
+    - unused
+    - gosimple
+    - structcheck
     - varcheck
     - ineffassign
-    - deadcode 
+    - deadcode
     - typecheck
     # add
     - misspell
     - golint
-    - stylecheck 
-#    - gosec 
-#    - lll 
-    - maligned 
+    - stylecheck
+    #    - gosec
+    - lll
+    - maligned
     - goconst
-#    - gocritic 
+    - gocritic
   disable-all: true
 run:
   skip-dirs:

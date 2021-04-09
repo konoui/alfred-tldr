@@ -54,18 +54,18 @@ func unzip(zipPath, dstDir string) error {
 
 		if f.FileInfo().IsDir() {
 			path := filepath.Join(dstDir, f.Name)
-			if err = os.MkdirAll(path, f.Mode()); err != nil {
+			if err := os.MkdirAll(path, f.Mode()); err != nil {
 				return err
 			}
 		} else {
 			buf := make([]byte, f.UncompressedSize)
-			_, err = io.ReadFull(rc, buf)
+			_, err := io.ReadFull(rc, buf)
 			if err != nil {
 				return err
 			}
 
 			path := filepath.Join(dstDir, f.Name)
-			if err = ioutil.WriteFile(path, buf, f.Mode()); err != nil {
+			if err := ioutil.WriteFile(path, buf, f.Mode()); err != nil {
 				return err
 			}
 		}

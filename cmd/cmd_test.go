@@ -19,26 +19,26 @@ import (
 )
 
 func testdataPath(file string) string {
-	return filepath.Join("./testdata", file)
+	return filepath.Join("testdata", file)
 }
 
-func setup(t *testing.T, awf *alfred.Workflow, command string) (*bytes.Buffer, *bytes.Buffer, *cobra.Command) {
+func setup(t *testing.T, awf *alfred.Workflow, command string) (outBuf, errBuf *bytes.Buffer, cmd *cobra.Command) {
 	t.Helper()
 
-	outBuf, errBuf := new(bytes.Buffer), new(bytes.Buffer)
+	outBuf, errBuf = new(bytes.Buffer), new(bytes.Buffer)
 	outStream = outBuf
 	errStream = outBuf
 	awf.SetOut(outBuf)
 	awf.SetLog(errBuf)
-	rootCmd := NewRootCmd()
+	cmd = NewRootCmd()
 	cmdArgs, err := shellwords.Parse(command)
 	if err != nil {
 		t.Fatalf("args parse error: %+v", err)
 	}
-	rootCmd.SetOutput(outBuf)
-	rootCmd.SetArgs(cmdArgs)
+	cmd.SetOutput(outBuf)
+	cmd.SetArgs(cmdArgs)
 
-	return outBuf, errBuf, rootCmd
+	return
 }
 
 func execute(t *testing.T, rootCmd *cobra.Command) {

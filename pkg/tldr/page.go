@@ -26,7 +26,7 @@ func parsePage(s io.Reader) (*Page, error) {
 	scanner := bufio.NewScanner(s)
 	for scanner.Scan() {
 		line := scanner.Text()
-		if len(line) <= 0 {
+		if line == "" {
 			continue
 		}
 		if strings.HasPrefix(line, "#") {
