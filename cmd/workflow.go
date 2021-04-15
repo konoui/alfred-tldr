@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/konoui/go-alfred"
-	"github.com/konoui/go-alfred/update"
 )
 
 // decide next action for workflow filter
@@ -39,7 +38,7 @@ func init() {
 			"konoui",
 			"alfred-tldr",
 			version,
-			update.WithCheckInterval(interval),
+			interval,
 		),
 	)
 	awf.SetOut(outStream)

@@ -3,8 +3,9 @@ module github.com/konoui/alfred-tldr
 go 1.16
 
 require (
+	github.com/golang/mock v1.5.0
 	github.com/google/go-cmp v0.5.2
-	github.com/konoui/go-alfred v0.7.0
+	github.com/konoui/go-alfred v0.8.0
 	github.com/mattn/go-shellwords v1.0.10
 	github.com/pkg/errors v0.9.1
 	github.com/sahilm/fuzzy v0.1.0

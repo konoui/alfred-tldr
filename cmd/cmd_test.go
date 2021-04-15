@@ -11,9 +11,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
 	"github.com/konoui/alfred-tldr/pkg/tldr"
 	"github.com/konoui/go-alfred"
 	"github.com/konoui/go-alfred/update"
+	mock "github.com/konoui/go-alfred/update/mock_update"
 	"github.com/mattn/go-shellwords"
 	"github.com/spf13/cobra"
 )
@@ -222,11 +224,10 @@ func TestExecute(t *testing.T) {
 
 func TestUpdateConfirmation(t *testing.T) {
 	type args struct {
-		filepath         string
-		command          string
-		currentVersion   string
-		dbTTL            time.Duration
-		workflowInterval time.Duration
+		filepath              string
+		command               string
+		dbTTL                 time.Duration
+		newerVersionAvailable bool
 	}
 	tests := []struct {
 		name   string
@@ -236,41 +237,37 @@ func TestUpdateConfirmation(t *testing.T) {
 		{
 			name: "no-input-and-update-recommendations",
 			args: args{
-				currentVersion:   "v0.0.1",
-				dbTTL:            0,
-				workflowInterval: 0,
-				command:          "",
-				filepath:         testdataPath("output_update-recommendations.json"),
+				dbTTL:                 0,
+				newerVersionAvailable: true,
+				command:               "",
+				filepath:              testdataPath("output_update-recommendations.json"),
 			},
 		},
 		{
 			name: "lsof-with-workflow-update-recommendation",
 			args: args{
-				currentVersion:   "v0.0.1",
-				dbTTL:            1000 * time.Hour,
-				workflowInterval: 0,
-				command:          "lsof",
-				filepath:         testdataPath("output_lsof-with-update-workflow-recommendation.json"),
+				dbTTL:                 1000 * time.Hour,
+				newerVersionAvailable: true,
+				command:               "lsof",
+				filepath:              testdataPath("output_lsof-with-update-workflow-recommendation.json"),
 			},
 		},
 		{
 			name: "lsof-with-db-recommendation",
 			args: args{
-				currentVersion:   "v0.0.1",
-				dbTTL:            0,
-				workflowInterval: 1000 * time.Hour,
-				command:          "lsof",
-				filepath:         testdataPath("output_lsof-with-update-db-recommendation.json"),
+				dbTTL:                 0,
+				newerVersionAvailable: false,
+				command:               "lsof",
+				filepath:              testdataPath("output_lsof-with-update-db-recommendation.json"),
 			},
 		},
 		{
 			name: "update-db-confirmation",
 			args: args{
-				currentVersion:   "v0.0.1",
-				dbTTL:            0,
-				workflowInterval: 1000 * time.Hour,
-				command:          "--update",
-				filepath:         testdataPath("output_update-db-confirmation.json"),
+				dbTTL:                 0,
+				newerVersionAvailable: false,
+				command:               "--update",
+				filepath:              testdataPath("output_update-db-confirmation.json"),
 			},
 		},
 	}
@@ -297,14 +294,13 @@ func TestUpdateConfirmation(t *testing.T) {
 				t.Fatal(err)
 			}
 
+			mockSource, teardown := newMockUpdaterSource(t, tt.args.newerVersionAvailable)
+			defer teardown()
+
 			// disable ttl
 			twoWeeks = tt.args.dbTTL
-			version = tt.args.currentVersion
 			awf = alfred.NewWorkflow(
-				alfred.WithGitHubUpdater(
-					"konoui", "alfred-tldr", version,
-					update.WithCheckInterval(tt.args.workflowInterval),
-				),
+				alfred.WithUpdater(mockSource, ""),
 			)
 
 			outBuf, errBuf, cmd := setup(t, awf, tt.args.command)
@@ -324,6 +320,16 @@ func TestUpdateConfirmation(t *testing.T) {
 			}
 		})
 	}
+}
+
+func newMockUpdaterSource(t *testing.T, newerVersionAvailable bool) (_ update.UpdaterSource, _ func()) {
+	ctrl := gomock.NewController(t)
+	mockSource := mock.NewMockUpdaterSource(ctrl)
+	mockUpdater := mock.NewMockUpdater(ctrl)
+	mockUpdater.EXPECT().Update(gomock.Any()).Return(nil).AnyTimes()
+	mockSource.EXPECT().NewerVersionAvailable(gomock.Any()).Return(newerVersionAvailable, nil).AnyTimes()
+	mockSource.EXPECT().IfNewerVersionAvailable(gomock.Any()).Return(mockUpdater).AnyTimes()
+	return mockSource, ctrl.Finish
 }
 
 func TestUpdateExecution(t *testing.T) {
