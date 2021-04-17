@@ -70,14 +70,14 @@ func NewRootCmd() *cobra.Command {
 			if err := cfg.initTldr(); err != nil {
 				return err
 			}
+			if cfg.version {
+				return cfg.printVersion(version, revision)
+			}
 			if cfg.updateWorkflow {
 				return cfg.updateTLDRWorkflow()
 			}
 			if cfg.update {
 				return cfg.updateDB()
-			}
-			if cfg.version {
-				return cfg.printVersion(version, revision)
 			}
 			return cfg.printPage(args)
 		},

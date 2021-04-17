@@ -75,35 +75,35 @@ func TestExecute(t *testing.T) {
 			},
 		},
 		{
-			name: "fuzzy search",
+			name: "fuzzy search returns git checkout",
 			args: args{
 				command:  "gitchec --fuzzy",
 				filepath: testdataPath("test_output_git-checkout_with_fuzzy.json"),
 			},
 		},
 		{
-			name: "fuzzy search return non-common platform",
+			name: "fuzzy search returns non-common platform",
 			args: args{
 				command:  "pstree --fuzzy",
 				filepath: testdataPath("test_output_pstree_with_fuzzy.json"),
 			},
 		},
 		{
-			name: "multi platform command yank without -p flag return computer pt OSX",
+			name: "multiple platform command yank without -p flag returns computer platform OSX",
 			args: args{
 				command:  "yan --fuzzy",
 				filepath: testdataPath("test_output_yank_without_p-flag_fuzzy.json"),
 			},
 		},
 		{
-			name: "multi platform command yank with -p flag return specified pt",
+			name: "multiple platform command yank with -p flag returns specified platform",
 			args: args{
 				command:  "yan -p linux --fuzzy",
 				filepath: testdataPath("test_output_yank_with_p-flag_with_fuzzy.json"),
 			},
 		},
 		{
-			name: "show no error when cache expired",
+			name: "outputs no error when cache expired",
 			args: args{
 				command:  "lsof",
 				filepath: testdataPath("test_output_lsof.json"),
@@ -112,82 +112,82 @@ func TestExecute(t *testing.T) {
 		{
 			name: "version flag is the highest priority",
 			args: args{
-				command:  "-v tldr -L -a",
+				command:  "-v -u tldr -L -a",
 				filepath: testdataPath("test_output_version.json"),
 			},
 		},
 		{
-			name: "print update confirmation when specified --update flag and ignore argument",
+			name: "prints update confirmation when specified --update flag and ignore argument",
 			args: args{
 				command:  "--update tldr",
 				filepath: testdataPath("test_output_update-confirmation.json"),
 			},
 		},
 		{
-			name: "specify language flag but not found",
+			name: "specify language flag but commands not found",
 			args: args{
 				command:  "-L ja tar",
 				filepath: testdataPath("test_output_language-empty-result.json"),
 			},
 		},
 		{
-			name: "empty result",
+			name: "input something but commands not found",
 			args: args{
 				command:  "dummy-empty-result",
 				filepath: testdataPath("test_output_empty-result.json"),
 			},
 		},
 		{
-			name: "fuzzy but empty result",
+			name: "fuzzy search but commands not found",
 			args: args{
 				command:  "--fuzzy dummy-empty-result",
 				filepath: testdataPath("test_output_empty-result.json"),
 			},
 		},
 		{
-			name: "no input",
+			name: "no input returns no-input message",
 			args: args{
 				command:  "",
 				filepath: testdataPath("test_output_no-input.json"),
 			},
 		},
 		{
-			name: "specify help flag",
+			name: "specify help flag returns usage",
 			args: args{
 				command:  "--help",
 				filepath: testdataPath("test_output_usage.json"),
 			},
 		},
 		{
-			name: "string flag but no value and invalid flag",
+			name: "string flag without any value and invalid flag return no-input message",
 			args: args{
 				command:  "-L -a",
 				filepath: testdataPath("test_output_no-input.json"),
 			},
 		},
 		{
-			name: "string flag but no value",
+			name: "string flag without any value returns usage",
 			args: args{
 				command:  "--fuzzy -L",
 				filepath: testdataPath("test_output_usage.json"),
 			},
 		},
 		{
-			name: "bool invalid flag",
+			name: "invalid bool flag returns usage",
 			args: args{
 				command:  "lsof -a",
 				filepath: testdataPath("test_output_usage.json"),
 			},
 		},
 		{
-			name: " bool invalid and valid flags",
+			name: " bool invalid flag and valid flag return usage",
 			args: args{
 				command:  "-a -u",
 				filepath: testdataPath("test_output_usage.json"),
 			},
 		},
 		{
-			name: "invalid platform flag",
+			name: "invalid platform flag returns platform error message",
 			args: args{
 				command:  "-p a",
 				filepath: testdataPath("test_output_platform-error.json"),
@@ -235,7 +235,7 @@ func TestUpdateConfirmation(t *testing.T) {
 		update bool
 	}{
 		{
-			name: "no-input-and-update-recommendations",
+			name: "no input and update recommendations",
 			args: args{
 				dbTTL:                 0,
 				newerVersionAvailable: true,
@@ -244,7 +244,7 @@ func TestUpdateConfirmation(t *testing.T) {
 			},
 		},
 		{
-			name: "lsof-with-workflow-update-recommendation",
+			name: "lsof with workflow update recommendation",
 			args: args{
 				dbTTL:                 1000 * time.Hour,
 				newerVersionAvailable: true,
@@ -253,7 +253,7 @@ func TestUpdateConfirmation(t *testing.T) {
 			},
 		},
 		{
-			name: "lsof-with-db-recommendation",
+			name: "lsof with db recommendation",
 			args: args{
 				dbTTL:                 0,
 				newerVersionAvailable: false,
@@ -262,7 +262,7 @@ func TestUpdateConfirmation(t *testing.T) {
 			},
 		},
 		{
-			name: "update-db-confirmation",
+			name: "update db confirmation",
 			args: args{
 				dbTTL:                 0,
 				newerVersionAvailable: false,
@@ -344,7 +344,7 @@ func TestUpdateExecution(t *testing.T) {
 		wantMsg     string
 	}{
 		{
-			name: "update db",
+			name: "update db returns succeeded message",
 			args: args{
 				command: "--update --confirm",
 			},
@@ -360,7 +360,7 @@ func TestUpdateExecution(t *testing.T) {
 			errMsg:      "direct update via flag is not supported",
 		},
 		{
-			name: "update-workflow but nil updater return error. update execution output to stdout",
+			name: "when update-workflow without updater, nil updater returns error. update execution outputs message to stdout",
 			args: args{
 				command: "--update-workflow --confirm",
 			},
@@ -413,7 +413,7 @@ func Test_choicePlatform(t *testing.T) {
 		want tldr.Platform
 	}{
 		{
-			name: "common return linux",
+			name: "return common when platforms do not contain selected",
 			args: args{
 				pts: []tldr.Platform{
 					tldr.PlatformCommon,
@@ -423,7 +423,7 @@ func Test_choicePlatform(t *testing.T) {
 			want: tldr.PlatformCommon,
 		},
 		{
-			name: "common,linux return linux",
+			name: "return selected insted of common when platforms contain selected",
 			args: args{
 				pts: []tldr.Platform{
 					tldr.PlatformCommon,
@@ -434,7 +434,7 @@ func Test_choicePlatform(t *testing.T) {
 			want: tldr.PlatformLinux,
 		},
 		{
-			name: "common,linux return common",
+			name: "returns common when platforms do not contain selected",
 			args: args{
 				pts: []tldr.Platform{
 					tldr.PlatformCommon,
