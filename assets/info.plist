@@ -332,7 +332,7 @@
 		<string>true</string>
 	</dict>
 	<key>version</key>
-	<string>v0.6.0</string>
+	<string>v0.6.1</string>
 	<key>webaddress</key>
 	<string>https://github.com/konoui/alfred-tldr</string>
 </dict>
