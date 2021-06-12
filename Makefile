@@ -40,7 +40,9 @@ darwin:
 
 ## Run tests for my project
 test:
-	export alfred_workflow_data=$(shell mktemp -d); \
+	export alfred_workflow_data="/tmp/"; \
+	export alfred_workflow_cache=$(shell mktemp -d); \
+	export alfred_workflow_bundleid=$(shell date +%s); \
 	go test -v ./...
 
 ## embed current version into workflow config
@@ -70,7 +72,9 @@ clean:
 
 ## Report coverage
 cover:
-	export alfred_workflow_data=$(shell mktemp -d); \
+	export alfred_workflow_data="/tmp/"; \
+	export alfred_workflow_cache=$(shell mktemp -d); \
+	export alfred_workflow_bundleid=$(shell date +%s); \
 	go test -coverprofile=cover.out ./...
 	go tool cover -html=cover.out -o cover.html
 
