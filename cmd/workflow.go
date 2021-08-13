@@ -3,7 +3,9 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/konoui/go-alfred"
@@ -18,6 +20,7 @@ const (
 	updateDBRecommendationEnvKey       = "TLDR_DB_UPDATE_RECOMMENDATION"
 	updateWorkflowRecommendationEnvKey = "TLDR_WORKFLOW_UPDATE_RECOMMENDATION"
 	updateWorkflowIntervalDays         = "TLDR_WORKFLOW_UPDATE_INTERVAL_DAYS"
+	commandFormatEnvKey                = "TLDR_COMMAND_FORMAT"
 )
 
 var awf *alfred.Workflow
@@ -45,6 +48,39 @@ func init() {
 	awf.SetLog(errStream)
 	if err := awf.OnInitialize(); err != nil {
 		awf.Fatal(err.Error(), err.Error())
+	}
+}
+
+var wordRe = regexp.MustCompile("{{.+?}}")
+
+func getCommandFormatFunc() func(string) string {
+	v := os.Getenv(commandFormatEnvKey)
+	switch v {
+	case "original":
+		return func(cmd string) string {
+			return cmd
+		}
+	case "remove":
+		return func(cmd string) string {
+			tmp := strings.ReplaceAll(cmd, "{{", "")
+			return strings.ReplaceAll(tmp, "}}", "")
+		}
+	case "uppercase":
+		return func(cmd string) string {
+			return wordRe.ReplaceAllStringFunc(cmd, func(w string) string {
+				upper := strings.ToUpper(w)
+				start := len("{{")
+				end := len("}}")
+				return upper[start : len(upper)-end]
+			})
+		}
+	case "single":
+	default:
+	}
+
+	return func(cmd string) string {
+		tmp := strings.ReplaceAll(cmd, "{{", "{")
+		return strings.ReplaceAll(tmp, "}}", "}")
 	}
 }
 

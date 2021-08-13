@@ -50,11 +50,13 @@ type config struct {
 	fuzzy          bool
 	version        bool
 	tldrClient     *tldr.Tldr
+	formatFunc     func(string) string
 }
 
 // NewRootCmd create a new cmd for root
 func NewRootCmd() *cobra.Command {
 	cfg := new(config)
+	cfg.formatFunc = getCommandFormatFunc()
 	var ptString string
 	rootCmd := &cobra.Command{
 		Use:   "tldr <cmd>",
@@ -94,11 +96,9 @@ func NewRootCmd() *cobra.Command {
 	rootCmd.PersistentFlags().StringVarP(&cfg.language, longLanguageFlag, languageFlag, "", "select language e.g.) en")
 
 	// internal flag
-	rootCmd.PersistentFlags().BoolVar(&cfg.confirm, confirmFlag,
-		false, "confirmation for update")
+	rootCmd.PersistentFlags().BoolVar(&cfg.confirm, confirmFlag, false, "confirmation for update")
 	rootCmd.PersistentFlags().BoolVar(&cfg.fuzzy, fuzzyFlag, false, "use fuzzy search")
-	rootCmd.PersistentFlags().BoolVar(&cfg.updateWorkflow, updateWorkflowFlag, false,
-		"update tldr workflow if possible")
+	rootCmd.PersistentFlags().BoolVar(&cfg.updateWorkflow, updateWorkflowFlag, false, "update tldr workflow if possible")
 
 	rootCmd.SetUsageFunc(usageFunc)
 	rootCmd.SetHelpFunc(helpFunc)

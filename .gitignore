@@ -1,7 +1,6 @@
 vendor/
 bin/*
 pages/*
-*.md
 !README.md
 .artifact/
 cover.*

@@ -84,11 +84,12 @@ func (cfg *config) printPage(cmds []string) error {
 			),
 	)
 	for _, cmd := range p.CmdExamples {
+		command := cfg.formatFunc(cmd.Cmd)
 		awf.Append(
 			alfred.NewItem().
-				Title(cmd.Cmd).
+				Title(command).
 				Subtitle(cmd.Description).
-				Arg(cmd.Cmd),
+				Arg(command),
 		).Variable(nextActionKey, nextActionCopy)
 	}
 

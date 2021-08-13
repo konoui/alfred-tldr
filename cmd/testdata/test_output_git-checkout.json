@@ -12,19 +12,19 @@
       "valid": false
     },
     {
-      "title": "git checkout -b {{branch_name}}",
+      "title": "git checkout -b {branch_name}",
       "subtitle": "Create and switch to a new branch:",
-      "arg": "git checkout -b {{branch_name}}"
+      "arg": "git checkout -b {branch_name}"
     },
     {
-      "title": "git checkout -b {{branch_name}} {{reference}}",
+      "title": "git checkout -b {branch_name} {reference}",
       "subtitle": "Create and switch to a new branch based on a specific reference (branch, remote/branch, tag are examples of valid references):",
-      "arg": "git checkout -b {{branch_name}} {{reference}}"
+      "arg": "git checkout -b {branch_name} {reference}"
     },
     {
-      "title": "git checkout {{branch_name}}",
+      "title": "git checkout {branch_name}",
       "subtitle": "Switch to an existing local branch:",
-      "arg": "git checkout {{branch_name}}"
+      "arg": "git checkout {branch_name}"
     },
     {
       "title": "git checkout -",
@@ -32,9 +32,9 @@
       "arg": "git checkout -"
     },
     {
-      "title": "git checkout --track {{remote_name}}/{{branch_name}}",
+      "title": "git checkout --track {remote_name}/{branch_name}",
       "subtitle": "Switch to an existing remote branch:",
-      "arg": "git checkout --track {{remote_name}}/{{branch_name}}"
+      "arg": "git checkout --track {remote_name}/{branch_name}"
     },
     {
       "title": "git checkout .",
@@ -42,14 +42,14 @@
       "arg": "git checkout ."
     },
     {
-      "title": "git checkout {{filename}}",
+      "title": "git checkout {filename}",
       "subtitle": "Discard unstaged changes to a given file:",
-      "arg": "git checkout {{filename}}"
+      "arg": "git checkout {filename}"
     },
     {
-      "title": "git checkout {{branch_name}} -- {{filename}}",
+      "title": "git checkout {branch_name} -- {filename}",
       "subtitle": "Replace a file in the current directory with the version of it committed in a given branch:",
-      "arg": "git checkout {{branch_name}} -- {{filename}}"
+      "arg": "git checkout {branch_name} -- {filename}"
     }
   ]
 }
