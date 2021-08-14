@@ -17,10 +17,10 @@ const (
 	nextActionCopy  = "copy"
 	nextActionShell = "shell"
 	// Note the key is also defined in workflow environment variable
-	updateDBRecommendationEnvKey       = "TLDR_DB_UPDATE_RECOMMENDATION"
-	updateWorkflowRecommendationEnvKey = "TLDR_WORKFLOW_UPDATE_RECOMMENDATION"
-	updateWorkflowIntervalDays         = "TLDR_WORKFLOW_UPDATE_INTERVAL_DAYS"
-	commandFormatEnvKey                = "TLDR_COMMAND_FORMAT"
+	envKeyUpdateDBRecommendation       = "TLDR_DB_UPDATE_RECOMMENDATION"
+	envKeyUpdateWorkflowRecommendation = "TLDR_WORKFLOW_UPDATE_RECOMMENDATION"
+	envKeyUpdateWorkflowIntervalDays   = "TLDR_WORKFLOW_UPDATE_INTERVAL_DAYS"
+	envKeyCommandFormat                = "TLDR_COMMAND_FORMAT"
 )
 
 var awf *alfred.Workflow
@@ -54,7 +54,7 @@ func init() {
 var wordRe = regexp.MustCompile("{{.+?}}")
 
 func getCommandFormatFunc() func(string) string {
-	v := os.Getenv(commandFormatEnvKey)
+	v := os.Getenv(envKeyCommandFormat)
 	switch v {
 	case "original":
 		return func(cmd string) string {
@@ -85,15 +85,15 @@ func getCommandFormatFunc() func(string) string {
 }
 
 func isUpdateDBRecommendEnabled() bool {
-	return parseBool(updateDBRecommendationEnvKey)
+	return parseBool(envKeyUpdateDBRecommendation)
 }
 
 func isUpdateWorkflowRecommendEnabled() bool {
-	return parseBool(updateWorkflowRecommendationEnvKey)
+	return parseBool(envKeyUpdateWorkflowRecommendation)
 }
 
 func getUpdateWorkflowInterval() (time.Duration, error) {
-	v := os.Getenv(updateWorkflowIntervalDays)
+	v := os.Getenv(envKeyUpdateWorkflowIntervalDays)
 	fv, err := strconv.ParseFloat(v, 64)
 	if err != nil {
 		return 0, fmt.Errorf("cannot parse update interval env: %w", err)

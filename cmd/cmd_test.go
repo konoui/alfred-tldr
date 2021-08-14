@@ -274,17 +274,17 @@ func TestUpdateConfirmation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := os.Setenv(updateDBRecommendationEnvKey, "true"); err != nil {
+			if err := os.Setenv(envKeyUpdateDBRecommendation, "true"); err != nil {
 				t.Fatal(err)
 			}
-			if err := os.Setenv(updateWorkflowRecommendationEnvKey, "true"); err != nil {
+			if err := os.Setenv(envKeyUpdateWorkflowRecommendation, "true"); err != nil {
 				t.Fatal(err)
 			}
 			defer func() {
-				if err := os.Unsetenv(updateDBRecommendationEnvKey); err != nil {
+				if err := os.Unsetenv(envKeyUpdateDBRecommendation); err != nil {
 					t.Fatal(err)
 				}
-				if err := os.Unsetenv(updateWorkflowRecommendationEnvKey); err != nil {
+				if err := os.Unsetenv(envKeyUpdateWorkflowRecommendation); err != nil {
 					t.Fatal(err)
 				}
 			}()
