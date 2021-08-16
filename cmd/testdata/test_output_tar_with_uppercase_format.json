@@ -1,0 +1,55 @@
+{
+  "variables": {
+    "nextAction": "copy"
+  },
+  "items": [
+    {
+      "title": "Archiving utility.",
+      "subtitle": "Often combined with a compression method, such as gzip or bzip2.",
+      "icon": {
+        "path": "description.png"
+      },
+      "valid": false
+    },
+    {
+      "title": "tar cf TARGET.TAR FILE1 FILE2 FILE3",
+      "subtitle": "[c]reate an archive and write it to a [f]ile:",
+      "arg": "tar cf TARGET.TAR FILE1 FILE2 FILE3"
+    },
+    {
+      "title": "tar czf TARGET.TAR.GZ FILE1 FILE2 FILE3",
+      "subtitle": "[c]reate a g[z]ipped archive and write it to a [f]ile:",
+      "arg": "tar czf TARGET.TAR.GZ FILE1 FILE2 FILE3"
+    },
+    {
+      "title": "tar czf TARGET.TAR.GZ --directory=PATH/TO/DIRECTORY .",
+      "subtitle": "[c]reate a g[z]ipped archive from a directory using relative paths:",
+      "arg": "tar czf TARGET.TAR.GZ --directory=PATH/TO/DIRECTORY ."
+    },
+    {
+      "title": "tar xvf SOURCE.TAR[.GZ|.BZ2|.XZ]",
+      "subtitle": "E[x]tract a (compressed) archive [f]ile into the current directory [v]erbosely:",
+      "arg": "tar xvf SOURCE.TAR[.GZ|.BZ2|.XZ]"
+    },
+    {
+      "title": "tar xf SOURCE.TAR[.GZ|.BZ2|.XZ] --directory=DIRECTORY",
+      "subtitle": "E[x]tract a (compressed) archive [f]ile into the target directory:",
+      "arg": "tar xf SOURCE.TAR[.GZ|.BZ2|.XZ] --directory=DIRECTORY"
+    },
+    {
+      "title": "tar caf TARGET.TAR.XZ FILE1 FILE2 FILE3",
+      "subtitle": "[c]reate a compressed archive and write it to a [f]ile, using [a]rchive suffix to determine the compression program:",
+      "arg": "tar caf TARGET.TAR.XZ FILE1 FILE2 FILE3"
+    },
+    {
+      "title": "tar tvf SOURCE.TAR",
+      "subtitle": "Lis[t] the contents of a tar [f]ile [v]erbosely:",
+      "arg": "tar tvf SOURCE.TAR"
+    },
+    {
+      "title": "tar xf SOURCE.TAR --wildcards \"*.HTML\"",
+      "subtitle": "E[x]tract files matching a pattern from an archive [f]ile:",
+      "arg": "tar xf SOURCE.TAR --wildcards \"*.HTML\""
+    }
+  ]
+}

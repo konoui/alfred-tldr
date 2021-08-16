@@ -59,6 +59,8 @@ func TestExecute(t *testing.T) {
 		name   string
 		args   args
 		update bool
+		up     func()
+		down   func()
 	}{
 		{
 			name: "lsof",
@@ -73,6 +75,42 @@ func TestExecute(t *testing.T) {
 				command:  "git checkout",
 				filepath: testdataPath("test_output_git-checkout.json"),
 			},
+		},
+		{
+			name: "tar with uppercase format",
+			args: args{
+				command:  "tar",
+				filepath: testdataPath("test_output_tar_with_uppercase_format.json"),
+			},
+			up:   func() { os.Setenv(envKeyCommandFormat, "uppercase") },
+			down: func() { os.Unsetenv(envKeyCommandFormat) },
+		},
+		{
+			name: "tar with single format",
+			args: args{
+				command:  "tar",
+				filepath: testdataPath("test_output_tar_with_single_format.json"),
+			},
+			up:   func() { os.Setenv(envKeyCommandFormat, "single") },
+			down: func() { os.Unsetenv(envKeyCommandFormat) },
+		},
+		{
+			name: "tar with original format",
+			args: args{
+				command:  "tar",
+				filepath: testdataPath("test_output_tar_with_original_format.json"),
+			},
+			up:   func() { os.Setenv(envKeyCommandFormat, "original") },
+			down: func() { os.Unsetenv(envKeyCommandFormat) },
+		},
+		{
+			name: "tar with remove format",
+			args: args{
+				command:  "tar",
+				filepath: testdataPath("test_output_tar_with_remove_format.json"),
+			},
+			up:   func() { os.Setenv(envKeyCommandFormat, "remove") },
+			down: func() { os.Unsetenv(envKeyCommandFormat) },
 		},
 		{
 			name: "fuzzy search returns git checkout",
@@ -197,6 +235,11 @@ func TestExecute(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.up != nil || tt.down != nil {
+				defer tt.down()
+				tt.up()
+			}
+
 			wantData, err := ioutil.ReadFile(tt.args.filepath)
 			if err != nil {
 				t.Fatal(err)
