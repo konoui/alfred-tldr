@@ -2,6 +2,22 @@
 
 The workflow provides some configurations via [workflow environment variables](https://www.alfredapp.com/help/workflows/advanced/variables/).
 
+### Open URL Modifier Key
+
+`TLDR_MOD_KEY_OPEN_URL` is variable that configures to open detail command url with default web browser.
+
+By default, you can open url with pressing `cmd` + `enter` if a specified command has related URL.
+
+Available variables are the followings
+
+- `cmd`
+- `ctrl`
+- `alt`
+- `fn`
+- `shift`
+
+For example, if you specified `ctrl` for `TLDR_MOD_KEY_OPEN_URL`, you can open url with pressing `ctrl` + `enter`.
+
 ### Command Format
 
 `TLDR_COMMAND_FORMAT` is variable that switches command output format for user input parameters.

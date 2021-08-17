@@ -22,6 +22,16 @@
 			</dict>
 			<dict>
 				<key>destinationuid</key>
+				<string>C13A4367-BA18-4631-A3EC-36FDF9191F9B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
 				<string>CA38E469-AAA8-4B30-9FBD-DA5E02F4E718</string>
 				<key>modifiers</key>
 				<integer>0</integer>
@@ -49,6 +59,19 @@
 			<dict>
 				<key>destinationuid</key>
 				<string>A6248A62-FD01-4D8D-8896-F93E87BDA4B0</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>C13A4367-BA18-4631-A3EC-36FDF9191F9B</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>1870D2FB-FB74-43F0-97A6-1E7CC1C16485</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -185,6 +208,44 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>browser</key>
+				<string></string>
+				<key>spaces</key>
+				<string></string>
+				<key>url</key>
+				<string>{query}</string>
+				<key>utf8</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.openurl</string>
+			<key>uid</key>
+			<string>1870D2FB-FB74-43F0-97A6-1E7CC1C16485</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>inputstring</key>
+				<string>{var:nextAction}</string>
+				<key>matchcasesensitive</key>
+				<false/>
+				<key>matchmode</key>
+				<integer>0</integer>
+				<key>matchstring</key>
+				<string>openURL</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.filter</string>
+			<key>uid</key>
+			<string>C13A4367-BA18-4631-A3EC-36FDF9191F9B</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>argument</key>
 				<string></string>
 				<key>passthroughargument</key>
@@ -270,6 +331,13 @@
 	<string></string>
 	<key>uidata</key>
 	<dict>
+		<key>1870D2FB-FB74-43F0-97A6-1E7CC1C16485</key>
+		<dict>
+			<key>xpos</key>
+			<integer>605</integer>
+			<key>ypos</key>
+			<integer>225</integer>
+		</dict>
 		<key>1D881CA9-D4C5-412D-8F3A-E40DC1034FD3</key>
 		<dict>
 			<key>note</key>
@@ -300,6 +368,13 @@
 			<key>ypos</key>
 			<integer>390</integer>
 		</dict>
+		<key>C13A4367-BA18-4631-A3EC-36FDF9191F9B</key>
+		<dict>
+			<key>xpos</key>
+			<integer>410</integer>
+			<key>ypos</key>
+			<integer>255</integer>
+		</dict>
 		<key>CA38E469-AAA8-4B30-9FBD-DA5E02F4E718</key>
 		<dict>
 			<key>xpos</key>
@@ -328,13 +403,15 @@
 		<string></string>
 		<key>TLDR_DB_UPDATE_RECOMMENDATION</key>
 		<string>true</string>
+		<key>TLDR_MOD_KEY_OPEN_URL</key>
+		<string></string>
 		<key>TLDR_WORKFLOW_UPDATE_INTERVAL_DAYS</key>
 		<string>7</string>
 		<key>TLDR_WORKFLOW_UPDATE_RECOMMENDATION</key>
 		<string>true</string>
 	</dict>
 	<key>version</key>
-	<string>v0.6.1</string>
+	<string>v0.7.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/konoui/alfred-tldr</string>
 </dict>

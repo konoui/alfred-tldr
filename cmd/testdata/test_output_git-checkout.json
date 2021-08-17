@@ -9,7 +9,16 @@
       "icon": {
         "path": "description.png"
       },
-      "valid": false
+      "valid": false,
+      "mods": {
+        "cmd": {
+          "variables": {
+            "nextAction": "openURL"
+          },
+          "arg": "https://git-scm.com/docs/git-checkout",
+          "subtitle": "open more information url"
+        }
+      }
     },
     {
       "title": "git checkout -b {branch_name}",
