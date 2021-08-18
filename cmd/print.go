@@ -69,7 +69,7 @@ func (cfg *config) printPage(cmds []string) error {
 	}
 
 	awf.Append(
-		makeDescriptionItem(p, cfg.fromEnv.openURLModKey),
+		makeDescriptionItem(p, cfg.fromEnv.modKeyOpenURL),
 	)
 	for _, cmd := range p.CmdExamples {
 		command := cfg.fromEnv.formatFunc(cmd.Cmd)
@@ -85,7 +85,7 @@ func (cfg *config) printPage(cmds []string) error {
 	return nil
 }
 
-func makeDescriptionItem(p *tldr.Page, openURLModKey alfred.ModKey) *alfred.Item {
+func makeDescriptionItem(p *tldr.Page, modKey alfred.ModKey) *alfred.Item {
 	// Note descriptions has one line at least
 	// see: https://github.com/tldr-pages/tldr/blob/master/contributing-guides/style-guide.md
 	title := p.CmdDescriptions[0]
@@ -94,15 +94,15 @@ func makeDescriptionItem(p *tldr.Page, openURLModKey alfred.ModKey) *alfred.Item
 		subtitle = p.CmdDescriptions[1]
 	}
 
-	mod := alfred.NewMod()
+	openMod := alfred.NewMod()
 	u, err := parseDetailURL(p.CmdDescriptions)
 	if err != nil {
 		awf.Logger().Warnln(err)
-		mod.
+		openMod.
 			Valid(false).
 			Subtitle("no action")
 	} else {
-		mod.
+		openMod.
 			Arg(u).
 			Subtitle("open more information url").
 			Variable(nextActionKey, nextActionOpenURL)
@@ -116,7 +116,7 @@ func makeDescriptionItem(p *tldr.Page, openURLModKey alfred.ModKey) *alfred.Item
 			alfred.NewIcon().
 				Path("description.png"),
 		).
-		Mod(openURLModKey, mod)
+		Mod(modKey, openMod)
 }
 
 func (cfg *config) printFuzzyPages(cmds []string) error {
@@ -179,7 +179,7 @@ func choicePlatform(pts []tldr.Platform, selected tldr.Platform) tldr.Platform {
 		}
 	}
 
-	// Note: unexpected case, we assume one pts at least but if zero return common
+	// Note: unexpected case, we assume one platform in pts at least but if empty, return common
 	if len(pts) == 0 {
 		return tldr.PlatformCommon
 	}

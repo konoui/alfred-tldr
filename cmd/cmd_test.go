@@ -113,7 +113,7 @@ func TestExecute(t *testing.T) {
 			down: func() { os.Unsetenv(envKeyCommandFormat) },
 		},
 		{
-			name: "tar with remove format",
+			name: "tar and open url with ctrl mod key",
 			args: args{
 				command:  "tar",
 				filepath: testdataPath("test_output_tar_with_ctrl_mod_key.json"),
@@ -493,6 +493,14 @@ func Test_choicePlatform(t *testing.T) {
 					tldr.PlatformLinux,
 				},
 				selected: tldr.PlatformOSX,
+			},
+			want: tldr.PlatformCommon,
+		},
+		{
+			name: "returns commond when empty pts",
+			args: args{
+				pts:      []tldr.Platform{},
+				selected: tldr.PlatformCommon,
 			},
 			want: tldr.PlatformCommon,
 		},

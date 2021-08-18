@@ -4,9 +4,9 @@ The workflow provides some configurations via [workflow environment variables](h
 
 ### Open URL Modifier Key
 
-`TLDR_MOD_KEY_OPEN_URL` is variable that configures to open detail command url with default web browser.
+`TLDR_MOD_KEY_OPEN_URL` is variable that configures keys to open detail command url with web browser.
 
-By default, you can open url with pressing `cmd` + `enter` if a specified command has related URL.
+By default, you can open url with pressing `cmd(⌘)` + `enter` if a specified command has related URL.
 
 Available variables are the followings
 
@@ -16,7 +16,7 @@ Available variables are the followings
 - `fn`
 - `shift`
 
-For example, if you specified `ctrl` for `TLDR_MOD_KEY_OPEN_URL`, you can open url with pressing `ctrl` + `enter`.
+For example, if you specified `ctrl` for `TLDR_MOD_KEY_OPEN_URL`, you can open url with pressing `ctrl(^)` + `enter`.
 
 ### Command Format
 

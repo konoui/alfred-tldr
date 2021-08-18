@@ -7,7 +7,7 @@ import (
 
 type envs struct {
 	formatFunc                       func(string) string
-	openURLModKey                    alfred.ModKey
+	modKeyOpenURL                    alfred.ModKey
 	isUpdateWorkflowRecommendEnabled bool
 	isUpdateDBRecommendEnabled       bool
 }
@@ -27,7 +27,7 @@ type config struct {
 func newConfig() *config {
 	cfg := new(config)
 	cfg.fromEnv.formatFunc = getCommandFormatFunc()
-	cfg.fromEnv.openURLModKey = getOpenURLMod()
+	cfg.fromEnv.modKeyOpenURL = getModKeyOpenURL()
 	cfg.fromEnv.isUpdateDBRecommendEnabled = isUpdateDBRecommendEnabled()
 	cfg.fromEnv.isUpdateWorkflowRecommendEnabled = isUpdateWorkflowRecommendEnabled()
 	return cfg

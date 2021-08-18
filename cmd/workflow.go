@@ -53,7 +53,7 @@ func init() {
 	}
 }
 
-func getOpenURLMod() alfred.ModKey {
+func getModKeyOpenURL() alfred.ModKey {
 	v := os.Getenv(envKeyOpenURLMod)
 	switch v {
 	case "alt":
