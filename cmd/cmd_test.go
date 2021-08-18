@@ -113,6 +113,15 @@ func TestExecute(t *testing.T) {
 			down: func() { os.Unsetenv(envKeyCommandFormat) },
 		},
 		{
+			name: "tar with remove format",
+			args: args{
+				command:  "tar",
+				filepath: testdataPath("test_output_tar_with_ctrl_mod_key.json"),
+			},
+			up:   func() { os.Setenv(envKeyOpenURLMod, "ctrl") },
+			down: func() { os.Unsetenv(envKeyOpenURLMod) },
+		},
+		{
 			name: "fuzzy search returns git checkout",
 			args: args{
 				command:  "gitchec --fuzzy",

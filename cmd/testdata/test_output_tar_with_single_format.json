@@ -9,7 +9,16 @@
       "icon": {
         "path": "description.png"
       },
-      "valid": false
+      "valid": false,
+      "mods": {
+        "cmd": {
+          "variables": {
+            "nextAction": "openURL"
+          },
+          "arg": "https://www.gnu.org/software/tar",
+          "subtitle": "open more information url"
+        }
+      }
     },
     {
       "title": "tar cf {target.tar} {file1} {file2} {file3}",

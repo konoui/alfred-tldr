@@ -20,7 +20,13 @@
       "icon": {
         "path": "description.png"
       },
-      "valid": false
+      "valid": false,
+      "mods": {
+        "cmd": {
+          "valid": false,
+          "subtitle": "no action"
+        }
+      }
     },
     {
       "title": "lsof {path/to/file}",

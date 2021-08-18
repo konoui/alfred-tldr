@@ -41,22 +41,9 @@ var (
 	languageFlag = strings.ToUpper(string(longLanguageFlag[0]))
 )
 
-type config struct {
-	platform       tldr.Platform
-	language       string
-	update         bool
-	updateWorkflow bool
-	confirm        bool
-	fuzzy          bool
-	version        bool
-	tldrClient     *tldr.Tldr
-	formatFunc     func(string) string
-}
-
 // NewRootCmd create a new cmd for root
 func NewRootCmd() *cobra.Command {
-	cfg := new(config)
-	cfg.formatFunc = getCommandFormatFunc()
+	cfg := newConfig()
 	var ptString string
 	rootCmd := &cobra.Command{
 		Use:   "tldr <cmd>",
