@@ -1,4 +1,4 @@
-VERSION := $(shell git describe --tags --abbrev=0)
+VERSION := $(shell git describe --tags --abbrev=0 | tr -cd '[0-9.]')
 REVISION := $(shell git rev-parse --short HEAD)
 SRC_DIR := ./
 BIN_NAME := tldr
