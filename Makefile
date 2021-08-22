@@ -1,4 +1,4 @@
-VERSION := $(shell git describe --tags --abbrev=0 | tr -cd '[0-9.]')
+VERSION := $(shell git describe --tags --abbrev=0)
 REVISION := $(shell git rev-parse --short HEAD)
 SRC_DIR := ./
 BIN_NAME := tldr
@@ -47,7 +47,8 @@ test:
 
 ## embed current version into workflow config
 embed-version:
-	@(plutil -replace version -string $(VERSION) $(ASSETS_DIR)/info.plist)
+	$(eval SEMVER := $(shell echo $(VERSION) | tr -cd '[0-9.]'))
+	@(plutil -replace version -string $(SEMVER) $(ASSETS_DIR)/info.plist)
 
 ## Install Binary and Assets to Workflow Directory
 install: build embed-version
