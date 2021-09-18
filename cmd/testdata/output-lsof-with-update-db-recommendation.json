@@ -23,8 +23,11 @@
       "valid": false,
       "mods": {
         "cmd": {
-          "valid": false,
-          "subtitle": "no action"
+          "variables": {
+            "nextAction": "openURL"
+          },
+          "arg": "https://manned.org/lsof",
+          "subtitle": "open more information url"
         }
       }
     },

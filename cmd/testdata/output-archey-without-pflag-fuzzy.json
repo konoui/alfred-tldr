@@ -1,57 +1,48 @@
 {
   "items": [
     {
-      "title": "yank",
-      "subtitle": "Platforms: [osx linux]",
+      "title": "archey",
+      "subtitle": "Platforms: [linux osx]",
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "-p linux yank",
+      "autocomplete": "archey",
       "valid": false
     },
     {
-      "title": "yarn",
+      "title": "git archive",
       "subtitle": "Platforms: [common]",
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "yarn",
+      "autocomplete": "git archive",
       "valid": false
     },
     {
-      "title": "yarn why",
-      "subtitle": "Platforms: [common]",
-      "icon": {
-        "path": "candidate.png"
-      },
-      "autocomplete": "yarn why",
-      "valid": false
-    },
-    {
-      "title": "systemd analyze",
+      "title": "vmware checkvm",
       "subtitle": "Platforms: [linux]",
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "-p linux systemd analyze",
+      "autocomplete": "-p linux vmware checkvm",
       "valid": false
     },
     {
-      "title": "ssh keyscan",
+      "title": "git archive file",
       "subtitle": "Platforms: [common]",
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "ssh keyscan",
+      "autocomplete": "git archive file",
       "valid": false
     },
     {
-      "title": "pyenv virtualenv",
+      "title": "roave backward compatibility check",
       "subtitle": "Platforms: [common]",
       "icon": {
         "path": "candidate.png"
       },
-      "autocomplete": "pyenv virtualenv",
+      "autocomplete": "roave backward compatibility check",
       "valid": false
     }
   ]

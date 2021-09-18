@@ -4,17 +4,6 @@
   },
   "items": [
     {
-      "variables": {
-        "nextAction": "shell"
-      },
-      "title": "Newer tldr wrokflow is available!",
-      "subtitle": "Please Enter!",
-      "arg": "--update-workflow --confirm",
-      "icon": {
-        "path": "/tmp/assets/AlertNoteIcon.icns"
-      }
-    },
-    {
       "title": "Lists open files and the corresponding processes.",
       "subtitle": "Note: Root privileges (or sudo) is required to list files opened by others.",
       "icon": {
@@ -23,8 +12,11 @@
       "valid": false,
       "mods": {
         "cmd": {
-          "valid": false,
-          "subtitle": "no action"
+          "variables": {
+            "nextAction": "openURL"
+          },
+          "arg": "https://manned.org/lsof",
+          "subtitle": "open more information url"
         }
       }
     },

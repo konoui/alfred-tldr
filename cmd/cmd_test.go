@@ -66,48 +66,48 @@ func TestExecute(t *testing.T) {
 			name: "lsof",
 			args: args{
 				command:  "lsof",
-				filepath: testdataPath("test_output_lsof.json"),
+				filepath: "output-lsof.json",
 			},
 		},
 		{
 			name: "sub command git checkout",
 			args: args{
 				command:  "git checkout",
-				filepath: testdataPath("test_output_git-checkout.json"),
+				filepath: "output-git-checkout.json",
 			},
 		},
 		{
-			name: "tar with uppercase format",
+			name: "tar with uppercase output format",
 			args: args{
 				command:  "tar",
-				filepath: testdataPath("test_output_tar_with_uppercase_format.json"),
+				filepath: "output-tar-with-uppercase-format.json",
 			},
 			up:   func() { os.Setenv(envKeyCommandFormat, "uppercase") },
 			down: func() { os.Unsetenv(envKeyCommandFormat) },
 		},
 		{
-			name: "tar with single format",
+			name: "tar with single output format",
 			args: args{
 				command:  "tar",
-				filepath: testdataPath("test_output_tar_with_single_format.json"),
+				filepath: "output-tar-with-single-format.json",
 			},
 			up:   func() { os.Setenv(envKeyCommandFormat, "single") },
 			down: func() { os.Unsetenv(envKeyCommandFormat) },
 		},
 		{
-			name: "tar with original format",
+			name: "tar with original output format",
 			args: args{
 				command:  "tar",
-				filepath: testdataPath("test_output_tar_with_original_format.json"),
+				filepath: "output-tar-with-original-format.json",
 			},
 			up:   func() { os.Setenv(envKeyCommandFormat, "original") },
 			down: func() { os.Unsetenv(envKeyCommandFormat) },
 		},
 		{
-			name: "tar with remove format",
+			name: "tar with remove output format",
 			args: args{
 				command:  "tar",
-				filepath: testdataPath("test_output_tar_with_remove_format.json"),
+				filepath: "output-tar-with-remove-format.json",
 			},
 			up:   func() { os.Setenv(envKeyCommandFormat, "remove") },
 			down: func() { os.Unsetenv(envKeyCommandFormat) },
@@ -116,7 +116,7 @@ func TestExecute(t *testing.T) {
 			name: "tar and open url with ctrl mod key",
 			args: args{
 				command:  "tar",
-				filepath: testdataPath("test_output_tar_with_ctrl_mod_key.json"),
+				filepath: "output-tar-with-ctrl-mod-key.json",
 			},
 			up:   func() { os.Setenv(envKeyOpenURLMod, "ctrl") },
 			down: func() { os.Unsetenv(envKeyOpenURLMod) },
@@ -125,119 +125,105 @@ func TestExecute(t *testing.T) {
 			name: "fuzzy search returns git checkout",
 			args: args{
 				command:  "gitchec --fuzzy",
-				filepath: testdataPath("test_output_git-checkout_with_fuzzy.json"),
+				filepath: "output-git-checkout-with-fuzzy.json",
 			},
 		},
 		{
 			name: "fuzzy search returns non-common platform",
 			args: args{
 				command:  "pstree --fuzzy",
-				filepath: testdataPath("test_output_pstree_with_fuzzy.json"),
+				filepath: "output-pstree-with-fuzzy.json",
 			},
 		},
 		{
-			name: "multiple platform command yank without -p flag returns computer platform OSX",
+			name: "multiple platform command archey without -p flag returns computer platform OSX for autocomplete",
 			args: args{
-				command:  "yan --fuzzy",
-				filepath: testdataPath("test_output_yank_without_p-flag_fuzzy.json"),
+				command:  "arche --fuzzy",
+				filepath: "output-archey-without-pflag-fuzzy.json",
 			},
 		},
 		{
-			name: "multiple platform command yank with -p flag returns specified platform",
+			name: "multiple platform command archey with -p flag returns specified platform for autocomplete",
 			args: args{
-				command:  "yan -p linux --fuzzy",
-				filepath: testdataPath("test_output_yank_with_p-flag_with_fuzzy.json"),
-			},
-		},
-		{
-			name: "outputs no error when cache expired",
-			args: args{
-				command:  "lsof",
-				filepath: testdataPath("test_output_lsof.json"),
+				command:  "arche -p linux --fuzzy",
+				filepath: "output-archey-with-pflag-with-fuzzy.json",
 			},
 		},
 		{
 			name: "version flag is the highest priority",
 			args: args{
 				command:  "-v -u tldr -L -a",
-				filepath: testdataPath("test_output_version.json"),
-			},
-		},
-		{
-			name: "prints update confirmation when specified --update flag and ignore argument",
-			args: args{
-				command:  "--update tldr",
-				filepath: testdataPath("test_output_update-confirmation.json"),
-			},
-		},
-		{
-			name: "specify language flag but commands not found",
-			args: args{
-				command:  "-L invalid-lang tar",
-				filepath: testdataPath("test_output_language-empty-result.json"),
+				filepath: "output-version.json",
 			},
 		},
 		{
 			name: "input something but commands not found",
 			args: args{
 				command:  "dummy-empty-result",
-				filepath: testdataPath("test_output_empty-result.json"),
+				filepath: "output-empty-result.json",
 			},
 		},
 		{
 			name: "fuzzy search but commands not found",
 			args: args{
 				command:  "--fuzzy dummy-empty-result",
-				filepath: testdataPath("test_output_empty-result.json"),
+				filepath: "output-empty-result.json",
+			},
+		},
+		{
+			name: "specify language flag but commands not found",
+			args: args{
+				command:  "-L invalid-lang tar",
+				filepath: "output-language-empty-result.json",
 			},
 		},
 		{
 			name: "no input returns no-input message",
 			args: args{
 				command:  "",
-				filepath: testdataPath("test_output_no-input.json"),
+				filepath: "output-no-input.json",
 			},
 		},
 		{
-			name: "specify help flag returns usage",
+			name: "specify help flag returns usages",
 			args: args{
 				command:  "--help",
-				filepath: testdataPath("test_output_usage.json"),
+				filepath: "output-usage.json",
 			},
 		},
 		{
-			name: "string flag without any value and invalid flag return no-input message",
+			name: "string flag -L without any values and invalid flag return no-input message",
 			args: args{
 				command:  "-L -a",
-				filepath: testdataPath("test_output_no-input.json"),
+				filepath: "output-no-input.json",
 			},
 		},
 		{
-			name: "string flag without any value returns usage",
+			name: "string flag -L without any value returns usage",
 			args: args{
 				command:  "--fuzzy -L",
-				filepath: testdataPath("test_output_usage.json"),
+				filepath: "output-usage.json",
 			},
 		},
 		{
 			name: "invalid bool flag returns usage",
 			args: args{
 				command:  "lsof -a",
-				filepath: testdataPath("test_output_usage.json"),
+				filepath: "output-usage.json",
 			},
 		},
 		{
-			name: " bool invalid flag and valid flag return usage",
+			name: "invalid bool flag and valid flag return usage",
 			args: args{
 				command:  "-a -u",
-				filepath: testdataPath("test_output_usage.json"),
+				filepath: "output-usage.json",
 			},
 		},
 		{
-			name: "invalid platform flag returns platform error message",
+			name: "invalid platform value returns platform error message",
 			args: args{
 				command:  "-p a",
-				filepath: testdataPath("test_output_platform-error.json"),
+				filepath: "output-platform-error.json",
 			},
 		},
 	}
@@ -249,7 +235,8 @@ func TestExecute(t *testing.T) {
 				tt.up()
 			}
 
-			wantData, err := ioutil.ReadFile(tt.args.filepath)
+			testpath := testdataPath(tt.args.filepath)
+			wantData, err := ioutil.ReadFile(testpath)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -262,7 +249,7 @@ func TestExecute(t *testing.T) {
 
 			// automatically update test data
 			if tt.update {
-				if err := writeFile(tt.args.filepath, outGotData); err != nil {
+				if err := writeFile(testpath, outGotData); err != nil {
 					t.Fatal(err)
 				}
 			}
@@ -292,7 +279,7 @@ func TestUpdateConfirmation(t *testing.T) {
 				dbTTL:                 0,
 				newerVersionAvailable: true,
 				command:               "",
-				filepath:              testdataPath("output_update-recommendations.json"),
+				filepath:              "output-update-recommendations.json",
 			},
 		},
 		{
@@ -301,7 +288,7 @@ func TestUpdateConfirmation(t *testing.T) {
 				dbTTL:                 1000 * time.Hour,
 				newerVersionAvailable: true,
 				command:               "lsof",
-				filepath:              testdataPath("output_lsof-with-update-workflow-recommendation.json"),
+				filepath:              "output-lsof-with-update-workflow-recommendation.json",
 			},
 		},
 		{
@@ -310,7 +297,7 @@ func TestUpdateConfirmation(t *testing.T) {
 				dbTTL:                 0,
 				newerVersionAvailable: false,
 				command:               "lsof",
-				filepath:              testdataPath("output_lsof-with-update-db-recommendation.json"),
+				filepath:              "output-lsof-with-update-db-recommendation.json",
 			},
 		},
 		{
@@ -319,7 +306,16 @@ func TestUpdateConfirmation(t *testing.T) {
 				dbTTL:                 0,
 				newerVersionAvailable: false,
 				command:               "--update",
-				filepath:              testdataPath("output_update-db-confirmation.json"),
+				filepath:              "output-update-db-confirmation.json",
+			},
+		},
+		{
+			name: "prints update confirmation when specified --update flag and ignore argument",
+			args: args{
+				dbTTL:                 0,
+				newerVersionAvailable: false,
+				command:               "--update tldr",
+				filepath:              "output-update-confirmation.json",
 			},
 		},
 	}
@@ -341,7 +337,8 @@ func TestUpdateConfirmation(t *testing.T) {
 				}
 			}()
 
-			wantData, err := ioutil.ReadFile(tt.args.filepath)
+			testpath := testdataPath(tt.args.filepath)
+			wantData, err := ioutil.ReadFile(testpath)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -361,7 +358,7 @@ func TestUpdateConfirmation(t *testing.T) {
 
 			// automatically update test data
 			if tt.update {
-				if err := writeFile(tt.args.filepath, outGotData); err != nil {
+				if err := writeFile(testpath, outGotData); err != nil {
 					t.Fatal(err)
 				}
 			}
