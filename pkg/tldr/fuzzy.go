@@ -35,20 +35,42 @@ func (c Cmds) Len() int {
 
 // Search fuzzy search commands by query.
 func (c Cmds) Search(args []string) Cmds {
-	// Note: We should replace space with highfun before search as a index file format is joined with highfun
-	// e.g.) git checkout -> git-checkout.md
-	query := strings.Join(args, "-")
+	query := commandWithHyphen(args)
 	results := fuzzy.FindFrom(query, c)
 	cmds := make(Cmds, results.Len())
 	for i, r := range results {
-		// Note: replace highfun with space after search
-		// e.g.) git-checkout -> git checkout
-		cmdName := strings.Replace(c[r.Index].Name, "-", " ", -1)
-		c[r.Index].Name = cmdName
-		cmds[i] = c[r.Index]
+		if guessHyphenCommand(args) {
+			// Note: if original args contain hyphen, it regards as command with hyphen.
+			// e.g.)  apt-key -> apt-key not apt key
+			cmds[i] = c[r.Index]
+		} else {
+			// Note: if original args does not have hyphen,	replacing highfun with space after search.
+			// e.g.) git-checkout -> git checkout
+			cmdName := strings.ReplaceAll(c[r.Index].Name, "-", " ")
+			c[r.Index].Name = cmdName
+			cmds[i] = c[r.Index]
+		}
 	}
-
 	return cmds
+}
+
+func commandWithHyphen(args []string) (arg string) {
+	// e.g.) git checkout -> git-checkout filename is git-checkout.md
+	arg = strings.Join(args, "-")
+	if guessHyphenCommand(args) {
+		// e.g.)  apt- key -> apt-key not apt--key
+		arg = strings.ReplaceAll(arg, "--", "-")
+	}
+	return
+}
+
+func guessHyphenCommand(args []string) bool {
+	for _, v := range args {
+		if strings.Contains(v, "-") {
+			return true
+		}
+	}
+	return false
 }
 
 // LoadIndexFile load command index file

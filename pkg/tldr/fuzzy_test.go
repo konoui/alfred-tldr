@@ -48,8 +48,19 @@ func TestSearch(t *testing.T) {
 		want        string
 	}{
 		{
-			description: "similar ls cmd",
-			query:       []string{"lsa"},
+			description: "similar html5validator cmd",
+			query:       []string{"html5"},
+			want:        "html5validator",
+		},
+		{
+			description: "no hyphen git check",
+			query:       []string{"git", "check"},
+			want:        "git checkout",
+		},
+		{
+			description: "hyphen apt- key",
+			query:       []string{"apt-", "get"},
+			want:        "apt-get",
 		},
 	}
 	for _, tt := range tests {
@@ -70,7 +81,12 @@ func TestSearch(t *testing.T) {
 			if len(got) == 0 {
 				t.Errorf("filter result is 0")
 			}
-
+			for _, cmd := range got {
+				if cmd.Name == tt.want {
+					return
+				}
+			}
+			t.Errorf("not found %s in cmds", tt.want)
 		})
 	}
 }

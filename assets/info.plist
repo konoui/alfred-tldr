@@ -411,7 +411,7 @@
 		<string>true</string>
 	</dict>
 	<key>version</key>
-	<string>v0.7.0</string>
+	<string>0.8.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/konoui/alfred-tldr</string>
 </dict>
