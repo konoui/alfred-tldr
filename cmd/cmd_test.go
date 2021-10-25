@@ -349,7 +349,7 @@ func TestUpdateConfirmation(t *testing.T) {
 			// disable ttl
 			twoWeeks = tt.args.dbTTL
 			awf = alfred.NewWorkflow(
-				alfred.WithUpdater(mockSource, ""),
+				alfred.WithUpdater(mockSource),
 			)
 
 			outBuf, errBuf, cmd := setup(t, awf, tt.args.command)
