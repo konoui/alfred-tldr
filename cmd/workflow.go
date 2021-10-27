@@ -28,22 +28,13 @@ const (
 var awf *alfred.Workflow
 
 func init() {
-	interval, err := getUpdateWorkflowInterval()
-	if err != nil {
-		interval = twoWeeks
-	}
-	defer func() {
-		if err != nil {
-			awf.Logger().Warnln(err.Error())
-		}
-	}()
 	awf = alfred.NewWorkflow(
 		alfred.WithMaxResults(30),
 		alfred.WithGitHubUpdater(
 			"konoui",
 			"alfred-tldr",
 			version,
-			interval,
+			getUpdateWorkflowInterval(twoWeeks),
 		),
 	)
 	awf.SetOut(outStream)
@@ -112,14 +103,14 @@ func isUpdateWorkflowRecommendEnabled() bool {
 	return parseBool(envKeyUpdateWorkflowRecommendation)
 }
 
-func getUpdateWorkflowInterval() (time.Duration, error) {
+func getUpdateWorkflowInterval(defaultInterval time.Duration) time.Duration {
 	v := os.Getenv(envKeyUpdateWorkflowIntervalDays)
 	fv, err := strconv.ParseFloat(v, 64)
 	if err != nil {
-		return 0, fmt.Errorf("cannot parse update interval env: %w", err)
+		return defaultInterval
 	}
 	tv := time.Duration(fv) * 24 * time.Hour
-	return tv, err
+	return tv
 }
 
 func parseBool(key string) bool {
