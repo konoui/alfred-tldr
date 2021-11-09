@@ -13,7 +13,8 @@ import (
 
 func (cfg *config) printPage(cmds []string) error {
 	// insert update recommendation first
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), updateWorkflowCheckTimeout)
+	defer cancel()
 	if cfg.fromEnv.isUpdateWorkflowRecommendEnabled && awf.Updater().NewerVersionAvailable(ctx) {
 		awf.Append(
 			alfred.NewItem().
@@ -164,7 +165,7 @@ func (cfg *config) printVersion(v, r string) (_ error) {
 func choicePlatform(pts []tldr.Platform, selected tldr.Platform) tldr.Platform {
 	if len(pts) >= 2 {
 		// if there are more than two platforms,
-		// priority are follow
+		// priority are follows
 		// selected pt, common, others
 		for _, pt := range pts {
 			if pt == selected {

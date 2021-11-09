@@ -1,6 +1,7 @@
 package tldr
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -56,8 +57,8 @@ func TestParsePage(t *testing.T) {
 						Cmd:         "lsof +D {{path/to/directory}}",
 					},
 					{
-						Description: "Find the process that is listening on a local TCP port:",
-						Cmd:         "lsof -iTCP:{{port}} -sTCP:LISTEN",
+						Description: "Find the process that is listening on a local IPv6 TCP port and don't convert network or port numbers:",
+						Cmd:         "lsof -i6TCP:{{port}} -sTCP:LISTEN -n -P",
 					},
 				},
 			},
@@ -65,7 +66,7 @@ func TestParsePage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			path, err := download(tt.url, os.TempDir(), filepath.Base(tt.url))
+			path, err := download(context.TODO(), tt.url, os.TempDir(), filepath.Base(tt.url))
 			if err != nil {
 				t.Fatal(err)
 			}

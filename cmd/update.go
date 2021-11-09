@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/konoui/go-alfred"
 )
@@ -21,7 +20,7 @@ func printUpdateResults(err error) (_ error) {
 func (cfg *config) updateTLDRWorkflow() error {
 	if cfg.confirm {
 		awf.Logger().Infoln("updating tldr workflow...")
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), updateWorkflowTimeout)
 		defer cancel()
 		err := awf.Updater().Update(ctx)
 		return printUpdateResults(err)
@@ -34,7 +33,9 @@ func (cfg *config) updateDB() error {
 	if cfg.confirm {
 		// update explicitly
 		awf.Logger().Infoln("updating tldr database...")
-		err := cfg.tldrClient.Update()
+		ctx, cancel := context.WithTimeout(context.Background(), updateDBTimeout)
+		defer cancel()
+		err := cfg.tldrClient.Update(ctx)
 		return printUpdateResults(err)
 	}
 

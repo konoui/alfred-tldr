@@ -2,6 +2,8 @@ package tldr
 
 import (
 	"archive/zip"
+	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -10,7 +12,7 @@ import (
 )
 
 // download data from `url` to `dstDir` as `filename`
-func download(url, dstDir, filename string) (string, error) {
+func download(ctx context.Context, url, dstDir, filename string) (string, error) {
 	path := filepath.Join(dstDir, filename)
 	if pathExists(path) {
 		if err := os.RemoveAll(path); err != nil {
@@ -24,13 +26,23 @@ func download(url, dstDir, filename string) (string, error) {
 	}
 	defer f.Close()
 
-	res, err := http.Get(url)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return "", err
 	}
-	defer res.Body.Close()
 
-	if _, err := io.Copy(f, res.Body); err != nil {
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if code := resp.StatusCode; code != http.StatusOK {
+		return "", fmt.Errorf("http response code was %d for downloading from %s", code, url)
+	}
+
+	if _, err := io.Copy(f, resp.Body); err != nil {
 		return "", err
 	}
 
@@ -38,7 +50,7 @@ func download(url, dstDir, filename string) (string, error) {
 }
 
 // unzip to `dstDir`
-func unzip(zipPath, dstDir string) error {
+func unzip(ctx context.Context, zipPath, dstDir string) error {
 	r, err := zip.OpenReader(zipPath)
 	if err != nil {
 		return err
@@ -46,6 +58,13 @@ func unzip(zipPath, dstDir string) error {
 	defer r.Close()
 
 	for _, f := range r.File {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			break
+		}
+
 		rc, err := f.Open()
 		if err != nil {
 			return err

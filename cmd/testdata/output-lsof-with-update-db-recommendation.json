@@ -67,9 +67,9 @@
       "arg": "lsof +D {path/to/directory}"
     },
     {
-      "title": "lsof -iTCP:{port} -sTCP:LISTEN",
-      "subtitle": "Find the process that is listening on a local TCP port:",
-      "arg": "lsof -iTCP:{port} -sTCP:LISTEN"
+      "title": "lsof -i6TCP:{port} -sTCP:LISTEN -n -P",
+      "subtitle": "Find the process that is listening on a local IPv6 TCP port and don't convert network or port numbers:",
+      "arg": "lsof -i6TCP:{port} -sTCP:LISTEN -n -P"
     }
   ]
 }

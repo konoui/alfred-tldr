@@ -1,6 +1,7 @@
 package tldr
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -39,7 +40,7 @@ func TestFindPage(t *testing.T) {
 				filepath.Join(os.TempDir(), ".tldr"),
 				&Options{Update: true},
 			)
-			err := tldr.OnInitialize()
+			err := tldr.OnInitialize(context.TODO())
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -92,7 +93,7 @@ func TestUpdate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			err := tt.tldr.Update()
+			err := tt.tldr.Update(context.TODO())
 			if tt.expectErr && err == nil {
 				t.Errorf("expect error happens, but got response")
 			}
@@ -134,7 +135,7 @@ func TestOnInitialize(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			err := tt.tldr.OnInitialize()
+			err := tt.tldr.OnInitialize(context.TODO())
 			if tt.expectErr && err == nil {
 				t.Errorf("expect error happens, but got response")
 			}
@@ -167,7 +168,7 @@ func TestExpired(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			err := tt.tldr.OnInitialize()
+			err := tt.tldr.OnInitialize(context.TODO())
 			if err != nil {
 				t.Fatal(err)
 			}

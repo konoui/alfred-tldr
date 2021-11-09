@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -15,11 +16,14 @@ import (
 )
 
 var (
-	outStream io.Writer = os.Stdout
-	errStream io.Writer = os.Stderr
-	version             = "*"
-	revision            = "*"
-	twoWeeks            = 2 * 7 * 24 * time.Hour
+	outStream                  io.Writer = os.Stdout
+	errStream                  io.Writer = os.Stderr
+	version                              = "*"
+	revision                             = "*"
+	twoWeeks                             = 2 * 7 * 24 * time.Hour
+	updateDBTimeout                      = 30 * time.Second
+	updateWorkflowTimeout                = 2 * time.Minute
+	updateWorkflowCheckTimeout           = 5 * time.Second
 )
 
 var defaultPlatform = tldr.PlatformOSX
@@ -163,9 +167,11 @@ func (cfg *config) initTldr() error {
 		Platform: cfg.platform,
 		Language: cfg.language,
 	}
-
 	cfg.tldrClient = tldr.New(path, opt)
-	return cfg.tldrClient.OnInitialize()
+
+	ctx, cancel := context.WithTimeout(context.Background(), updateDBTimeout)
+	defer cancel()
+	return cfg.tldrClient.OnInitialize(ctx)
 }
 
 // Execute Execute root cmd

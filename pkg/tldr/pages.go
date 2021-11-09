@@ -1,6 +1,7 @@
 package tldr
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -63,7 +64,7 @@ func New(tldrPath string, opt *Options) *Tldr {
 }
 
 // OnInitialize create and update tldr directory
-func (t *Tldr) OnInitialize() error {
+func (t *Tldr) OnInitialize(ctx context.Context) error {
 	initUpdate := false
 	if !pathExists(t.path) {
 		if err := os.MkdirAll(t.path, os.ModePerm); err != nil {
@@ -74,7 +75,7 @@ func (t *Tldr) OnInitialize() error {
 	}
 
 	if t.update || initUpdate {
-		if err := t.Update(); err != nil {
+		if err := t.Update(ctx); err != nil {
 			return fmt.Errorf("failed to update tldr repository: %w", err)
 		}
 	}
@@ -87,14 +88,14 @@ func (t *Tldr) OnInitialize() error {
 }
 
 // Update tldr pages from remote zip file
-func (t *Tldr) Update() error {
-	zipPath, err := download(t.pageSourceURL, t.path, filepath.Base(t.pageSourceURL))
+func (t *Tldr) Update(ctx context.Context) error {
+	zipPath, err := download(ctx, t.pageSourceURL, t.path, filepath.Base(t.pageSourceURL))
 	if err != nil {
 		return fmt.Errorf("failed to download a tldr repository: %w", err)
 	}
 	defer os.Remove(zipPath)
 
-	err = unzip(zipPath, t.path)
+	err = unzip(ctx, zipPath, t.path)
 	if err != nil {
 		return fmt.Errorf("failed to unzip a tldr repository: %w", err)
 	}

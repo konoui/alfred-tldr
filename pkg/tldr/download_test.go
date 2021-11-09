@@ -1,6 +1,7 @@
 package tldr
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -23,7 +24,7 @@ func TestDownload(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			// download on current directory
-			got, err := download(tt.url, "", tt.want)
+			got, err := download(context.TODO(), tt.url, "", tt.want)
 			defer os.RemoveAll(got)
 			if !tt.expectErr && err != nil {
 				t.Errorf("unexpected error got: %+v", err)
@@ -51,13 +52,13 @@ func TestUnzip(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			tmpDir := os.TempDir()
-			path, err := download(tt.url, tmpDir, filepath.Base(tt.url))
+			path, err := download(context.TODO(), tt.url, tmpDir, filepath.Base(tt.url))
 			if err != nil {
 				t.Fatalf("faltal error: %+v", err)
 			}
 			defer os.RemoveAll(path)
 
-			if err := unzip(path, tmpDir); !tt.expectErr && err != nil {
+			if err := unzip(context.TODO(), path, tmpDir); !tt.expectErr && err != nil {
 				t.Errorf("unexpected error got: %+v", err)
 			}
 		})
