@@ -25,24 +25,17 @@ const (
 	envKeyOpenURLMod                   = "TLDR_MOD_KEY_OPEN_URL"
 )
 
-var awf *alfred.Workflow
-
-func init() {
-	awf = alfred.NewWorkflow(
-		alfred.WithMaxResults(30),
-		alfred.WithGitHubUpdater(
-			"konoui",
-			"alfred-tldr",
-			version,
-			getUpdateWorkflowInterval(twoWeeks),
-		),
-	)
-	awf.SetOut(outStream)
-	awf.SetLog(errStream)
-	if err := awf.OnInitialize(); err != nil {
-		awf.Fatal(err.Error(), err.Error())
-	}
-}
+var awf = alfred.NewWorkflow(
+	alfred.WithMaxResults(30),
+	alfred.WithGitHubUpdater(
+		"konoui",
+		"alfred-tldr",
+		version,
+		getUpdateWorkflowInterval(twoWeeks),
+	),
+	alfred.WithOutWriter(os.Stdout),
+	alfred.WithLogWriter(os.Stderr),
+)
 
 func getModKeyOpenURL() alfred.ModKey {
 	v := os.Getenv(envKeyOpenURLMod)

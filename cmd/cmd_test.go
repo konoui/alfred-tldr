@@ -24,20 +24,32 @@ func testdataPath(file string) string {
 	return filepath.Join("testdata", file)
 }
 
-func setup(t *testing.T, awf *alfred.Workflow, command string) (outBuf, errBuf *bytes.Buffer, cmd *cobra.Command) {
+func setAlfredWorkflowEnv(t *testing.T) {
+	tmpDir := t.TempDir()
+	for k, v := range map[string]string{
+		"alfred_workflow_data":     "/tmp",
+		"alfred_workflow_cache":    tmpDir,
+		"alfred_workflow_bundleid": "test-bundle-id",
+	} {
+		if err := os.Setenv(k, v); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func setup(t *testing.T, command string) (outBuf, errBuf *bytes.Buffer, cmd *cobra.Command) {
 	t.Helper()
 
+	setAlfredWorkflowEnv(t)
+
 	outBuf, errBuf = new(bytes.Buffer), new(bytes.Buffer)
-	outStream = outBuf
-	errStream = outBuf
-	awf.SetOut(outBuf)
-	awf.SetLog(errBuf)
 	cmd = NewRootCmd()
 	cmdArgs, err := shellwords.Parse(command)
 	if err != nil {
 		t.Fatalf("args parse error: %+v", err)
 	}
-	cmd.SetOutput(outBuf)
+	cmd.SetOut(outBuf)
+	cmd.SetErr(errBuf)
 	cmd.SetArgs(cmdArgs)
 
 	return
@@ -241,9 +253,13 @@ func TestExecute(t *testing.T) {
 				t.Fatal(err)
 			}
 
+			outBuf, errBuf, cmd := setup(t, tt.args.command)
 			// overwrite global awf
-			awf = alfred.NewWorkflow()
-			outBuf, _, cmd := setup(t, awf, tt.args.command)
+			awf = alfred.NewWorkflow(
+				alfred.WithOutWriter(outBuf),
+				alfred.WithLogWriter(errBuf),
+			)
+
 			execute(t, cmd)
 			outGotData := outBuf.Bytes()
 
@@ -348,11 +364,13 @@ func TestUpdateConfirmation(t *testing.T) {
 
 			// disable ttl
 			twoWeeks = tt.args.dbTTL
+			outBuf, errBuf, cmd := setup(t, tt.args.command)
 			awf = alfred.NewWorkflow(
 				alfred.WithUpdater(mockSource),
+				alfred.WithOutWriter(outBuf),
+				alfred.WithLogWriter(errBuf),
 			)
 
-			outBuf, errBuf, cmd := setup(t, awf, tt.args.command)
 			execute(t, cmd)
 			outGotData := outBuf.Bytes()
 
@@ -420,8 +438,11 @@ func TestUpdateExecution(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			awf = alfred.NewWorkflow()
-			outBuf, _, cmd := setup(t, awf, tt.args.command)
+			outBuf, errBuf, cmd := setup(t, tt.args.command)
+			awf = alfred.NewWorkflow(
+				alfred.WithOutWriter(outBuf),
+				alfred.WithLogWriter(errBuf),
+			)
 			err := cmd.Execute()
 			if tt.expectedErr && err == nil {
 				t.Errorf("unexpected results")
@@ -431,8 +452,9 @@ func TestUpdateExecution(t *testing.T) {
 					t.Errorf("want: %v\n got: %v", tt.errMsg, err.Error())
 				}
 			}
+
 			got := outBuf.String()
-			if got != tt.wantMsg {
+			if !strings.Contains(got, tt.wantMsg) {
 				t.Errorf("want: %v\n got: %v", tt.wantMsg, got)
 			}
 		})

@@ -3,8 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"io"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -16,14 +14,12 @@ import (
 )
 
 var (
-	outStream                  io.Writer = os.Stdout
-	errStream                  io.Writer = os.Stderr
-	version                              = "*"
-	revision                             = "*"
-	twoWeeks                             = 2 * 7 * 24 * time.Hour
-	updateDBTimeout                      = 30 * time.Second
-	updateWorkflowTimeout                = 2 * time.Minute
-	updateWorkflowCheckTimeout           = 5 * time.Second
+	version                    = "*"
+	revision                   = "*"
+	twoWeeks                   = 2 * 7 * 24 * time.Hour
+	updateDBTimeout            = 30 * time.Second
+	updateWorkflowTimeout      = 2 * time.Minute
+	updateWorkflowCheckTimeout = 5 * time.Second
 )
 
 var defaultPlatform = tldr.PlatformOSX
@@ -48,18 +44,24 @@ var (
 // NewRootCmd create a new cmd for root
 func NewRootCmd() *cobra.Command {
 	cfg := newConfig()
+
 	var ptString string
 	rootCmd := &cobra.Command{
 		Use:   "tldr <cmd>",
 		Short: "show cmd examples",
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := awf.OnInitialize(); err != nil {
+				return err
+			}
+
 			if err := cfg.setPlatform(ptString); err != nil {
 				awf.SetEmptyWarning(strings.Title(err.Error()),
 					"supported are linux/osx/sunos/windows").
 					Output()
 				return nil
 			}
+
 			if err := cfg.initTldr(); err != nil {
 				return err
 			}
@@ -176,8 +178,6 @@ func (cfg *config) initTldr() error {
 
 // Execute Execute root cmd
 func Execute(rootCmd *cobra.Command) {
-	rootCmd.SetOut(outStream)
-	rootCmd.SetErr(errStream)
 	if err := rootCmd.Execute(); err != nil {
 		fatal(err)
 	}

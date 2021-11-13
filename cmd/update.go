@@ -10,9 +10,9 @@ import (
 
 func printUpdateResults(err error) (_ error) {
 	if err != nil {
-		fmt.Fprintf(outStream, "update failed due to %s", err)
+		fmt.Fprintf(awf.OutWriter(), "update failed due to %s", err)
 	} else {
-		fmt.Fprintf(outStream, "update succeeded")
+		fmt.Fprintf(awf.OutWriter(), "update succeeded")
 	}
 	return
 }

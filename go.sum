@@ -53,8 +53,8 @@ github.com/jonboulle/clockwork v0.1.0/go.mod h1:Ii8DK3G1RaLaWxj9trq07+26W01tbo22
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
 github.com/kisielk/errcheck v1.1.0/go.mod h1:EZBBE59ingxPouuu3KfxchcWSUPOHkagtvWXihfKN4Q=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
-github.com/konoui/go-alfred v0.15.0 h1:OL61D7pBOR53hFXEPUnKgMLttkHe78U0OI3I3TCHgkw=
-github.com/konoui/go-alfred v0.15.0/go.mod h1:m1b5CIOS7Wb8ep3liVSWv+gjNx3nv08syUfZpLpsY7c=
+github.com/konoui/go-alfred v0.16.0 h1:dcVHW4+rDv/D2fm0C32kx/S0JmfaRyasYUe8FfouzHU=
+github.com/konoui/go-alfred v0.16.0/go.mod h1:m1b5CIOS7Wb8ep3liVSWv+gjNx3nv08syUfZpLpsY7c=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515/go.mod h1:+0opPa2QZZtGFBFZlji/RkVcI2GknAs/DXo4wKdlNEc=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
