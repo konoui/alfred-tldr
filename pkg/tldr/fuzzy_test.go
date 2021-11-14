@@ -21,7 +21,7 @@ func TestLoadIndexFile(t *testing.T) {
 		t.Run(tt.description, func(t *testing.T) {
 			tldr := New(
 				filepath.Join(os.TempDir(), ".tldr"),
-				&Options{Update: true},
+				WithForceUpdate(),
 			)
 			if err := tldr.OnInitialize(context.TODO()); err != nil {
 				t.Fatal(err)
@@ -68,7 +68,7 @@ func TestSearch(t *testing.T) {
 		t.Run(tt.description, func(t *testing.T) {
 			tldr := New(
 				filepath.Join(os.TempDir(), ".tldr"),
-				&Options{},
+				WithForceUpdate(),
 			)
 			if err := tldr.OnInitialize(context.TODO()); err != nil {
 				t.Fatal(err)

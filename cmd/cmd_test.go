@@ -43,7 +43,8 @@ func setup(t *testing.T, command string) (outBuf, errBuf *bytes.Buffer, cmd *cob
 	setAlfredWorkflowEnv(t)
 
 	outBuf, errBuf = new(bytes.Buffer), new(bytes.Buffer)
-	cmd = NewRootCmd()
+	cfg := NewConfig()
+	cmd = NewRootCmd(cfg)
 	cmdArgs, err := shellwords.Parse(command)
 	if err != nil {
 		t.Fatalf("args parse error: %+v", err)

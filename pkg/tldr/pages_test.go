@@ -38,7 +38,7 @@ func TestFindPage(t *testing.T) {
 		t.Run(tt.description, func(t *testing.T) {
 			tldr := New(
 				filepath.Join(os.TempDir(), ".tldr"),
-				&Options{Update: true},
+				WithForceUpdate(),
 			)
 			err := tldr.OnInitialize(context.TODO())
 			if err != nil {
@@ -62,33 +62,31 @@ func TestFindPage(t *testing.T) {
 func TestUpdate(t *testing.T) {
 	tests := []struct {
 		description string
-		tldr        Tldr
+		tldr        *Tldr
 		expectErr   bool
 	}{
 		{
 			description: "success test for expected",
 			expectErr:   false,
-			tldr: Tldr{
-				path:          filepath.Join(os.TempDir(), ".tldr"),
-				pageSourceURL: pageSourceURL,
-				update:        true,
-			},
+			tldr: New(
+				filepath.Join(os.TempDir(), ".tldr"),
+				WithForceUpdate(),
+			),
 		},
 		{
 			description: "failed test due to permission deny",
 			expectErr:   true,
-			tldr: Tldr{
-				path:          "/.tldr",
-				pageSourceURL: pageSourceURL,
-			},
+			tldr: New(
+				"/.tldr",
+			),
 		},
 		{
 			description: "failed test due to invalid url",
 			expectErr:   true,
-			tldr: Tldr{
-				path:          filepath.Join(os.TempDir(), ".tldr"),
-				pageSourceURL: "https://google.com/index.html",
-			},
+			tldr: New(
+				filepath.Join(os.TempDir(), ".tldr"),
+				WithRepositoryURL("https://google.com/index.html"),
+			),
 		},
 	}
 	for _, tt := range tests {
@@ -108,28 +106,24 @@ func TestUpdate(t *testing.T) {
 func TestOnInitialize(t *testing.T) {
 	tests := []struct {
 		description string
-		tldr        Tldr
+		tldr        *Tldr
 		expectErr   bool
 	}{
 		{
 			description: "success test for expected",
 			expectErr:   false,
-			tldr: Tldr{
-				path:          filepath.Join(os.TempDir(), ".tldr"),
-				pageSourceURL: pageSourceURL,
-				update:        true,
-			},
+			tldr: New(
+				filepath.Join(os.TempDir(), ".tldr"),
+				WithForceUpdate(),
+			),
 		},
 		{
 			description: "failed test due to permission deny",
 			expectErr:   true,
-			tldr: Tldr{
-				path:          "/.tldr",
-				pageSourceURL: pageSourceURL,
-				platforms:     []Platform{PlatformLinux, PlatformCommon},
-				languages:     []string{},
-				update:        false,
-			},
+			tldr: New(
+				"/.tldr",
+				WithPlatform(PlatformLinux),
+			),
 		},
 	}
 
@@ -150,17 +144,15 @@ func TestOnInitialize(t *testing.T) {
 func TestExpired(t *testing.T) {
 	tests := []struct {
 		description string
-		tldr        Tldr
+		tldr        *Tldr
 		want        bool
 		tldrTTL     time.Duration
 	}{
 		{
 			description: "failed test due to expired cache",
-			tldr: Tldr{
-				path:          filepath.Join(os.TempDir(), ".tldr"),
-				pageSourceURL: pageSourceURL,
-				update:        false,
-			},
+			tldr: New(
+				filepath.Join(os.TempDir(), ".tldr"),
+			),
 			tldrTTL: 0 * time.Hour,
 			want:    true,
 		},

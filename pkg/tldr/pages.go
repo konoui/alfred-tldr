@@ -2,13 +2,12 @@ package tldr
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 type Platform string
@@ -21,20 +20,45 @@ const (
 	PlatformOSX     Platform = "osx"
 )
 
+const (
+	languageCodeEN = "en"
+)
+
+var (
+	ErrNotFoundPage = errors.New("no page found")
+)
+
 func (pt Platform) String() string {
 	return string(pt)
 }
 
-const (
-	pageSourceURL  = "https://tldr.sh/assets/tldr.zip"
-	languageCodeEN = "en"
-)
+type Option func(*Tldr)
 
-// Options are tldr functions
-type Options struct {
-	Platform Platform
-	Language string
-	Update   bool
+func WithPlatform(pt Platform) Option {
+	return func(t *Tldr) {
+		// Note specified platform is highest priority
+		t.platforms = append([]Platform{pt}, t.platforms...)
+	}
+}
+
+func WithLanguage(lang string) Option {
+	return func(t *Tldr) {
+		t.languages = getLanguages(lang)
+	}
+}
+
+func WithForceUpdate() Option {
+	return func(t *Tldr) {
+		t.update = true
+	}
+}
+
+// WithRepositoryURL replaces default tldr remote url
+// This is useful for local test
+func WithRepositoryURL(u string) Option {
+	return func(t *Tldr) {
+		t.pageSourceURL = u
+	}
 }
 
 // Tldr Repository of tldir pages
@@ -46,21 +70,22 @@ type Tldr struct {
 	update        bool
 }
 
-var ErrNotFoundPage = errors.New("no page found")
-
 // New create a instance of tldr repository
-func New(tldrPath string, opt *Options) *Tldr {
-	if opt == nil {
-		opt = new(Options)
+func New(tldrPath string, opts ...Option) *Tldr {
+
+	t := &Tldr{
+		path:          tldrPath,
+		pageSourceURL: "https://tldr.sh/assets/tldr.zip",
+		platforms:     []Platform{PlatformCommon},
+		languages:     getLanguages(""),
+		update:        false,
 	}
 
-	return &Tldr{
-		path:          tldrPath,
-		pageSourceURL: pageSourceURL,
-		platforms:     []Platform{opt.Platform, PlatformCommon},
-		languages:     getLanguages(opt.Language),
-		update:        opt.Update,
+	for _, opt := range opts {
+		opt(t)
 	}
+
+	return t
 }
 
 // OnInitialize create and update tldr directory

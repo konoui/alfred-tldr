@@ -12,7 +12,7 @@ type envs struct {
 	isUpdateDBRecommendEnabled       bool
 }
 
-type config struct {
+type Config struct {
 	platform       tldr.Platform
 	language       string
 	update         bool
@@ -22,10 +22,11 @@ type config struct {
 	version        bool
 	tldrClient     *tldr.Tldr
 	fromEnv        envs
+	opts           []tldr.Option
 }
 
-func newConfig() *config {
-	cfg := new(config)
+func NewConfig() *Config {
+	cfg := new(Config)
 	cfg.fromEnv.formatFunc = getCommandFormatFunc()
 	cfg.fromEnv.modKeyOpenURL = getModKeyOpenURL()
 	cfg.fromEnv.isUpdateDBRecommendEnabled = isUpdateDBRecommendEnabled()

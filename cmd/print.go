@@ -11,7 +11,7 @@ import (
 	"github.com/konoui/go-alfred"
 )
 
-func (cfg *config) printPage(cmds []string) error {
+func (cfg *Config) printPage(cmds []string) error {
 	// insert update recommendation first
 	ctx, cancel := context.WithTimeout(context.Background(), updateWorkflowCheckTimeout)
 	defer cancel()
@@ -120,7 +120,7 @@ func makeDescriptionItem(p *tldr.Page, modKey alfred.ModKey) *alfred.Item {
 		Mod(modKey, openMod)
 }
 
-func (cfg *config) printFuzzyPages(cmds []string) error {
+func (cfg *Config) printFuzzyPages(cmds []string) error {
 	index, err := cfg.tldrClient.LoadIndexFile()
 	if err != nil {
 		return err
@@ -154,7 +154,7 @@ func (cfg *config) printFuzzyPages(cmds []string) error {
 	return nil
 }
 
-func (cfg *config) printVersion(v, r string) (_ error) {
+func (cfg *Config) printVersion(v, r string) (_ error) {
 	title := fmt.Sprintf("alfred-tldr %v(%s)", v, r)
 	awf.Append(
 		alfred.NewItem().Title(title),

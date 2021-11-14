@@ -42,8 +42,7 @@ var (
 )
 
 // NewRootCmd create a new cmd for root
-func NewRootCmd() *cobra.Command {
-	cfg := newConfig()
+func NewRootCmd(cfg *Config) *cobra.Command {
 
 	var ptString string
 	rootCmd := &cobra.Command{
@@ -143,7 +142,7 @@ func makeUsageItem(p *pflag.Flag) *alfred.Item {
 		Valid(false)
 }
 
-func (cfg *config) setPlatform(ptString string) error {
+func (cfg *Config) setPlatform(ptString string) error {
 	platforms := []tldr.Platform{
 		tldr.PlatformCommon,
 		tldr.PlatformLinux,
@@ -160,16 +159,16 @@ func (cfg *config) setPlatform(ptString string) error {
 	return fmt.Errorf("%s is unsupported platform", ptString)
 }
 
-func (cfg *config) initTldr() error {
+func (cfg *Config) initTldr() error {
 	path := filepath.Join(awf.GetDataDir(), "data")
 
-	// Note turn off update option as we update database explicitly
-	opt := &tldr.Options{
-		Update:   false,
-		Platform: cfg.platform,
-		Language: cfg.language,
-	}
-	cfg.tldrClient = tldr.New(path, opt)
+	cfg.opts = append(cfg.opts,
+		tldr.WithPlatform(cfg.platform),
+		tldr.WithLanguage(cfg.language),
+	)
+	cfg.tldrClient = tldr.New(path,
+		cfg.opts...,
+	)
 
 	ctx, cancel := context.WithTimeout(context.Background(), updateDBTimeout)
 	defer cancel()
@@ -177,7 +176,9 @@ func (cfg *config) initTldr() error {
 }
 
 // Execute Execute root cmd
-func Execute(rootCmd *cobra.Command) {
+func Execute() {
+	cfg := NewConfig()
+	rootCmd := NewRootCmd(cfg)
 	if err := rootCmd.Execute(); err != nil {
 		fatal(err)
 	}

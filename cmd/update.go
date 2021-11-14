@@ -17,7 +17,7 @@ func printUpdateResults(err error) (_ error) {
 	return
 }
 
-func (cfg *config) updateTLDRWorkflow() error {
+func (cfg *Config) updateTLDRWorkflow() error {
 	if cfg.confirm {
 		awf.Logger().Infoln("updating tldr workflow...")
 		ctx, cancel := context.WithTimeout(context.Background(), updateWorkflowTimeout)
@@ -29,7 +29,7 @@ func (cfg *config) updateTLDRWorkflow() error {
 	return errors.New("direct update via flag is not supported")
 }
 
-func (cfg *config) updateDB() error {
+func (cfg *Config) updateDB() error {
 	if cfg.confirm {
 		// update explicitly
 		awf.Logger().Infoln("updating tldr database...")
