@@ -2,11 +2,66 @@ package tldr
 
 import (
 	"context"
+	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
+
+const tldrZipFilename = "tldr.zip"
+
+var testServer *httptest.Server
+
+func tmpDir() string {
+	return "/tmp"
+}
+
+func serverURL() string {
+	return testServer.URL
+}
+
+func tldrZipURL() string {
+	return serverURL() + "/" + tldrZipFilename
+}
+
+func init() {
+	setupTldrRepositoryServer()
+}
+
+// global test server
+func setupTldrRepositoryServer() {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if !strings.HasSuffix(r.URL.Path, tldrZipFilename) {
+			fmt.Fprintf(w, "hello")
+			return
+		}
+
+		zipPath := filepath.Join(tmpDir(), tldrZipFilename)
+		if _, err := os.Stat(zipPath); err != nil {
+			panic(err)
+		}
+
+		f, err := os.Open(zipPath)
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
+
+		if _, err := io.Copy(w, f); err != nil {
+			panic(err)
+		}
+	})
+
+	// set to global val
+	testServer = httptest.NewUnstartedServer(mux)
+	testServer.Start()
+}
 
 func TestFindPage(t *testing.T) {
 	tests := []struct {
@@ -38,7 +93,8 @@ func TestFindPage(t *testing.T) {
 		t.Run(tt.description, func(t *testing.T) {
 			tldr := New(
 				filepath.Join(os.TempDir(), ".tldr"),
-				WithForceUpdate(),
+				WithRepositoryURL(tldrZipURL()),
+				WithLanguage("en"),
 			)
 			err := tldr.OnInitialize(context.TODO())
 			if err != nil {
@@ -60,38 +116,50 @@ func TestFindPage(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
+	type args struct {
+		opts     []Option
+		tldrPath string
+	}
 	tests := []struct {
-		description string
-		tldr        *Tldr
-		expectErr   bool
+		name      string
+		args      args
+		expectErr bool
 	}{
 		{
-			description: "success test for expected",
-			expectErr:   false,
-			tldr: New(
-				filepath.Join(os.TempDir(), ".tldr"),
-				WithForceUpdate(),
-			),
+			name:      "success test for expected",
+			expectErr: false,
+			args: args{
+				tldrPath: filepath.Join(os.TempDir(), ".tldr"),
+				opts: []Option{
+					WithRepositoryURL(tldrZipURL()),
+				},
+			},
 		},
 		{
-			description: "failed test due to permission deny",
-			expectErr:   true,
-			tldr: New(
-				"/.tldr",
-			),
+			name:      "failed test due to permission deny",
+			expectErr: true,
+			args: args{
+				tldrPath: "/.tldr",
+				opts: []Option{
+					WithRepositoryURL(tldrZipURL()),
+				},
+			},
 		},
 		{
-			description: "failed test due to invalid url",
-			expectErr:   true,
-			tldr: New(
-				filepath.Join(os.TempDir(), ".tldr"),
-				WithRepositoryURL("https://google.com/index.html"),
-			),
+			name:      "failed test due to invalid url",
+			expectErr: true,
+			args: args{
+				tldrPath: filepath.Join(os.TempDir(), ".tldr"),
+				opts: []Option{
+					WithRepositoryURL(serverURL() + "/" + "invalid-file"),
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.description, func(t *testing.T) {
-			err := tt.tldr.Update(context.TODO())
+		t.Run(tt.name, func(t *testing.T) {
+			i := New(tt.args.tldrPath, tt.args.opts...)
+			err := i.Update(context.TODO())
 			if tt.expectErr && err == nil {
 				t.Errorf("expect error happens, but got response")
 			}
@@ -104,32 +172,43 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestOnInitialize(t *testing.T) {
+	type args struct {
+		opts     []Option
+		tldrPath string
+	}
 	tests := []struct {
-		description string
-		tldr        *Tldr
-		expectErr   bool
+		name      string
+		args      args
+		expectErr bool
 	}{
 		{
-			description: "success test for expected",
-			expectErr:   false,
-			tldr: New(
-				filepath.Join(os.TempDir(), ".tldr"),
-				WithForceUpdate(),
-			),
+			name:      "success test for expected",
+			expectErr: false,
+			args: args{
+				tldrPath: filepath.Join(os.TempDir(), ".tldr"),
+				opts: []Option{
+					WithRepositoryURL(tldrZipURL()),
+					WithForceUpdate(),
+				},
+			},
 		},
 		{
-			description: "failed test due to permission deny",
-			expectErr:   true,
-			tldr: New(
-				"/.tldr",
-				WithPlatform(PlatformLinux),
-			),
+			name:      "failed test due to permission deny",
+			expectErr: true,
+			args: args{
+				tldrPath: "/.tldr",
+				opts: []Option{
+					WithPlatform(PlatformLinux),
+					WithRepositoryURL(tldrZipURL()),
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.description, func(t *testing.T) {
-			err := tt.tldr.OnInitialize(context.TODO())
+		t.Run(tt.name, func(t *testing.T) {
+			i := New(tt.args.tldrPath, tt.args.opts...)
+			err := i.OnInitialize(context.TODO())
 			if tt.expectErr && err == nil {
 				t.Errorf("expect error happens, but got response")
 			}
@@ -142,30 +221,38 @@ func TestOnInitialize(t *testing.T) {
 }
 
 func TestExpired(t *testing.T) {
+	type args struct {
+		opts     []Option
+		tldrPath string
+	}
 	tests := []struct {
-		description string
-		tldr        *Tldr
-		want        bool
-		tldrTTL     time.Duration
+		name    string
+		args    args
+		want    bool
+		tldrTTL time.Duration
 	}{
 		{
-			description: "failed test due to expired cache",
-			tldr: New(
-				filepath.Join(os.TempDir(), ".tldr"),
-			),
+			name: "failed test due to expired cache",
+			args: args{
+				tldrPath: filepath.Join(os.TempDir(), ".tldr"),
+				opts: []Option{
+					WithRepositoryURL(tldrZipURL()),
+				},
+			},
 			tldrTTL: 0 * time.Hour,
 			want:    true,
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.description, func(t *testing.T) {
-			err := tt.tldr.OnInitialize(context.TODO())
+		t.Run(tt.name, func(t *testing.T) {
+			i := New(tt.args.tldrPath, tt.args.opts...)
+			err := i.OnInitialize(context.TODO())
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			if got := tt.tldr.Expired(tt.tldrTTL); got != tt.want {
+			if got := i.Expired(tt.tldrTTL); got != tt.want {
 				t.Errorf("want: %+v, got: %+v", tt.want, got)
 			}
 		})

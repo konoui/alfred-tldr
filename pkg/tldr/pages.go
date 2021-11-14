@@ -21,6 +21,7 @@ const (
 )
 
 const (
+	PageSourceURL  = "https://tldr.sh/assets/tldr.zip"
 	languageCodeEN = "en"
 )
 
@@ -75,7 +76,7 @@ func New(tldrPath string, opts ...Option) *Tldr {
 
 	t := &Tldr{
 		path:          tldrPath,
-		pageSourceURL: "https://tldr.sh/assets/tldr.zip",
+		pageSourceURL: PageSourceURL,
 		platforms:     []Platform{PlatformCommon},
 		languages:     getLanguages(""),
 		update:        false,

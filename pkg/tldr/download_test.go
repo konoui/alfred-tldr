@@ -9,23 +9,23 @@ import (
 
 func TestDownload(t *testing.T) {
 	tests := []struct {
-		description string
-		url         string
-		want        string
-		expectErr   bool
+		name      string
+		url       string
+		want      string
+		expectErr bool
 	}{
 		{
-			description: "download example1",
-			url:         "https://raw.githubusercontent.com/tldr-pages/tldr/master/pages/common/lsof.md",
-			want:        "lsof.md",
-			expectErr:   false,
+			name:      "download example1",
+			url:       tldrZipURL(),
+			want:      filepath.Base(tldrZipURL()),
+			expectErr: false,
 		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.description, func(t *testing.T) {
-			// download on current directory
+		t.Run(tt.name, func(t *testing.T) {
+			// since download on current directory, got is only filename
 			got, err := download(context.TODO(), tt.url, "", tt.want)
-			defer os.RemoveAll(got)
+			t.Cleanup(func() { os.RemoveAll(got) })
 			if !tt.expectErr && err != nil {
 				t.Errorf("unexpected error got: %+v", err)
 			}
@@ -39,19 +39,19 @@ func TestDownload(t *testing.T) {
 
 func TestUnzip(t *testing.T) {
 	tests := []struct {
-		description string
-		url         string
-		expectErr   bool
+		name      string
+		url       string
+		expectErr bool
 	}{
 		{
-			description: "download and unzip 1",
-			url:         "https://tldr.sh/assets/tldr.zip",
-			expectErr:   false,
+			name:      "download and unzip 1",
+			url:       tldrZipURL(),
+			expectErr: false,
 		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.description, func(t *testing.T) {
-			tmpDir := os.TempDir()
+		t.Run(tt.name, func(t *testing.T) {
+			tmpDir := t.TempDir()
 			path, err := download(context.TODO(), tt.url, tmpDir, filepath.Base(tt.url))
 			if err != nil {
 				t.Fatalf("faltal error: %+v", err)

@@ -22,11 +22,6 @@ export GO111MODULE=on
 build:
 	CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" -o $(BINARY) $(SRC_DIR)
 
-## Format source codes
-fmt:
-	@(if ! type goimports >/dev/null 2>&1; then go get -u golang.org/x/tools/cmd/goimports ;fi)
-	goimports -w $$(go list -f {{.Dir}} ./... | grep -v /vendor/)
-
 ## Lint
 lint:
 	@(if ! type golangci-lint >/dev/null 2>&1; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin $(GOLANGCI_LINT_VERSION) ;fi)
@@ -38,11 +33,14 @@ darwin:
 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags "$(LDFLAGS) -s -w" -o  $(BIN_DIR)/arm64 $(SRC_DIR)
 	lipo -create $(BIN_DIR)/amd64 $(BIN_DIR)/arm64 -output $(BINARY)
 
+setup-testdata:
+	if [ ! -e /tmp/tldr.zip ]; then curl -s -o /tmp/tldr.zip https://tldr.sh/assets/tldr.zip ; fi
+
 ## Run tests for my project
-test:
+test: setup-testdata
 	go test ./...
 
-## embed current version into workflow config
+## Embed current version into workflow config
 embed-version:
 	$(eval SEMVER := $(shell echo $(VERSION) | tr -cd '[0-9.]'))
 	@(plutil -replace version -string $(SEMVER) $(ASSETS_DIR)/info.plist)
@@ -59,14 +57,13 @@ package: darwin embed-version
 
 ## GitHub Release and uploads artifacts
 release: package
-	@(if ! type ghr >/dev/null 2>&1; then go get -u github.com/tcnksm/ghr ;fi)
+	@(if ! type ghr >/dev/null 2>&1; then go install github.com/tcnksm/ghr ;fi)
 	@ghr -replace $(VERSION) $(ARTIFACT_NAME)
 
 ## Clean Binary
 clean:
 	rm -f $(BIN_DIR)/*
 	rm -f $(ARTIFACT_DIR)/*
-
 
 ## Report coverage
 cover:
@@ -75,7 +72,7 @@ cover:
 
 ## Show help
 help:
-	@(if ! type make2help >/dev/null 2>&1; then go get -u github.com/Songmu/make2help/cmd/make2help ;fi)
+	@(if ! type make2help >/dev/null 2>&1; then go install github.com/Songmu/make2help/cmd/make2help ;fi)
 	@make2help $(MAKEFILE_LIST)
 
 .PHONY: build test lint fmt darwin clean help

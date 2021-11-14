@@ -1,9 +1,7 @@
 package tldr
 
 import (
-	"context"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -12,13 +10,13 @@ import (
 func TestParsePage(t *testing.T) {
 	tests := []struct {
 		description string
-		url         string
+		filepath    string
 		want        *Page
 		expectErr   bool
 	}{
 		{
 			description: "lsof",
-			url:         "https://raw.githubusercontent.com/tldr-pages/tldr/master/pages/common/lsof.md",
+			filepath:    "testdata/lsof.md",
 			expectErr:   false,
 			want: &Page{
 				CmdName: "lsof",
@@ -66,13 +64,7 @@ func TestParsePage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			path, err := download(context.TODO(), tt.url, os.TempDir(), filepath.Base(tt.url))
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer os.RemoveAll(path)
-
-			f, err := os.Open(path)
+			f, err := os.Open(tt.filepath)
 			if err != nil {
 				t.Fatal(err)
 			}
