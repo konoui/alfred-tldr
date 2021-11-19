@@ -115,6 +115,8 @@ func parseBool(key string) bool {
 	return bv
 }
 
-func fatal(err error) {
-	awf.Fatal("a fatal error occurred", fmt.Sprint(err))
+func fatalIfErr(err error) {
+	if err != nil {
+		awf.Fatal("a fatal error occurred", fmt.Sprint(err))
+	}
 }

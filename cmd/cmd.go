@@ -18,7 +18,7 @@ var (
 	revision                   = "*"
 	twoWeeks                   = 2 * 7 * 24 * time.Hour
 	updateDBTimeout            = 30 * time.Second
-	updateWorkflowTimeout      = 2 * time.Minute
+	updateWorkflowTimeout      = 1 * time.Minute
 	updateWorkflowCheckTimeout = 5 * time.Second
 )
 
@@ -50,8 +50,14 @@ func NewRootCmd(cfg *Config) *cobra.Command {
 		Short: "show cmd examples",
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
+
 			if err := awf.OnInitialize(); err != nil {
 				return err
+			}
+
+			// normalize args since alfred workflow pass query as NFD
+			for i, arg := range args {
+				args[i] = alfred.Normalize(arg)
 			}
 
 			if err := cfg.setPlatform(ptString); err != nil {
@@ -64,6 +70,7 @@ func NewRootCmd(cfg *Config) *cobra.Command {
 			if err := cfg.initTldr(); err != nil {
 				return err
 			}
+
 			if cfg.version {
 				return cfg.printVersion(version, revision)
 			}
@@ -179,7 +186,5 @@ func (cfg *Config) initTldr() error {
 func Execute() {
 	cfg := NewConfig()
 	rootCmd := NewRootCmd(cfg)
-	if err := rootCmd.Execute(); err != nil {
-		fatal(err)
-	}
+	fatalIfErr(rootCmd.Execute())
 }
