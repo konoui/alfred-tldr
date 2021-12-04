@@ -33,8 +33,9 @@ darwin:
 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags "$(LDFLAGS) -s -w" -o  $(BIN_DIR)/arm64 $(SRC_DIR)
 	lipo -create $(BIN_DIR)/amd64 $(BIN_DIR)/arm64 -output $(BINARY)
 
+TEST_DIR := /tmp/tldrtest
 setup-testdata:
-	if [ ! -e /tmp/tldr.zip ]; then curl -s -o /tmp/tldr.zip https://tldr.sh/assets/tldr.zip ; fi
+	if [ ! -e $(TEST_DIR)/tldr.zip ]; then mkdir -p $(TEST_DIR) && curl -s -o $(TEST_DIR)/tldr.zip https://tldr.sh/assets/tldr.zip ; fi
 
 ## Run tests for my project
 test: setup-testdata

@@ -2,65 +2,24 @@ package tldr
 
 import (
 	"context"
-	"fmt"
-	"io"
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
+
+	tldrtest "github.com/konoui/alfred-tldr/pkg/tldr/test"
 )
 
-const tldrZipFilename = "tldr.zip"
+// global test server instance
+var testServer = tldrtest.NewServer().Start()
 
-var testServer *httptest.Server
-
-func tmpDir() string {
-	return "/tmp"
+// heler function for test
+func WithTestZipURL() Option {
+	return WithRepositoryURL(testServer.TldrZipURL())
 }
 
-func serverURL() string {
-	return testServer.URL
-}
-
-func tldrZipURL() string {
-	return serverURL() + "/" + tldrZipFilename
-}
-
-func init() {
-	setupTldrRepositoryServer()
-}
-
-// global test server
-func setupTldrRepositoryServer() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if !strings.HasSuffix(r.URL.Path, tldrZipFilename) {
-			fmt.Fprintf(w, "hello")
-			return
-		}
-
-		zipPath := filepath.Join(tmpDir(), tldrZipFilename)
-		if _, err := os.Stat(zipPath); err != nil {
-			panic(err)
-		}
-
-		f, err := os.Open(zipPath)
-		if err != nil {
-			panic(err)
-		}
-		defer f.Close()
-
-		if _, err := io.Copy(w, f); err != nil {
-			panic(err)
-		}
-	})
-
-	// set to global val
-	testServer = httptest.NewUnstartedServer(mux)
-	testServer.Start()
+func WithTestInvalidURL() Option {
+	return WithRepositoryURL(testServer.ServerURL() + "/" + "invalid-file")
 }
 
 func TestFindPage(t *testing.T) {
@@ -93,7 +52,7 @@ func TestFindPage(t *testing.T) {
 		t.Run(tt.description, func(t *testing.T) {
 			tldr := New(
 				filepath.Join(os.TempDir(), ".tldr"),
-				WithRepositoryURL(tldrZipURL()),
+				WithRepositoryURL(testServer.TldrZipURL()),
 				WithLanguage("en"),
 			)
 			err := tldr.OnInitialize(context.TODO())
@@ -131,7 +90,7 @@ func TestUpdate(t *testing.T) {
 			args: args{
 				tldrPath: filepath.Join(os.TempDir(), ".tldr"),
 				opts: []Option{
-					WithRepositoryURL(tldrZipURL()),
+					WithTestZipURL(),
 				},
 			},
 		},
@@ -141,7 +100,7 @@ func TestUpdate(t *testing.T) {
 			args: args{
 				tldrPath: "/.tldr",
 				opts: []Option{
-					WithRepositoryURL(tldrZipURL()),
+					WithTestZipURL(),
 				},
 			},
 		},
@@ -151,7 +110,7 @@ func TestUpdate(t *testing.T) {
 			args: args{
 				tldrPath: filepath.Join(os.TempDir(), ".tldr"),
 				opts: []Option{
-					WithRepositoryURL(serverURL() + "/" + "invalid-file"),
+					WithTestInvalidURL(),
 				},
 			},
 		},
@@ -187,8 +146,8 @@ func TestOnInitialize(t *testing.T) {
 			args: args{
 				tldrPath: filepath.Join(os.TempDir(), ".tldr"),
 				opts: []Option{
-					WithRepositoryURL(tldrZipURL()),
 					WithForceUpdate(),
+					WithTestZipURL(),
 				},
 			},
 		},
@@ -199,7 +158,7 @@ func TestOnInitialize(t *testing.T) {
 				tldrPath: "/.tldr",
 				opts: []Option{
 					WithPlatform(PlatformLinux),
-					WithRepositoryURL(tldrZipURL()),
+					WithTestZipURL(),
 				},
 			},
 		},
@@ -236,7 +195,7 @@ func TestExpired(t *testing.T) {
 			args: args{
 				tldrPath: filepath.Join(os.TempDir(), ".tldr"),
 				opts: []Option{
-					WithRepositoryURL(tldrZipURL()),
+					WithTestZipURL(),
 				},
 			},
 			tldrTTL: 0 * time.Hour,

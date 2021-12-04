@@ -3,11 +3,7 @@ package cmd
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"io"
 	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -17,6 +13,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/konoui/alfred-tldr/pkg/tldr"
+	tldrtest "github.com/konoui/alfred-tldr/pkg/tldr/test"
 	"github.com/konoui/go-alfred"
 	"github.com/konoui/go-alfred/update"
 	mock "github.com/konoui/go-alfred/update/mock_update"
@@ -24,56 +21,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const tldrZipFilename = "tldr.zip"
-
-var testServer *httptest.Server
-
-func tmpDir() string {
-	return "/tmp"
-}
-
-func serverURL() string {
-	return testServer.URL
-}
-
-func tldrZipURL() string {
-	return serverURL() + "/" + tldrZipFilename
-}
-
-func init() {
-	setupTldrRepositoryServer()
-}
-
-// global test server
-func setupTldrRepositoryServer() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if !strings.HasSuffix(r.URL.Path, tldrZipFilename) {
-			fmt.Fprintf(w, "hello")
-			return
-		}
-
-		zipPath := filepath.Join(tmpDir(), tldrZipFilename)
-		if _, err := os.Stat(zipPath); err != nil {
-			// FIXME download from tldr.PageSourceURL
-			panic(err)
-		}
-
-		f, err := os.Open(zipPath)
-		if err != nil {
-			panic(err)
-		}
-		defer f.Close()
-
-		if _, err := io.Copy(w, f); err != nil {
-			panic(err)
-		}
-	})
-
-	// set to global val
-	testServer = httptest.NewUnstartedServer(mux)
-	testServer.Start()
-}
+// global test server instance
+var testServer = tldrtest.NewServer().Start()
 
 func testdataPath(file string) string {
 	return filepath.Join("testdata", file)
@@ -100,7 +49,7 @@ func setup(t *testing.T, command string) (outBuf, errBuf *bytes.Buffer, cmd *cob
 	outBuf, errBuf = new(bytes.Buffer), new(bytes.Buffer)
 	cfg := NewConfig()
 	// set dummy url for local test
-	cfg.opts = append(cfg.opts, tldr.WithRepositoryURL(tldrZipURL()))
+	cfg.opts = append(cfg.opts, tldr.WithRepositoryURL(testServer.TldrZipURL()))
 	cmd = NewRootCmd(cfg)
 	cmdArgs, err := shellwords.Parse(command)
 	if err != nil {

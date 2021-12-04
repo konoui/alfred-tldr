@@ -16,8 +16,8 @@ func TestDownload(t *testing.T) {
 	}{
 		{
 			name:      "download example1",
-			url:       tldrZipURL(),
-			want:      filepath.Base(tldrZipURL()),
+			url:       testServer.TldrZipURL(),
+			want:      filepath.Base(testServer.TldrZipURL()),
 			expectErr: false,
 		},
 	}
@@ -45,7 +45,7 @@ func TestUnzip(t *testing.T) {
 	}{
 		{
 			name:      "download and unzip 1",
-			url:       tldrZipURL(),
+			url:       testServer.TldrZipURL(),
 			expectErr: false,
 		},
 	}
