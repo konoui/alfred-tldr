@@ -135,14 +135,15 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 	for _, ptDir := range t.platforms {
 		for _, lang := range t.languages {
 			path := filepath.Join(t.path, getLangDir(lang), ptDir.String(), page)
-			if !pathExists(path) {
-				// if cmd does not exist, try to find it in next platform/language
-				continue
-			}
 
 			f, err := os.Open(path)
 			if err != nil {
-				return &Page{}, fmt.Errorf("failed to open the page (%s): %w", f.Name(), err)
+				if errors.Is(err, os.ErrNotExist) {
+					// if cmd does not exist, try to find it in next platform/language
+					continue
+				} else {
+					return &Page{}, fmt.Errorf("failed to open the page (%s): %w", f.Name(), err)
+				}
 			}
 			defer f.Close()
 
