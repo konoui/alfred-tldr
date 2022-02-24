@@ -11,7 +11,7 @@
       "subtitle": "Please Enter!",
       "arg": "--update --confirm",
       "icon": {
-        "path": "/tmp/assets/AlertNoteIcon.icns"
+        "path": "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertNoteIcon.icns"
       }
     },
     {

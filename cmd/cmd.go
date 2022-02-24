@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -51,15 +52,6 @@ func NewRootCmd(cfg *Config) *cobra.Command {
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			if err := awf.OnInitialize(); err != nil {
-				return err
-			}
-
-			// normalize args since alfred workflow pass query as NFD
-			for i, arg := range args {
-				args[i] = alfred.Normalize(arg)
-			}
-
 			if err := cfg.setPlatform(ptString); err != nil {
 				awf.SetEmptyWarning(strings.Title(err.Error()),
 					"supported are linux/osx/sunos/windows").
@@ -71,16 +63,16 @@ func NewRootCmd(cfg *Config) *cobra.Command {
 				return err
 			}
 
-			if cfg.version {
+			switch {
+			case cfg.version:
 				return cfg.printVersion(version, revision)
-			}
-			if cfg.updateWorkflow {
+			case cfg.updateWorkflow:
 				return cfg.updateTLDRWorkflow()
-			}
-			if cfg.update {
+			case cfg.update:
 				return cfg.updateDB()
+			default:
+				return cfg.printPage(args)
 			}
-			return cfg.printPage(args)
 		},
 		SilenceErrors:      true,
 		SilenceUsage:       true,
@@ -169,14 +161,12 @@ func (cfg *Config) setPlatform(ptString string) error {
 func (cfg *Config) initTldr() error {
 	path := filepath.Join(awf.GetDataDir(), "data")
 
-	cfg.opts = append(cfg.opts,
+	opts := append([]tldr.Option{
 		tldr.WithPlatform(cfg.platform),
 		tldr.WithLanguage(cfg.language),
-	)
-	cfg.tldrClient = tldr.New(path,
-		cfg.opts...,
-	)
+	}, cfg.opts...)
 
+	cfg.tldrClient = tldr.New(path, opts...)
 	ctx, cancel := context.WithTimeout(context.Background(), updateDBTimeout)
 	defer cancel()
 	return cfg.tldrClient.OnInitialize(ctx)
@@ -186,5 +176,5 @@ func (cfg *Config) initTldr() error {
 func Execute() {
 	cfg := NewConfig()
 	rootCmd := NewRootCmd(cfg)
-	fatalIfErr(rootCmd.Execute())
+	os.Exit(awf.RunSimple(rootCmd.Execute))
 }

@@ -12,7 +12,6 @@ ARTIFACT_NAME := $(BIN_NAME).alfredworkflow
 CMD_PACKAGE_DIR := github.com/konoui/alfred-tldr/cmd
 LDFLAGS := -X '$(CMD_PACKAGE_DIR).version=$(VERSION)' -X '$(CMD_PACKAGE_DIR).revision=$(REVISION)'
 
-## For local test
 WORKFLOW_DIR := "$${HOME}/Library/Application Support/Alfred/Alfred.alfredpreferences/workflows/user.workflow.2569C1E1-8114-4B77-9506-52AA966313A9"
 
 GOLANGCI_LINT_VERSION := v1.30.0
@@ -48,6 +47,7 @@ embed-version:
 
 ## Install Binary and Assets to Workflow Directory
 install: build embed-version
+	@(mkdir -p $(WORKFLOW_DIR))
 	@(cp $(ASSETS)  $(WORKFLOW_DIR)/)
 
 ## Create workflow artifact

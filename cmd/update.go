@@ -26,7 +26,7 @@ func (cfg *Config) updateTLDRWorkflow() error {
 		return printUpdateResults(err)
 	}
 
-	return errors.New("direct update via flag is not supported")
+	return errors.New("update workflow flag is not supported")
 }
 
 func (cfg *Config) updateDB() error {

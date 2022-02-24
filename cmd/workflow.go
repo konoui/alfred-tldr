@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"regexp"
 	"strconv"
@@ -9,6 +8,7 @@ import (
 	"time"
 
 	"github.com/konoui/go-alfred"
+	"github.com/konoui/go-alfred/initialize"
 )
 
 // decide next action for workflow filter
@@ -35,6 +35,9 @@ var awf = alfred.NewWorkflow(
 	),
 	alfred.WithOutWriter(os.Stdout),
 	alfred.WithLogWriter(os.Stderr),
+	alfred.WithInitializers(
+		initialize.NewEmbedAssets(),
+	),
 )
 
 func getModKeyOpenURL() alfred.ModKey {
@@ -113,10 +116,4 @@ func parseBool(key string) bool {
 		return false
 	}
 	return bv
-}
-
-func fatalIfErr(err error) {
-	if err != nil {
-		awf.Fatal("a fatal error occurred", fmt.Sprint(err))
-	}
 }

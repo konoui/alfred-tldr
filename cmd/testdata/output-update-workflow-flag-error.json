@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "title": "update workflow flag is not supported",
+      "subtitle": "Please check workflow debug log",
+      "icon": {
+        "path": "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionBadgeIcon.icns"
+      }
+    }
+  ]
+}

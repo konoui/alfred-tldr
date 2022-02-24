@@ -15,7 +15,7 @@ func (cfg *Config) printPage(cmds []string) error {
 	// insert update recommendation first
 	ctx, cancel := context.WithTimeout(context.Background(), updateWorkflowCheckTimeout)
 	defer cancel()
-	if cfg.fromEnv.isUpdateWorkflowRecommendEnabled && awf.Updater().NewerVersionAvailable(ctx) {
+	if cfg.fromEnv.isUpdateWorkflowRecommendEnabled && awf.Updater().IsNewVersionAvailable(ctx) {
 		awf.Append(
 			alfred.NewItem().
 				Title("Newer tldr wrokflow is available!").

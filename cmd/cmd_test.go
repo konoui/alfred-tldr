@@ -62,10 +62,11 @@ func setup(t *testing.T, command string) (outBuf, errBuf *bytes.Buffer, cmd *cob
 	return
 }
 
-func execute(t *testing.T, rootCmd *cobra.Command) {
-	err := rootCmd.Execute()
-	if err != nil {
-		t.Errorf("unexpected error got: %+v", err)
+// FIXME wantExitCode argument
+func execute(t *testing.T, awf *alfred.Workflow, rootCmd *cobra.Command, wantExitCode int) {
+	exitCode := awf.RunSimple(rootCmd.Execute)
+	if exitCode != wantExitCode {
+		t.Errorf("unexpected exit code want %d, got %d", wantExitCode, exitCode)
 	}
 }
 
@@ -267,7 +268,7 @@ func TestExecute(t *testing.T) {
 				alfred.WithLogWriter(errBuf),
 			)
 
-			execute(t, cmd)
+			execute(t, awf, cmd, 0)
 			outGotData := outBuf.Bytes()
 
 			// automatically update test data
@@ -292,9 +293,10 @@ func TestUpdateConfirmation(t *testing.T) {
 		newerVersionAvailable bool
 	}
 	tests := []struct {
-		name   string
-		args   args
-		update bool
+		name         string
+		args         args
+		update       bool
+		wantExitCode int
 	}{
 		{
 			name: "no input and update recommendations",
@@ -341,6 +343,14 @@ func TestUpdateConfirmation(t *testing.T) {
 				filepath:              "output-update-confirmation.json",
 			},
 		},
+		{
+			name: "update-workflow confirmation does not support",
+			args: args{
+				command:  "--update-workflow",
+				filepath: "output-update-workflow-flag-error.json",
+			},
+			wantExitCode: 1,
+		},
 	}
 
 	for _, tt := range tests {
@@ -378,7 +388,7 @@ func TestUpdateConfirmation(t *testing.T) {
 				alfred.WithLogWriter(errBuf),
 			)
 
-			execute(t, cmd)
+			execute(t, awf, cmd, tt.wantExitCode)
 			outGotData := outBuf.Bytes()
 
 			// automatically update test data
@@ -401,8 +411,8 @@ func newMockUpdaterSource(t *testing.T, newerVersionAvailable bool) (_ update.Up
 	mockSource := mock.NewMockUpdaterSource(ctrl)
 	mockUpdater := mock.NewMockUpdater(ctrl)
 	mockUpdater.EXPECT().Update(gomock.Any()).Return(nil).AnyTimes()
-	mockSource.EXPECT().NewerVersionAvailable(gomock.Any()).Return(newerVersionAvailable, nil).AnyTimes()
-	mockSource.EXPECT().IfNewerVersionAvailable().Return(mockUpdater).AnyTimes()
+	mockSource.EXPECT().IsNewVersionAvailable(gomock.Any()).Return(newerVersionAvailable, nil).AnyTimes()
+	mockSource.EXPECT().IfNewVersionAvailable().Return(mockUpdater).AnyTimes()
 	return mockSource, ctrl.Finish
 }
 
@@ -426,14 +436,6 @@ func TestUpdateExecution(t *testing.T) {
 			expectedErr: false,
 		},
 		{
-			name: "update-workflow confirmation does not support",
-			args: args{
-				command: "--update-workflow",
-			},
-			expectedErr: true,
-			errMsg:      "direct update via flag is not supported",
-		},
-		{
 			name: "when update-workflow without updater, nil updater returns error. update execution outputs message to stdout",
 			args: args{
 				command: "--update-workflow --confirm",
@@ -450,13 +452,14 @@ func TestUpdateExecution(t *testing.T) {
 				alfred.WithOutWriter(outBuf),
 				alfred.WithLogWriter(errBuf),
 			)
-			err := cmd.Execute()
-			if tt.expectedErr && err == nil {
+
+			exitCode := awf.RunSimple(cmd.Execute)
+			if tt.expectedErr && exitCode == 0 {
 				t.Errorf("unexpected results")
 			}
-			if tt.expectedErr && err != nil {
-				if !strings.Contains(err.Error(), tt.errMsg) {
-					t.Errorf("want: %v\n got: %v", tt.errMsg, err.Error())
+			if tt.expectedErr && exitCode != 0 {
+				if !strings.Contains(errBuf.String(), tt.errMsg) {
+					t.Errorf("want: %v\n got: %v", tt.errMsg, errBuf)
 				}
 			}
 

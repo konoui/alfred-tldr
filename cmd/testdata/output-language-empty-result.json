@@ -4,7 +4,7 @@
       "title": "Not found the command in selected language",
       "subtitle": "Try not to specify language option",
       "icon": {
-        "path": "/tmp/assets/AlertNoteIcon.icns"
+        "path": "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertNoteIcon.icns"
       },
       "valid": false
     }

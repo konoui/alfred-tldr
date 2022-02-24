@@ -8,7 +8,7 @@
       "subtitle": "Please Enter!",
       "arg": "--update-workflow --confirm",
       "icon": {
-        "path": "/tmp/assets/AlertNoteIcon.icns"
+        "path": "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertNoteIcon.icns"
       }
     },
     {
@@ -19,7 +19,7 @@
       "subtitle": "Please Enter!",
       "arg": "--update --confirm",
       "icon": {
-        "path": "/tmp/assets/AlertNoteIcon.icns"
+        "path": "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertNoteIcon.icns"
       }
     },
     {
