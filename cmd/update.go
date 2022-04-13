@@ -4,42 +4,43 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 
 	"github.com/konoui/go-alfred"
 )
 
-func printUpdateResults(err error) (_ error) {
+func printUpdateResults(w io.Writer, err error) (_ error) {
 	if err != nil {
-		fmt.Fprintf(awf.OutWriter(), "update failed due to %s", err)
+		fmt.Fprintf(w, "update failed due to %s", err)
 	} else {
-		fmt.Fprintf(awf.OutWriter(), "update succeeded")
+		fmt.Fprintf(w, "update succeeded")
 	}
 	return
 }
 
-func (cfg *Config) updateTLDRWorkflow() error {
-	if cfg.confirm {
-		awf.Logger().Infoln("updating tldr workflow...")
+func updateTLDRWorkflow(c *client) error {
+	if c.cfg.confirm {
+		c.Logger().Infoln("updating tldr workflow...")
 		ctx, cancel := context.WithTimeout(context.Background(), updateWorkflowTimeout)
 		defer cancel()
-		err := awf.Updater().Update(ctx)
-		return printUpdateResults(err)
+		err := c.Updater().Update(ctx)
+		return printUpdateResults(c.OutWriter(), err)
 	}
 
 	return errors.New("update workflow flag is not supported")
 }
 
-func (cfg *Config) updateDB() error {
-	if cfg.confirm {
+func updateDB(c *client) error {
+	if c.cfg.confirm {
 		// update explicitly
-		awf.Logger().Infoln("updating tldr database...")
+		c.Logger().Infoln("updating tldr database...")
 		ctx, cancel := context.WithTimeout(context.Background(), updateDBTimeout)
 		defer cancel()
-		err := cfg.tldrClient.Update(ctx)
-		return printUpdateResults(err)
+		err := c.tldrClient.Update(ctx)
+		return printUpdateResults(c.OutWriter(), err)
 	}
 
-	awf.Append(
+	c.Append(
 		alfred.NewItem().
 			Title("Please Enter if update tldr database").
 			Arg(fmt.Sprintf("--%s --%s", longUpdateFlag, confirmFlag)),

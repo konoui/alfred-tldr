@@ -11,35 +11,35 @@ import (
 	"github.com/konoui/go-alfred"
 )
 
-func (cfg *Config) printPage(cmds []string) error {
+func printPage(c *client, cmds []string) error {
 	// insert update recommendation first
 	ctx, cancel := context.WithTimeout(context.Background(), updateWorkflowCheckTimeout)
 	defer cancel()
-	if cfg.fromEnv.isUpdateWorkflowRecommendEnabled && awf.Updater().IsNewVersionAvailable(ctx) {
-		awf.Append(
+	if c.cfg.fromEnv.isUpdateWorkflowRecommendEnabled && c.Updater().IsNewVersionAvailable(ctx) {
+		c.Append(
 			alfred.NewItem().
 				Title("Newer tldr wrokflow is available!").
 				Subtitle("Please Enter!").
 				Arg(fmt.Sprintf("--%s --%s", updateWorkflowFlag, confirmFlag)).
 				Variable(nextActionKey, nextActionShell).
-				Icon(awf.Assets().IconAlertNote()),
+				Icon(c.Asseter().IconAlertNote()),
 		)
 	}
 
-	if cfg.fromEnv.isUpdateDBRecommendEnabled && cfg.tldrClient.Expired(twoWeeks) {
-		awf.Append(
+	if c.cfg.fromEnv.isUpdateDBRecommendEnabled && c.tldrClient.Expired(twoWeeks) {
+		c.Append(
 			alfred.NewItem().
 				Title("Tldr database is older than 2 weeks").
 				Subtitle("Please Enter!").
 				Arg(fmt.Sprintf("--%s --%s", longUpdateFlag, confirmFlag)).
-				Icon(awf.Assets().IconAlertNote()).
+				Icon(c.Asseter().IconAlertNote()).
 				Variable(nextActionKey, nextActionShell),
 		)
 	}
 
 	// no input case
 	if len(cmds) == 0 {
-		awf.Append(
+		c.Append(
 			alfred.NewItem().
 				Title("Please input a command").
 				Subtitle("e.g.) tldr tar e.g.) tldr --help").
@@ -48,33 +48,33 @@ func (cfg *Config) printPage(cmds []string) error {
 		return nil
 	}
 
-	awf.SetEmptyWarning("No matching query", "Try a different query")
-	p, err := cfg.tldrClient.FindPage(cmds)
+	c.SetEmptyWarning("No matching query", "Try a different query")
+	p, err := c.tldrClient.FindPage(cmds)
 	if err != nil {
 		if errors.Is(err, tldr.ErrNotFoundPage) {
-			if cfg.language != "" {
-				awf.Clear().SetEmptyWarning(
+			if c.cfg.language != "" {
+				c.Clear().SetEmptyWarning(
 					"Not found the command in selected language",
 					"Try not to specify language option",
 				).Output()
 				return nil
 			}
-			if cfg.fuzzy {
+			if c.cfg.fuzzy {
 				// list suggestions
-				return cfg.printFuzzyPages(cmds)
+				return printFuzzyPages(c, cmds)
 			}
-			awf.Output()
+			c.Output()
 			return nil
 		}
 		return err
 	}
 
-	awf.Append(
-		makeDescriptionItem(p, cfg.fromEnv.modKeyOpenURL),
+	c.Append(
+		makeDescriptionItem(p, c.cfg.fromEnv.modKeyOpenURL),
 	)
 	for _, cmd := range p.CmdExamples {
-		command := cfg.fromEnv.formatFunc(cmd.Cmd)
-		awf.Append(
+		command := c.cfg.fromEnv.formatFunc(cmd.Cmd)
+		c.Append(
 			alfred.NewItem().
 				Title(command).
 				Subtitle(cmd.Description).
@@ -82,7 +82,7 @@ func (cfg *Config) printPage(cmds []string) error {
 		).Variable(nextActionKey, nextActionCopy)
 	}
 
-	awf.Output()
+	c.Output()
 	return nil
 }
 
@@ -98,7 +98,6 @@ func makeDescriptionItem(p *tldr.Page, modKey alfred.ModKey) *alfred.Item {
 	openMod := alfred.NewMod()
 	u, err := parseDetailURL(p.CmdDescriptions)
 	if err != nil {
-		awf.Logger().Warnln(err)
 		openMod.
 			Valid(false).
 			Subtitle("no action")
@@ -120,8 +119,8 @@ func makeDescriptionItem(p *tldr.Page, modKey alfred.ModKey) *alfred.Item {
 		Mod(modKey, openMod)
 }
 
-func (cfg *Config) printFuzzyPages(cmds []string) error {
-	index, err := cfg.tldrClient.LoadIndexFile()
+func printFuzzyPages(c *client, cmds []string) error {
+	index, err := c.tldrClient.LoadIndexFile()
 	if err != nil {
 		return err
 	}
@@ -129,7 +128,7 @@ func (cfg *Config) printFuzzyPages(cmds []string) error {
 	suggestions := index.Commands.Search(cmds)
 	for _, cmd := range suggestions {
 		complete := cmd.Name
-		pt := choicePlatform(cmd.Platforms, cfg.platform)
+		pt := choicePlatform(cmd.Platforms, c.cfg.platform)
 		if pt != tldr.PlatformCommon && pt != defaultPlatform {
 			complete = fmt.Sprintf("-%s %s %s",
 				platformFlag,
@@ -137,7 +136,7 @@ func (cfg *Config) printFuzzyPages(cmds []string) error {
 				cmd.Name,
 			)
 		}
-		awf.Append(
+		c.Append(
 			alfred.NewItem().
 				Title(cmd.Name).
 				Subtitle(fmt.Sprintf("Platforms: %s", fmt.Sprintf("%s", cmd.Platforms))).
@@ -150,13 +149,13 @@ func (cfg *Config) printFuzzyPages(cmds []string) error {
 		)
 	}
 
-	awf.Output()
+	c.Output()
 	return nil
 }
 
-func (cfg *Config) printVersion(v, r string) (_ error) {
+func printVersion(c *client, v, r string) (_ error) {
 	title := fmt.Sprintf("alfred-tldr %v(%s)", v, r)
-	awf.Append(
+	c.Append(
 		alfred.NewItem().Title(title),
 	).Output()
 	return

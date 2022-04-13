@@ -8,10 +8,6 @@ linters-settings:
           - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
           - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
           - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
-  golint:
-    min-confidence: 0
-  maligned:
-    suggest-new: true
   goconst:
     min-len: 2
     min-occurrences: 3
@@ -46,11 +42,10 @@ linters:
     - typecheck
     # add
     - misspell
-    - golint
+    - revive
     - stylecheck
     #    - gosec
     - lll
-    - maligned
     - goconst
     - gocritic
   disable-all: true

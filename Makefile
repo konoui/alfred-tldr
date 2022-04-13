@@ -9,13 +9,14 @@ ASSETS := $(ASSETS_DIR)/* $(BINARY) README.md
 ARTIFACT_DIR := .artifact
 ARTIFACT_NAME := $(BIN_NAME).alfredworkflow
 
+export LANGUAGE=en
+
 CMD_PACKAGE_DIR := github.com/konoui/alfred-tldr/cmd
 LDFLAGS := -X '$(CMD_PACKAGE_DIR).version=$(VERSION)' -X '$(CMD_PACKAGE_DIR).revision=$(REVISION)'
 
 WORKFLOW_DIR := "$${HOME}/Library/Application Support/Alfred/Alfred.alfredpreferences/workflows/user.workflow.2569C1E1-8114-4B77-9506-52AA966313A9"
 
-GOLANGCI_LINT_VERSION := v1.30.0
-export GO111MODULE=on
+GOLANGCI_LINT_VERSION := v1.47.2
 
 ## Build binaries on your environment
 build:
@@ -63,6 +64,7 @@ release: package
 
 ## Clean Binary
 clean:
+	go clean -testcache
 	rm -f $(BIN_DIR)/*
 	rm -f $(ARTIFACT_DIR)/*
 

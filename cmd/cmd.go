@@ -1,15 +1,14 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/konoui/alfred-tldr/pkg/tldr"
 	"github.com/konoui/go-alfred"
+	"github.com/konoui/go-alfred/initialize"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -23,7 +22,23 @@ var (
 	updateWorkflowCheckTimeout = 5 * time.Second
 )
 
-var defaultPlatform = tldr.PlatformOSX
+var (
+	defaultPlatform = tldr.PlatformOSX
+	defaultOpts     = []alfred.Option{
+		alfred.WithMaxResults(30),
+		alfred.WithGitHubUpdater(
+			"konoui",
+			"alfred-tldr",
+			version,
+			getUpdateWorkflowInterval(twoWeeks),
+		),
+		alfred.WithOutWriter(os.Stdout),
+		alfred.WithLogWriter(os.Stderr),
+		alfred.WithInitializers(
+			initialize.NewEmbedAssets(),
+		),
+	}
+)
 
 const (
 	longPlatformFlag   = "platform"
@@ -42,10 +57,20 @@ var (
 	languageFlag = strings.ToUpper(string(longLanguageFlag[0]))
 )
 
+type client struct {
+	cfg *Config
+	*alfred.Workflow
+	tldrClient *tldr.Tldr
+}
+
 // NewRootCmd create a new cmd for root
-func NewRootCmd(cfg *Config) *cobra.Command {
+func NewRootCmd(cfg *Config, awf *alfred.Workflow) *cobra.Command {
 
 	var ptString string
+	c := &client{
+		cfg:      cfg,
+		Workflow: awf,
+	}
 	rootCmd := &cobra.Command{
 		Use:   "tldr <cmd>",
 		Short: "show cmd examples",
@@ -53,25 +78,30 @@ func NewRootCmd(cfg *Config) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			if err := cfg.setPlatform(ptString); err != nil {
-				awf.SetEmptyWarning(strings.Title(err.Error()),
+				awf.SetEmptyWarning(err.Error(),
 					"supported are linux/osx/sunos/windows").
 					Output()
 				return nil
 			}
 
-			if err := cfg.initTldr(); err != nil {
+			tc, err := newTldrClient(cfg, awf)
+			if err != nil {
 				return err
 			}
 
+			c.tldrClient = tc
+			// update and normalize
+			args = c.UpdateOpts(alfred.WithArguments(args...)).Args()
+
 			switch {
 			case cfg.version:
-				return cfg.printVersion(version, revision)
+				return printVersion(c, version, revision)
 			case cfg.updateWorkflow:
-				return cfg.updateTLDRWorkflow()
+				return updateTLDRWorkflow(c)
 			case cfg.update:
-				return cfg.updateDB()
+				return updateDB(c)
 			default:
-				return cfg.printPage(args)
+				return printPage(c, args)
 			}
 		},
 		SilenceErrors:      true,
@@ -91,9 +121,9 @@ func NewRootCmd(cfg *Config) *cobra.Command {
 	rootCmd.PersistentFlags().BoolVar(&cfg.fuzzy, fuzzyFlag, false, "use fuzzy search")
 	rootCmd.PersistentFlags().BoolVar(&cfg.updateWorkflow, updateWorkflowFlag, false, "update tldr workflow if possible")
 
-	rootCmd.SetUsageFunc(usageFunc)
-	rootCmd.SetHelpFunc(helpFunc)
-	rootCmd.SetFlagErrorFunc(flagErrorFunc)
+	rootCmd.SetUsageFunc(getUsageFunc(c))
+	rootCmd.SetHelpFunc(getHelpFunc(c))
+	rootCmd.SetFlagErrorFunc(getFlagErrorFunc(c))
 	rootCmd.SetHelpCommand(&cobra.Command{
 		Use:    "no-help",
 		Hidden: true,
@@ -101,34 +131,37 @@ func NewRootCmd(cfg *Config) *cobra.Command {
 	return rootCmd
 }
 
-func usageFunc(cmd *cobra.Command) error {
-	showWorkflowUsage(cmd)
-	return nil
-}
-
-func helpFunc(cmd *cobra.Command, args []string) {
-	showWorkflowUsage(cmd)
-}
-
-func flagErrorFunc(cmd *cobra.Command, err error) error {
-	showWorkflowUsage(cmd)
-	return nil
-}
-
-func showWorkflowUsage(cmd *cobra.Command) {
-	pflags := []*pflag.Flag{
-		cmd.Flag(longPlatformFlag),
-		cmd.Flag(longUpdateFlag),
-		cmd.Flag(longVersionFlag),
-		cmd.Flag(longLanguageFlag),
+func getHelpFunc(c *client) func(*cobra.Command, []string) {
+	return func(cmd *cobra.Command, args []string) {
+		usageFunc := getUsageFunc(c)
+		_ = usageFunc(cmd)
 	}
+}
 
-	for _, p := range pflags {
-		awf.Append(
-			makeUsageItem(p),
-		)
+func getFlagErrorFunc(c *client) func(*cobra.Command, error) error {
+	return func(cmd *cobra.Command, err error) error {
+		usageFunc := getUsageFunc(c)
+		return usageFunc(cmd)
 	}
-	awf.Output()
+}
+
+func getUsageFunc(c *client) func(*cobra.Command) error {
+	return func(cmd *cobra.Command) error {
+		pflags := []*pflag.Flag{
+			cmd.Flag(longPlatformFlag),
+			cmd.Flag(longUpdateFlag),
+			cmd.Flag(longVersionFlag),
+			cmd.Flag(longLanguageFlag),
+		}
+
+		for _, p := range pflags {
+			c.Append(
+				makeUsageItem(p),
+			)
+		}
+		c.Output()
+		return nil
+	}
 }
 
 func makeUsageItem(p *pflag.Flag) *alfred.Item {
@@ -141,40 +174,10 @@ func makeUsageItem(p *pflag.Flag) *alfred.Item {
 		Valid(false)
 }
 
-func (cfg *Config) setPlatform(ptString string) error {
-	platforms := []tldr.Platform{
-		tldr.PlatformCommon,
-		tldr.PlatformLinux,
-		tldr.PlatformOSX,
-		tldr.PlatformWindows,
-		tldr.PlatformSunos,
-	}
-	for _, pt := range platforms {
-		if ptString == pt.String() {
-			cfg.platform = pt
-			return nil
-		}
-	}
-	return fmt.Errorf("%s is unsupported platform", ptString)
-}
-
-func (cfg *Config) initTldr() error {
-	path := filepath.Join(awf.GetDataDir(), "data")
-
-	opts := append([]tldr.Option{
-		tldr.WithPlatform(cfg.platform),
-		tldr.WithLanguage(cfg.language),
-	}, cfg.opts...)
-
-	cfg.tldrClient = tldr.New(path, opts...)
-	ctx, cancel := context.WithTimeout(context.Background(), updateDBTimeout)
-	defer cancel()
-	return cfg.tldrClient.OnInitialize(ctx)
-}
-
-// Execute Execute root cmd
+// Execute executes root cmd
 func Execute() {
 	cfg := NewConfig()
-	rootCmd := NewRootCmd(cfg)
+	awf := alfred.NewWorkflow(defaultOpts...)
+	rootCmd := NewRootCmd(cfg, awf)
 	os.Exit(awf.RunSimple(rootCmd.Execute))
 }

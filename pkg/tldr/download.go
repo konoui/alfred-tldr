@@ -3,30 +3,28 @@ package tldr
 import (
 	"archive/zip"
 	"context"
+	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
 )
 
 // download data from `url` to `dstDir` as `filename`
-func download(ctx context.Context, url, dstDir, filename string) (string, error) {
+func download(ctx context.Context, url, dstDir, filename string) (_ string, reterr error) {
 	path := filepath.Join(dstDir, filename)
-	if pathExists(path) {
-		if err := os.RemoveAll(path); err != nil {
-			return "", err
-		}
-	}
-
 	f, err := os.Create(path)
 	if err != nil {
 		return "", err
 	}
-	defer f.Close()
+	defer func() {
+		if ferr := f.Close(); ferr != nil && reterr == nil {
+			reterr = ferr
+		}
+	}()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, http.NoBody)
 	if err != nil {
 		return "", err
 	}
@@ -57,36 +55,47 @@ func unzip(ctx context.Context, zipPath, dstDir string) error {
 	}
 	defer r.Close()
 
+	if len(r.File) == 0 {
+		return errors.New("no files in a zip")
+	}
+
 	for _, f := range r.File {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-			break
-		}
-
-		rc, err := f.Open()
-		if err != nil {
-			return err
-		}
-		defer rc.Close()
-
-		if f.FileInfo().IsDir() {
-			path := filepath.Join(dstDir, f.Name)
-			if err := os.MkdirAll(path, f.Mode()); err != nil {
-				return err
+		fn := func() error {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			default:
+				break
 			}
-		} else {
-			buf := make([]byte, f.UncompressedSize)
-			_, err := io.ReadFull(rc, buf)
+
+			rc, err := f.Open()
 			if err != nil {
 				return err
 			}
+			defer rc.Close()
 
-			path := filepath.Join(dstDir, f.Name)
-			if err := ioutil.WriteFile(path, buf, f.Mode()); err != nil {
-				return err
+			if f.FileInfo().IsDir() {
+				path := filepath.Join(dstDir, f.Name)
+				if err := os.MkdirAll(path, f.Mode()); err != nil {
+					return err
+				}
+			} else {
+				buf := make([]byte, f.UncompressedSize)
+				_, err := io.ReadFull(rc, buf)
+				if err != nil {
+					return err
+				}
+
+				path := filepath.Join(dstDir, f.Name)
+				if err := os.WriteFile(path, buf, f.Mode()); err != nil {
+					return err
+				}
 			}
+			return nil
+		}
+
+		if reterr := fn(); reterr != nil {
+			return reterr
 		}
 	}
 

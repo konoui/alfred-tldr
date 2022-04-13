@@ -3,7 +3,6 @@ package cmd
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -15,6 +14,7 @@ import (
 	"github.com/konoui/alfred-tldr/pkg/tldr"
 	tldrtest "github.com/konoui/alfred-tldr/pkg/tldr/test"
 	"github.com/konoui/go-alfred"
+	"github.com/konoui/go-alfred/env"
 	"github.com/konoui/go-alfred/update"
 	mock "github.com/konoui/go-alfred/update/mock_update"
 	"github.com/mattn/go-shellwords"
@@ -31,30 +31,37 @@ func testdataPath(file string) string {
 func setAlfredWorkflowEnv(t *testing.T) {
 	tmpDir := t.TempDir()
 	for k, v := range map[string]string{
-		"alfred_workflow_data":     "/tmp",
-		"alfred_workflow_cache":    tmpDir,
-		"alfred_workflow_bundleid": "test-bundle-id",
+		env.KeyWorkflowData:     "/tmp",
+		env.KeyWorkflowCache:    tmpDir,
+		env.KeyWorkflowBundleID: "test-bundle-id",
 	} {
-		if err := os.Setenv(k, v); err != nil {
-			t.Fatal(err)
-		}
+		t.Setenv(k, v)
 	}
 }
 
-func setup(t *testing.T, command string) (outBuf, errBuf *bytes.Buffer, cmd *cobra.Command) {
+func setup(t *testing.T, command string,
+	alfredOpts ...alfred.Option) (awf *alfred.Workflow, cmd *cobra.Command, outBuf, errBuf *bytes.Buffer) {
 	t.Helper()
 
 	setAlfredWorkflowEnv(t)
 
-	outBuf, errBuf = new(bytes.Buffer), new(bytes.Buffer)
-	cfg := NewConfig()
-	// set dummy url for local test
-	cfg.opts = append(cfg.opts, tldr.WithRepositoryURL(testServer.TldrZipURL()))
-	cmd = NewRootCmd(cfg)
 	cmdArgs, err := shellwords.Parse(command)
 	if err != nil {
 		t.Fatalf("args parse error: %+v", err)
 	}
+
+	outBuf, errBuf = new(bytes.Buffer), new(bytes.Buffer)
+	awf = alfred.NewWorkflow(append(alfredOpts,
+		alfred.WithOutWriter(outBuf),
+		alfred.WithLogWriter(errBuf),
+		alfred.WithArguments(cmdArgs...),
+		alfred.WithInitializers(nil),
+	)...)
+	cfg := NewConfig()
+	// set dummy url for local test
+	cfg.tldrOpts = append(cfg.tldrOpts, tldr.WithRepositoryURL(testServer.TldrZipURL()))
+	cmd = NewRootCmd(cfg, awf)
+
 	cmd.SetOut(outBuf)
 	cmd.SetErr(errBuf)
 	cmd.SetArgs(cmdArgs)
@@ -62,7 +69,6 @@ func setup(t *testing.T, command string) (outBuf, errBuf *bytes.Buffer, cmd *cob
 	return
 }
 
-// FIXME wantExitCode argument
 func execute(t *testing.T, awf *alfred.Workflow, rootCmd *cobra.Command, wantExitCode int) {
 	exitCode := awf.RunSimple(rootCmd.Execute)
 	if exitCode != wantExitCode {
@@ -256,18 +262,12 @@ func TestExecute(t *testing.T) {
 			}
 
 			testpath := testdataPath(tt.args.filepath)
-			wantData, err := ioutil.ReadFile(testpath)
+			wantData, err := os.ReadFile(testpath)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			outBuf, errBuf, cmd := setup(t, tt.args.command)
-			// overwrite global awf
-			awf = alfred.NewWorkflow(
-				alfred.WithOutWriter(outBuf),
-				alfred.WithLogWriter(errBuf),
-			)
-
+			awf, cmd, outBuf, _ := setup(t, tt.args.command)
 			execute(t, awf, cmd, 0)
 			outGotData := outBuf.Bytes()
 
@@ -371,7 +371,7 @@ func TestUpdateConfirmation(t *testing.T) {
 			})
 
 			testpath := testdataPath(tt.args.filepath)
-			wantData, err := ioutil.ReadFile(testpath)
+			wantData, err := os.ReadFile(testpath)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -381,13 +381,7 @@ func TestUpdateConfirmation(t *testing.T) {
 
 			// disable ttl
 			twoWeeks = tt.args.dbTTL
-			outBuf, errBuf, cmd := setup(t, tt.args.command)
-			awf = alfred.NewWorkflow(
-				alfred.WithUpdater(mockSource),
-				alfred.WithOutWriter(outBuf),
-				alfred.WithLogWriter(errBuf),
-			)
-
+			awf, cmd, outBuf, errBuf := setup(t, tt.args.command, alfred.WithUpdater(mockSource))
 			execute(t, awf, cmd, tt.wantExitCode)
 			outGotData := outBuf.Bytes()
 
@@ -447,12 +441,7 @@ func TestUpdateExecution(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			outBuf, errBuf, cmd := setup(t, tt.args.command)
-			awf = alfred.NewWorkflow(
-				alfred.WithOutWriter(outBuf),
-				alfred.WithLogWriter(errBuf),
-			)
-
+			awf, cmd, outBuf, errBuf := setup(t, tt.args.command)
 			exitCode := awf.RunSimple(cmd.Execute)
 			if tt.expectedErr && exitCode == 0 {
 				t.Errorf("unexpected results")
@@ -469,18 +458,6 @@ func TestUpdateExecution(t *testing.T) {
 			}
 		})
 	}
-}
-
-func writeFile(filename string, data []byte) error {
-	pretty := new(bytes.Buffer)
-	if err := json.Indent(pretty, data, "", "  "); err != nil {
-		return err
-	}
-
-	if err := ioutil.WriteFile(filename, pretty.Bytes(), 0600); err != nil {
-		return err
-	}
-	return nil
 }
 
 func Test_choicePlatform(t *testing.T) {
@@ -541,4 +518,16 @@ func Test_choicePlatform(t *testing.T) {
 			}
 		})
 	}
+}
+
+func writeFile(filename string, data []byte) error {
+	pretty := new(bytes.Buffer)
+	if err := json.Indent(pretty, data, "", "  "); err != nil {
+		return err
+	}
+
+	if err := os.WriteFile(filename, pretty.Bytes(), 0o600); err != nil {
+		return err
+	}
+	return nil
 }

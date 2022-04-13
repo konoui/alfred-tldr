@@ -1,7 +1,7 @@
 {
   "items": [
     {
-      "title": "A Is Unsupported Platform",
+      "title": "a is unsupported platform",
       "subtitle": "supported are linux/osx/sunos/windows",
       "icon": {
         "path": "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertNoteIcon.icns"

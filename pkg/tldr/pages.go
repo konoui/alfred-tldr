@@ -73,7 +73,6 @@ type Tldr struct {
 
 // New create a instance of tldr repository
 func New(tldrPath string, opts ...Option) *Tldr {
-
 	t := &Tldr{
 		path:          tldrPath,
 		pageSourceURL: PageSourceURL,
@@ -119,13 +118,14 @@ func (t *Tldr) Update(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to download a tldr repository: %w", err)
 	}
-	defer os.Remove(zipPath)
 
 	err = unzip(ctx, zipPath, t.path)
 	if err != nil {
 		return fmt.Errorf("failed to unzip a tldr repository: %w", err)
 	}
 
+	// not remove for troubleshooting when download/update failed
+	_ = os.Remove(zipPath)
 	return nil
 }
 
@@ -145,7 +145,7 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 					return &Page{}, fmt.Errorf("failed to open the page (%s): %w", f.Name(), err)
 				}
 			}
-			defer f.Close()
+			defer f.Close() //nolint
 
 			return parsePage(f)
 		}
@@ -181,5 +181,5 @@ func age(path string) (time.Duration, error) {
 // pathExists return true if path exists
 func pathExists(path string) bool {
 	_, err := os.Stat(path)
-	return !os.IsNotExist(err)
+	return err == nil
 }

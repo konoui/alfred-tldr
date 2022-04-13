@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/konoui/go-alfred"
-	"github.com/konoui/go-alfred/initialize"
 )
 
 // decide next action for workflow filter
@@ -23,21 +22,6 @@ const (
 	envKeyUpdateWorkflowIntervalDays   = "TLDR_WORKFLOW_UPDATE_INTERVAL_DAYS"
 	envKeyCommandFormat                = "TLDR_COMMAND_FORMAT"
 	envKeyOpenURLMod                   = "TLDR_MOD_KEY_OPEN_URL"
-)
-
-var awf = alfred.NewWorkflow(
-	alfred.WithMaxResults(30),
-	alfred.WithGitHubUpdater(
-		"konoui",
-		"alfred-tldr",
-		version,
-		getUpdateWorkflowInterval(twoWeeks),
-	),
-	alfred.WithOutWriter(os.Stdout),
-	alfred.WithLogWriter(os.Stderr),
-	alfred.WithInitializers(
-		initialize.NewEmbedAssets(),
-	),
 )
 
 func getModKeyOpenURL() alfred.ModKey {
