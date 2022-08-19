@@ -25,7 +25,7 @@ build:
 ## Lint
 lint:
 	@(if ! type golangci-lint >/dev/null 2>&1; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin $(GOLANGCI_LINT_VERSION) ;fi)
-	golangci-lint run ./...
+	$$(go env GOPATH)/bin/golangci-lint run ./...
 
 ## Build macos binaries
 darwin:

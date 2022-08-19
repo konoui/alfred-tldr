@@ -8,6 +8,15 @@
       },
       "autocomplete": "-p linux pstree",
       "valid": false
+    },
+    {
+      "title": "rpm ostree",
+      "subtitle": "Platforms: [linux]",
+      "icon": {
+        "path": "candidate.png"
+      },
+      "autocomplete": "-p linux rpm ostree",
+      "valid": false
     }
   ]
 }
