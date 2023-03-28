@@ -10,6 +10,15 @@
       "valid": false
     },
     {
+      "title": "archivemount",
+      "subtitle": "Platforms: [linux]",
+      "icon": {
+        "path": "candidate.png"
+      },
+      "autocomplete": "-p linux archivemount",
+      "valid": false
+    },
+    {
       "title": "git archive",
       "subtitle": "Platforms: [common]",
       "icon": {

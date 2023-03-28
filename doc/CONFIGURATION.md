@@ -1,14 +1,14 @@
 ## Configurations
 
-The workflow provides some configurations via [workflow environment variables](https://www.alfredapp.com/help/workflows/advanced/variables/).
+This workflow provides several configurations through [workflow environment variables](https://www.alfredapp.com/help/workflows/advanced/variables/).
 
 ### Open URL Modifier Key
 
-`TLDR_MOD_KEY_OPEN_URL` is variable that configures keys to open detail command url with web browser.
+The `TLDR_MOD_KEY_OPEN_URL` variable configures the keys to use in order to open the URL of a detail command with a web browser.
 
-By default, you can open url with pressing `cmd(⌘)` + `enter` if a specified command has related URL.
+By default, you can open the URL by pressing cmd(⌘) + enter, if a specified command has a related URL.
 
-Available variables are the followings
+The available variables are:
 
 - `cmd`
 - `ctrl`
@@ -16,13 +16,13 @@ Available variables are the followings
 - `fn`
 - `shift`
 
-For example, if you specified `ctrl` for `TLDR_MOD_KEY_OPEN_URL`, you can open url with pressing `ctrl(^)` + `enter`.
+For example, if you specify ctrl for `TLDR_MOD_KEY_OPEN_URL`, you can open the URL by pressing `ctrl(^)` + `enter`.
 
 ### Command Format
 
-`TLDR_COMMAND_FORMAT` is variable that switches command output format for user input parameters.
+The `TLDR_COMMAND_FORMAT` variable switches the command output format for user input parameters.
 
-The workflow adopts `single` for default value.
+The workflow adopts `single` as the default value.
 
 By default, user input parameters are quoted by `{}`.
 
@@ -50,8 +50,8 @@ tar czf target.tar.gz --directory=path/to/directory .
 
 Note:
 
-Several commands are using uppercase in a place where no user input parameters.
-For instance, `LISTEN` of `lsof` command is not user input parameter, but upppercase.
+Several commands use uppercase in places where no user input parameters are present.
+For instance, `LISTEN` of the `lsof` command is not a user input parameter but is written in uppercase.
 If you care, I recommend using `single` or `original`.
 
 ```
@@ -60,21 +60,20 @@ lsof -iTCP:{{port}} -sTCP:LISTEN
 
 ### Recommendations
 
-The workflow shows update recommendations when tldr database is older or newer workflow is available.
+This workflow shows update recommendations when the tldr database is out of date or when a newer version of the workflow is available.
 
 #### Tldr Database Recommendation
 
-`TLDR_DB_UPDATE_RECOMMENDATION` is variable that enable or disable showing update recommendation of tldr database .
+The `TLDR_DB_UPDATE_RECOMMENDATION` variable enables or disables showing the update recommendation of the tldr database.
 The value is `true` by default.
-If tldr database is older than `two weeks`, the workflow shows it.
+If the tldr database is older than `two weeks`, the workflow shows the update recommendation.
 
 #### Newer Alfred Workflow Recommendation
 
-`TLDR_WORKFLOW_UPDATE_RECOMMENDATION` is variable that enables or disables showing update recommendation if newer version alfred workflow is released.
+The `TLDR_WORKFLOW_UPDATE_RECOMMENDATION` variable enables or disables showing the update recommendation if a newer version of the Alfred workflow is released.
 The value is `true` by default.
 
-`TLDR_WORKFLOW_UPDATE_INTERVAL_DAYS` is variable that defines how frequency the workflow checks remote git repository.
+The `TLDR_WORKFLOW_UPDATE_INTERVAL_DAYS` variable defines how frequently the workflow checks the remote git repository.
 The value is `7` days by default.
-
-The workflow checks new workflow version by accessing remote git repository per `7` days.
-It shows update recommendation if newer version is available.
+The workflow checks for a new workflow version by accessing the remote git repository every `7` days.
+It shows an update recommendation if a newer version is available.

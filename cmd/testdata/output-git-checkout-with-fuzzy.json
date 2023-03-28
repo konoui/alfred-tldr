@@ -62,6 +62,15 @@
       },
       "autocomplete": "git cherry pick",
       "valid": false
+    },
+    {
+      "title": "grub script check",
+      "subtitle": "Platforms: [linux]",
+      "icon": {
+        "path": "candidate.png"
+      },
+      "autocomplete": "-p linux grub script check",
+      "valid": false
     }
   ]
 }

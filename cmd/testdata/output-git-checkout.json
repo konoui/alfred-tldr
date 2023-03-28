@@ -51,14 +51,14 @@
       "arg": "git checkout ."
     },
     {
-      "title": "git checkout {filename}",
+      "title": "git checkout {path/to/file}",
       "subtitle": "Discard unstaged changes to a given file:",
-      "arg": "git checkout {filename}"
+      "arg": "git checkout {path/to/file}"
     },
     {
-      "title": "git checkout {branch_name} -- {filename}",
+      "title": "git checkout {branch_name} -- {path/to/file}",
       "subtitle": "Replace a file in the current directory with the version of it committed in a given branch:",
-      "arg": "git checkout {branch_name} -- {filename}"
+      "arg": "git checkout {branch_name} -- {path/to/file}"
     }
   ]
 }

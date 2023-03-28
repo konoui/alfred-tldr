@@ -21,44 +21,44 @@
       }
     },
     {
-      "title": "tar cf TARGET.TAR FILE1 FILE2 FILE3",
+      "title": "tar cf PATH/TO/TARGET.TAR PATH/TO/FILE1 PATH/TO/FILE2 ...",
       "subtitle": "[c]reate an archive and write it to a [f]ile:",
-      "arg": "tar cf TARGET.TAR FILE1 FILE2 FILE3"
+      "arg": "tar cf PATH/TO/TARGET.TAR PATH/TO/FILE1 PATH/TO/FILE2 ..."
     },
     {
-      "title": "tar czf TARGET.TAR.GZ FILE1 FILE2 FILE3",
+      "title": "tar czf PATH/TO/TARGET.TAR.GZ PATH/TO/FILE1 PATH/TO/FILE2 ...",
       "subtitle": "[c]reate a g[z]ipped archive and write it to a [f]ile:",
-      "arg": "tar czf TARGET.TAR.GZ FILE1 FILE2 FILE3"
+      "arg": "tar czf PATH/TO/TARGET.TAR.GZ PATH/TO/FILE1 PATH/TO/FILE2 ..."
     },
     {
-      "title": "tar czf TARGET.TAR.GZ --directory=PATH/TO/DIRECTORY .",
+      "title": "tar czf PATH/TO/TARGET.TAR.GZ --directory=PATH/TO/DIRECTORY .",
       "subtitle": "[c]reate a g[z]ipped archive from a directory using relative paths:",
-      "arg": "tar czf TARGET.TAR.GZ --directory=PATH/TO/DIRECTORY ."
+      "arg": "tar czf PATH/TO/TARGET.TAR.GZ --directory=PATH/TO/DIRECTORY ."
     },
     {
-      "title": "tar xvf SOURCE.TAR[.GZ|.BZ2|.XZ]",
+      "title": "tar xvf PATH/TO/SOURCE.TAR[.GZ|.BZ2|.XZ]",
       "subtitle": "E[x]tract a (compressed) archive [f]ile into the current directory [v]erbosely:",
-      "arg": "tar xvf SOURCE.TAR[.GZ|.BZ2|.XZ]"
+      "arg": "tar xvf PATH/TO/SOURCE.TAR[.GZ|.BZ2|.XZ]"
     },
     {
-      "title": "tar xf SOURCE.TAR[.GZ|.BZ2|.XZ] --directory=DIRECTORY",
+      "title": "tar xf PATH/TO/SOURCE.TAR[.GZ|.BZ2|.XZ] --directory=PATH/TO/DIRECTORY",
       "subtitle": "E[x]tract a (compressed) archive [f]ile into the target directory:",
-      "arg": "tar xf SOURCE.TAR[.GZ|.BZ2|.XZ] --directory=DIRECTORY"
+      "arg": "tar xf PATH/TO/SOURCE.TAR[.GZ|.BZ2|.XZ] --directory=PATH/TO/DIRECTORY"
     },
     {
-      "title": "tar caf TARGET.TAR.XZ FILE1 FILE2 FILE3",
+      "title": "tar caf PATH/TO/TARGET.TAR.XZ PATH/TO/FILE1 PATH/TO/FILE2 ...",
       "subtitle": "[c]reate a compressed archive and write it to a [f]ile, using [a]rchive suffix to determine the compression program:",
-      "arg": "tar caf TARGET.TAR.XZ FILE1 FILE2 FILE3"
+      "arg": "tar caf PATH/TO/TARGET.TAR.XZ PATH/TO/FILE1 PATH/TO/FILE2 ..."
     },
     {
-      "title": "tar tvf SOURCE.TAR",
+      "title": "tar tvf PATH/TO/SOURCE.TAR",
       "subtitle": "Lis[t] the contents of a tar [f]ile [v]erbosely:",
-      "arg": "tar tvf SOURCE.TAR"
+      "arg": "tar tvf PATH/TO/SOURCE.TAR"
     },
     {
-      "title": "tar xf SOURCE.TAR --wildcards \"*.HTML\"",
+      "title": "tar xf PATH/TO/SOURCE.TAR --wildcards \"*.HTML\"",
       "subtitle": "E[x]tract files matching a pattern from an archive [f]ile:",
-      "arg": "tar xf SOURCE.TAR --wildcards \"*.HTML\""
+      "arg": "tar xf PATH/TO/SOURCE.TAR --wildcards \"*.HTML\""
     }
   ]
 }
