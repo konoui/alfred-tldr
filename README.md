@@ -1,5 +1,4 @@
-![Generic badge](https://github.com/konoui/alfred-tldr/workflows/test/badge.svg)
-[![Code Grade](https://api.codiga.io/project/20715/status/svg)](https://www.codiga.io)
+![Generic badge](https://github.com/konoui/alfred-tldr/workflows/test_release/badge.svg)
 
 ## alfred tldr
 
