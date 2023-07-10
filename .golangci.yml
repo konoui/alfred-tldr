@@ -35,10 +35,7 @@ linters:
     - staticcheck
     - unused
     - gosimple
-    - structcheck
-    - varcheck
     - ineffassign
-    - deadcode
     - typecheck
     # add
     - misspell

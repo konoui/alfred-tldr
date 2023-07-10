@@ -141,9 +141,8 @@ func (t *Tldr) FindPage(cmds []string) (*Page, error) {
 				if errors.Is(err, os.ErrNotExist) {
 					// if cmd does not exist, try to find it in next platform/language
 					continue
-				} else {
-					return &Page{}, fmt.Errorf("failed to open the page (%s): %w", f.Name(), err)
 				}
+				return &Page{}, fmt.Errorf("failed to open the page (%s): %w", page, err)
 			}
 			defer f.Close() //nolint
 

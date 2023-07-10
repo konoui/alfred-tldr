@@ -16,7 +16,7 @@ LDFLAGS := -X '$(CMD_PACKAGE_DIR).version=$(VERSION)' -X '$(CMD_PACKAGE_DIR).rev
 
 WORKFLOW_DIR := "$${HOME}/Library/Application Support/Alfred/Alfred.alfredpreferences/workflows/user.workflow.2569C1E1-8114-4B77-9506-52AA966313A9"
 
-GOLANGCI_LINT_VERSION := v1.51.0 
+GOLANGCI_LINT_VERSION := v1.53.3
 
 ## Build binaries on your environment
 build:

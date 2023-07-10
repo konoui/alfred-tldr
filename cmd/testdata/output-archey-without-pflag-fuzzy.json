@@ -2,7 +2,7 @@
   "items": [
     {
       "title": "archey",
-      "subtitle": "Platforms: [linux osx]",
+      "subtitle": "Platforms: [osx linux]",
       "icon": {
         "path": "candidate.png"
       },

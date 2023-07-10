@@ -28,7 +28,10 @@ func testdataPath(file string) string {
 	return filepath.Join("testdata", file)
 }
 
-func setAlfredWorkflowEnv(t *testing.T) {
+func setup(t *testing.T, command string,
+	alfredOpts ...alfred.Option) (awf *alfred.Workflow, cmd *cobra.Command, outBuf, errBuf *bytes.Buffer) {
+	t.Helper()
+
 	tmpDir := t.TempDir()
 	for k, v := range map[string]string{
 		env.KeyWorkflowData:     "/tmp",
@@ -37,13 +40,6 @@ func setAlfredWorkflowEnv(t *testing.T) {
 	} {
 		t.Setenv(k, v)
 	}
-}
-
-func setup(t *testing.T, command string,
-	alfredOpts ...alfred.Option) (awf *alfred.Workflow, cmd *cobra.Command, outBuf, errBuf *bytes.Buffer) {
-	t.Helper()
-
-	setAlfredWorkflowEnv(t)
 
 	cmdArgs, err := shellwords.Parse(command)
 	if err != nil {
@@ -526,8 +522,5 @@ func writeFile(filename string, data []byte) error {
 		return err
 	}
 
-	if err := os.WriteFile(filename, pretty.Bytes(), 0o600); err != nil {
-		return err
-	}
-	return nil
+	return os.WriteFile(filename, pretty.Bytes(), 0o600)
 }

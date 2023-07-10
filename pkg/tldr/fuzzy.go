@@ -57,10 +57,8 @@ func (c Cmds) Search(args []string) Cmds {
 func commandWithHyphen(args []string) (arg string) {
 	// e.g.) git checkout -> git-checkout filename is git-checkout.md
 	arg = strings.Join(args, "-")
-	if guessHyphenCommand(args) {
-		// e.g.)  apt- key -> apt-key not apt--key
-		arg = strings.ReplaceAll(arg, "--", "-")
-	}
+	// e.g.)  apt- key -> apt-key not apt--key
+	arg = strings.ReplaceAll(arg, "--", "-")
 	return
 }
 
