@@ -56,7 +56,7 @@ func getCommandFormatFunc() func(string) string {
 			return strings.ReplaceAll(tmp, "}}", "")
 		}
 	case "uppercase":
-		var wordRe = regexp.MustCompile("{{.+?}}")
+		wordRe := regexp.MustCompile("{{.+?}}")
 		return func(cmd string) string {
 			return wordRe.ReplaceAllStringFunc(cmd, func(w string) string {
 				upper := strings.ToUpper(w)
@@ -64,6 +64,11 @@ func getCommandFormatFunc() func(string) string {
 				end := len("}}")
 				return upper[start : len(upper)-end]
 			})
+		}
+	case "angle":
+		return func(cmd string) string {
+			tmp := strings.ReplaceAll(cmd, "{{", "<")
+			return strings.ReplaceAll(tmp, "}}", ">")
 		}
 	case "single":
 	default:

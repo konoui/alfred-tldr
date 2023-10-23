@@ -78,11 +78,11 @@ func TestExecute(t *testing.T) {
 		command  string
 	}
 	tests := []struct {
-		name   string
-		args   args
-		update bool
 		up     func()
 		down   func()
+		args   args
+		name   string
+		update bool
 	}{
 		{
 			name: "lsof",
@@ -413,9 +413,9 @@ func TestUpdateExecution(t *testing.T) {
 	tests := []struct {
 		name        string
 		args        args
-		expectedErr bool
 		errMsg      string
 		wantMsg     string
+		expectedErr bool
 	}{
 		{
 			name: "update db returns succeeded message",
@@ -458,13 +458,13 @@ func TestUpdateExecution(t *testing.T) {
 
 func Test_choicePlatform(t *testing.T) {
 	type args struct {
-		pts      []tldr.Platform
 		selected tldr.Platform
+		pts      []tldr.Platform
 	}
 	tests := []struct {
 		name string
-		args args
 		want tldr.Platform
+		args args
 	}{
 		{
 			name: "return common when platforms do not contain selected",

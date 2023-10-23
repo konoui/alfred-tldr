@@ -19,13 +19,13 @@ type envs struct {
 type Config struct {
 	platform       tldr.Platform
 	language       string
+	fromEnv        envs
+	tldrOpts       []tldr.Option
 	update         bool
 	updateWorkflow bool
 	confirm        bool
 	fuzzy          bool
 	version        bool
-	fromEnv        envs
-	tldrOpts       []tldr.Option
 }
 
 func NewConfig() *Config {

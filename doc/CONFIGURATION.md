@@ -48,6 +48,12 @@ When the value is `remove`, user input parameters are not quoted by any words.
 tar czf target.tar.gz --directory=path/to/directory .
 ```
 
+When the value is `angle`, user input parameters are not quoted by any words.
+
+```
+tar czf <target.tar.gz> --directory=<path/to/directory> .
+```
+
 Note:
 
 Several commands use uppercase in places where no user input parameters are present.

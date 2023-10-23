@@ -65,7 +65,6 @@ type client struct {
 
 // NewRootCmd create a new cmd for root
 func NewRootCmd(cfg *Config, awf *alfred.Workflow) *cobra.Command {
-
 	var ptString string
 	c := &client{
 		cfg:      cfg,
@@ -76,7 +75,6 @@ func NewRootCmd(cfg *Config, awf *alfred.Workflow) *cobra.Command {
 		Short: "show cmd examples",
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			if err := cfg.setPlatform(ptString); err != nil {
 				awf.SetEmptyWarning(err.Error(),
 					"supported are linux/osx/sunos/windows").

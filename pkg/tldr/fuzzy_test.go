@@ -45,8 +45,8 @@ func TestLoadIndexFile(t *testing.T) {
 func TestSearch(t *testing.T) {
 	tests := []struct {
 		description string
-		query       []string
 		want        string
+		query       []string
 	}{
 		{
 			description: "similar html5validator cmd",

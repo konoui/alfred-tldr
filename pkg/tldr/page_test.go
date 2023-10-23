@@ -9,9 +9,9 @@ import (
 
 func TestParsePage(t *testing.T) {
 	tests := []struct {
+		want        *Page
 		description string
 		filepath    string
-		want        *Page
 		expectErr   bool
 	}{
 		{
