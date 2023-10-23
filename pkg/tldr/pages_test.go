@@ -26,8 +26,8 @@ func TestFindPage(t *testing.T) {
 	tests := []struct {
 		description string
 		want        string
-		expectErr   bool
 		cmds        []string
+		expectErr   bool
 	}{
 		{
 			description: "valid cmd",
@@ -76,8 +76,8 @@ func TestFindPage(t *testing.T) {
 
 func TestUpdate(t *testing.T) {
 	type args struct {
-		opts     []Option
 		tldrPath string
+		opts     []Option
 	}
 	tests := []struct {
 		name      string
@@ -132,8 +132,8 @@ func TestUpdate(t *testing.T) {
 
 func TestOnInitialize(t *testing.T) {
 	type args struct {
-		opts     []Option
 		tldrPath string
+		opts     []Option
 	}
 	tests := []struct {
 		name      string
@@ -181,8 +181,8 @@ func TestOnInitialize(t *testing.T) {
 
 func TestExpired(t *testing.T) {
 	type args struct {
-		opts     []Option
 		tldrPath string
+		opts     []Option
 	}
 	tests := []struct {
 		name    string

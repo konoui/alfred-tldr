@@ -115,7 +115,6 @@ func Test_getLanguages(t *testing.T) {
 }
 
 func Test_getLanguageCode(t *testing.T) {
-
 	tests := []struct {
 		name  string
 		input string

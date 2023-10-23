@@ -25,9 +25,7 @@ const (
 	languageCodeEN = "en"
 )
 
-var (
-	ErrNotFoundPage = errors.New("no page found")
-)
+var ErrNotFoundPage = errors.New("no page found")
 
 func (pt Platform) String() string {
 	return string(pt)
